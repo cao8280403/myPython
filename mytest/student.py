@@ -7,6 +7,9 @@ __author__ = 'Michael Liao'
 
 
 class Student(object):
+    name = 'student'
+    # s.name = 'Michael' 由于实例属性优先级比类属性高，因此，它会屏蔽掉类的name属性
+    # print(Student.name)但是类属性并未消失，用Student.name仍然可以访问
 
     def __init__(self, name, score):
         # self.name = name
@@ -23,6 +26,12 @@ class Student(object):
 
     def get_score(self):
         return self.__score
+
+    def set_score(self, score):
+        if 0 <= score <= 100:
+            self.__score = score
+        else:
+            raise ValueError('bad score')
 
     def get_grade(self):
         if self.__score >= 90:
