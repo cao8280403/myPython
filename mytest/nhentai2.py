@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 headers = {
     'User-Agent': 'Mozilla/5.0'
 }
-html = 'https://nhentai.net/g/260924/'
+html = 'https://nhentai.net/g/252398/'
 # 需要使用url和headers生成一个Request对象，然后将其传入urlopen方法中
 req = request.Request(html, headers=headers)
 resp = request.urlopen(req)
@@ -18,6 +18,7 @@ content = resp.read().decode('utf-8')
 f = open('caifuchaoshi.html', 'w', encoding='utf-8')
 f.write(content)
 f.close()
+os.makedirs('pic/')
 soup = BeautifulSoup(content, "html.parser", from_encoding="utf-8")
 link_node1 = soup.find('div', class_="content")
 link_node3 = soup.find('div', id='thumbnail-container')
