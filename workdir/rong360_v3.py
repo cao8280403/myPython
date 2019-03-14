@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # analyze-dom
 
+import difflib
 import sys
 import json
 import requests
@@ -20,6 +21,12 @@ logging.basicConfig(level=logging.INFO)
 # 定义主流的标签，用于后面匹配
 taglist = ['div', 'a', 'span', 'ul', 'img', 'li', 'table', 'th', 'td', 'script']
 __cengci = 0
+totaltext = ''
+
+
+def string_similar(s1, s2):
+    return difflib.SequenceMatcher(None, s1, s2).quick_ratio()
+
 
 def getcontent(html):
     headers = {
@@ -92,12 +99,29 @@ def analyzedom1(content):
 # 分析html结构，递归
 def analyzedom(soup):
     # print(type(soup))
+    # 寻找兄弟节点
+    global totaltext
+    flag = '#########################################################################################################################################################' \
+           ''
+    count = 0
+    if (isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
+        parentnode = soup.parent
+        nextnode = soup.next_sibling
+        # 判断有多少兄弟节点跟此soup的结构相同（计算父节点contents 内容相同的个数）
+        brothernodes = parentnode.contents
+        for i in brothernodes:
+            totaltext = totaltext+flag+'\n'+str(i)+'\n'
+            # if(i.next_sibling)
+            # string_similar(i, )
     if(isinstance(soup, BeautifulSoup) | isinstance(soup, Tag)):  #只解析有用的节点 tag标签
-        nodes = soup.contents  # 获取每一个子节点，其中换行算都算做一个，注释也算做一个，所以总数是标签个数x2+1
-        # 遍历，解析每一个子节点
-        for i in nodes:
-            analyzedom(i)
-            print(i)
+        if(soup.string == None): # 如果有多个子节点，返回null
+            nodes = soup.contents  # 获取每一个子节点，其中换行算都算做一个，注释也算做一个，所以总数是标签个数x2+1
+            # 遍历，解析每一个子节点
+            for i in nodes:
+                analyzedom(i)
+                print(i)
+        else:  # 如果有一个子节点，返回内容
+            print(soup.string)
     else:
         print(soup)
 
@@ -121,7 +145,11 @@ def main():
     html = 'https://www.rong360.com/nantong/s_tp9m5t12?guarantee_type=2'
     content = getcontent(html)
     soup = BeautifulSoup(content, "html.parser", from_encoding="utf-8")
-    analyzedom(soup)
+    body = soup.find('body')
+    fo = open('temp.text', 'w', encoding='utf_8_sig')
+    analyzedom(body)
+    fo.write(totaltext)
+    fo.close()
 
 
 if __name__ == '__main__':
