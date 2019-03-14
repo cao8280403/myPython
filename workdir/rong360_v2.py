@@ -7,7 +7,6 @@ from urllib import request
 from bs4 import BeautifulSoup
 
 
-
 def main():
     headers = {
         # 'Host': 'www.lagou.com',

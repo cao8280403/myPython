@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 ' a test module '
+import logging
+logging.basicConfig(level=logging.INFO)
 
 __author__ = 'Michael Liao'
 
@@ -21,6 +23,7 @@ class Student(object):
 
     def print_score(self):
         print('%s: %s' % (self.__name, self.__score))
+        logging.info('logging'+str(self.__name))
         # pass
 
     def get_name(self):
@@ -75,6 +78,7 @@ def test():
     s = Student('Michael', '46')
     s.name = 'apple'
     print(s)
+    logging.info(s)
 
 
 if __name__ == '__main__':
