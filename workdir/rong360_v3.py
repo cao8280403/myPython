@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 # 定义主流的标签，用于后面匹配
 taglist = ['div', 'a', 'span', 'ul', 'img', 'li', 'table', 'th', 'td', 'script']
-__cengci = 0
+totalcengci = 0
 totaltext = ''
 
 
@@ -104,6 +104,8 @@ def analyzedom(soup):
     flag = '#########################################################################################################################################################' \
            ''
     count = 0
+    totaltext = totaltext + flag + '\n' + str(soup) + '\n'
+    '''
     if (isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
         parentnode = soup.parent
         nextnode = soup.next_sibling
@@ -113,13 +115,16 @@ def analyzedom(soup):
             totaltext = totaltext+flag+'\n'+str(i)+'\n'
             # if(i.next_sibling)
             # string_similar(i, )
+            '''
     if(isinstance(soup, BeautifulSoup) | isinstance(soup, Tag)):  #只解析有用的节点 tag标签
         if(soup.string == None): # 如果有多个子节点，返回null
             nodes = soup.contents  # 获取每一个子节点，其中换行算都算做一个，注释也算做一个，所以总数是标签个数x2+1
             # 遍历，解析每一个子节点
             for i in nodes:
-                analyzedom(i)
-                print(i)
+                if(isinstance(i, BeautifulSoup) | isinstance(i, Tag)):
+                    analyzedom(i)
+                else:
+                    continue
         else:  # 如果有一个子节点，返回内容
             print(soup.string)
     else:
