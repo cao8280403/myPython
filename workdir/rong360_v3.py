@@ -74,26 +74,16 @@ def sum_recu(n):
         return 0
 
 
-# 分析html结构，递归
-def analyzedom1(content):
-    logging.info('begining')
-    #找到content的根节点，获取所有子节点，循环
-    soup = BeautifulSoup(content, "html.parser", from_encoding="utf-8")
-
-
-    body = soup.find('body')
-    print(body.text)# 所有text
-    print(body.parent)# 父节点
-    # print(body.nextSibling)# 后一个兄弟节点
-    print(body.next_sibling)# 后一个兄弟节点 没有返回None
-    print(body.previous_sibling)# 前一个兄弟节点
-    print(body.previous_element)#
-    print(body.next_element)#
-    print(body.children)# 子节点
-    ch = body.contents  #获取每一个标签，其中换行算都算做一个，注释也算做一个，所以总数是标签个数x2+1
-
-    logging.info(soup)
-    return 'ok'
+# 分析html结构，获取相似节点的个数
+def comparenodes(brothernodeslist,soup):
+    #遍历列表，找出相似度高的节点，计算个数
+    count = 0
+    for i in brothernodeslist:
+        length = min(20, len(str(i)))
+        substr = i[:length]
+        pp = string_similar(str(i),soup)
+        print(pp)
+    return count
 
 
 # 分析html结构，递归
@@ -104,18 +94,20 @@ def analyzedom(soup):
     flag = '#########################################################################################################################################################' \
            ''
     count = 0
+    brothernodeslist = []  #当前soup层级所有兄弟节点（包括自己）
     totaltext = totaltext + flag + '\n' + str(soup) + '\n'
-    '''
     if (isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
         parentnode = soup.parent
         nextnode = soup.next_sibling
         # 判断有多少兄弟节点跟此soup的结构相同（计算父节点contents 内容相同的个数）
         brothernodes = parentnode.contents
         for i in brothernodes:
-            totaltext = totaltext+flag+'\n'+str(i)+'\n'
-            # if(i.next_sibling)
+            if (isinstance(i, BeautifulSoup) | isinstance(i, Tag)):
+                brothernodeslist.append(i)
             # string_similar(i, )
-            '''
+    brothernodescount = brothernodeslist.__len__()-1 #兄弟节点个数
+    #结构相似的兄弟节点个数
+    likenodecount = comparenodes(brothernodeslist,soup)
     if(isinstance(soup, BeautifulSoup) | isinstance(soup, Tag)):  #只解析有用的节点 tag标签
         if(soup.string == None): # 如果有多个子节点，返回null
             nodes = soup.contents  # 获取每一个子节点，其中换行算都算做一个，注释也算做一个，所以总数是标签个数x2+1
@@ -126,9 +118,9 @@ def analyzedom(soup):
                 else:
                     continue
         else:  # 如果有一个子节点，返回内容
-            print(soup.string)
+            print('hello')
     else:
-        print(soup)
+        print('world')
 
     # body = soup.find('body')
     # print(body.text)# 所有text
