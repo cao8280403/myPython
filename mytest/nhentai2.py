@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 headers = {
     'User-Agent': 'Mozilla/5.0'
 }
-html = 'https://nhentai.net/g/252398/'
+html = 'https://nhentai.net/g/179511/'
 # 需要使用url和headers生成一个Request对象，然后将其传入urlopen方法中
 req = request.Request(html, headers=headers)
 resp = request.urlopen(req)
