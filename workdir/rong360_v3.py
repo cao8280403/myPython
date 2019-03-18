@@ -29,7 +29,7 @@ cursor = db.cursor()
 taglist = ['div', 'a', 'span', 'ul', 'img', 'li', 'table', 'th', 'td', 'script']
 totalcengci = 0
 totaltext = ''
-
+yezicount = 0
 
 def insert_sql(node_prefix, node_brother_count, node_likely_count):
     sql = """INSERT INTO node_list(guid,
@@ -131,12 +131,14 @@ def analyzedom(soup):
     # 判定是否是img节点
     check_img(soup)
     # 寻找兄弟节点
-    global totaltext
+    global totaltext,yezicount
     flag = '#########################################################################################################################################################' \
            ''
     count = 0
     brothernodeslist = []  # 当前soup层级所有兄弟节点（包括自己）
     totaltext = totaltext + flag + '\n' + str(soup) + '\n'
+    #判断是否有img标签
+    #统计此节点所在层数
     if (isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
         parentnode = soup.parent
         nextnode = soup.next_sibling
@@ -164,7 +166,7 @@ def analyzedom(soup):
                 #     print(str(i))
                     # return
         else:  # 如果有一个子节点，返回内容
-            print('我是一个叶子节点')
+            yezicount = yezicount + 1
         # else:
         #     print(str(soup))
         # return
@@ -180,6 +182,7 @@ def main():
     body = soup.find('body')
     fo = open('temp.text', 'w', encoding='utf_8_sig')
     analyzedom(body)
+    print(yezicount)
     fo.write(totaltext)
     fo.close()
 
