@@ -24,23 +24,37 @@ logging.basicConfig(level=logging.INFO)
 db = MySQLdb.connect("120.79.117.64", "root", "123456", "internet_product_collector", charset='utf8')
 # 使用cursor()方法获取操作游标
 cursor = db.cursor()
-
+html = 'https://www.rong360.com/nantong/s_tp9m5t12?guarantee_type=2'
 # 定义主流的标签，用于后面匹配
-taglist = ['div', 'a', 'span', 'ul', 'img', 'li', 'table', 'th', 'td', 'script']
+# taglist = ['div', 'a', 'span', 'ul', 'img', 'li', 'table', 'th', 'td', 'script']
 totalcengci = 0
 totaltext = ''
 yezicount = 0
+cengshulist = []
 
-def insert_sql(node_prefix, node_brother_count, node_likely_count):
+def insert_sql(node_prefix, node_brother_count, node_likely_count, hasimg, juli, cengshu):
     sql = """INSERT INTO node_list(guid,
-             create_time, node_prefix, node_brother_count, node_likely_brother_count,node_depth,node_img,node_to_img,node_total_depth)
-             VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s) """
+             create_time, website, node_prefix, node_brother_count, node_likely_brother_count,node_depth,node_img,node_to_img,node_total_depth)
+             VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """
     guid = str(uuid.uuid1())
     createtime = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
     # sql = sql % (guid, createtime, node_prefix, node_brother_count, node_likely_count, 1, 1, 1, 1)
     try:
         # 执行sql语句,这种写法防止注入
-        cursor.execute(sql, (guid, createtime, node_prefix, node_brother_count, node_likely_count, 1, 1, 1, 1))
+        cursor.execute(sql, (guid, createtime, html, node_prefix, node_brother_count, node_likely_count, cengshu, hasimg, juli, 1))
+        # 提交到数据库执行
+        db.commit()
+    except Exception:
+        print(Exception)
+        # Rollback in case there is any error
+        db.rollback()
+
+
+def setmaxcengshu(maxcengshu):
+    sql = """UPDATE node_list SET node_total_depth = %s where website = %s """
+    try:
+        # 执行sql语句,这种写法防止注入
+        cursor.execute(sql, (maxcengshu, html))
         # 提交到数据库执行
         db.commit()
     except Exception:
@@ -53,7 +67,7 @@ def string_similar(s1, s2):
     return difflib.SequenceMatcher(None, s1, s2).quick_ratio()
 
 
-def getcontent(html):
+def getcontent():
     headers = {
         # 'Host': 'www.lagou.com',
         # 'Connection': 'keep-alive',
@@ -114,22 +128,9 @@ def comparenodes(brothernodeslist, soup):
     count = count - 1  # 最后减去自身
     return count
 
-    # 判定是否是img节点
-
-
-def check_img(soup):
-    flag = False
-
-    return flag
-
 
 # 分析html结构，递归
 def analyzedom(soup):
-    if str(soup).find('6eb4b65c0bee25bfee69b69c55547732c6c03bf9') != -1:
-        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-    # print(type(soup))
-    # 判定是否是img节点
-    check_img(soup)
     # 寻找兄弟节点
     global totaltext,yezicount
     flag = '#########################################################################################################################################################' \
@@ -137,8 +138,25 @@ def analyzedom(soup):
     count = 0
     brothernodeslist = []  # 当前soup层级所有兄弟节点（包括自己）
     totaltext = totaltext + flag + '\n' + str(soup) + '\n'
-    #判断是否有img标签
+    #判断是否有img标签,并计算距离层数
+    hasimg = 0
+    juli = 0
+    img = soup.find('img')
+    if isinstance(img,Tag):
+        hasimg = 1
+        # global juli
+        juli = 1
+        imgparent = img.parent
+        while imgparent != soup:
+            imgparent = imgparent.parent
+            juli = juli +1
     #统计此节点所在层数
+    cengshu = 1
+    tempparent = soup.parent
+    while not str(tempparent).startswith('<html'):
+        tempparent = tempparent.parent
+        cengshu = cengshu +1
+    cengshulist.append(cengshu)
     if (isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
         parentnode = soup.parent
         nextnode = soup.next_sibling
@@ -153,7 +171,7 @@ def analyzedom(soup):
     likenodecount = comparenodes(brothernodeslist, soup)
     length = min(60, len(str(soup)))
     node_prefix = str(soup)[:length]
-    insert_sql(node_prefix, brothernodescount, likenodecount)
+    insert_sql(node_prefix, brothernodescount, likenodecount, hasimg, juli, cengshu)
     if (isinstance(soup, BeautifulSoup) | isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
         # if (soup.string == None):  # 如果有多个子节点，返回null
         nodes = soup.contents  # 获取每一个子节点，其中换行算都算做一个，注释也算做一个，所以总数是标签个数x2+1
@@ -176,13 +194,14 @@ def analyzedom(soup):
 def main():
     # print("循环求和：",sum_cycle(100))
     # print("递归求和：",sum_recu(100))
-    html = 'https://www.rong360.com/nantong/s_tp9m5t12?guarantee_type=2'
-    content = getcontent(html)
+    content = getcontent()
     soup = BeautifulSoup(content, "html.parser", from_encoding="utf-8")
     body = soup.find('body')
     fo = open('temp.text', 'w', encoding='utf_8_sig')
     analyzedom(body)
     print(yezicount)
+    print(max(cengshulist))
+    setmaxcengshu(max(cengshulist))
     fo.write(totaltext)
     fo.close()
 
