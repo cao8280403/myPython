@@ -34,16 +34,17 @@ totaltext = ''
 def insert_sql(node_prefix, node_brother_count, node_likely_count):
     sql = """INSERT INTO node_list(guid,
              create_time, node_prefix, node_brother_count, node_likely_brother_count,node_depth,node_img,node_to_img,node_total_depth)
-             VALUES ( '%s','%s','%s','%s','%s','%s','%s','%s','%s') """
+             VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s) """
     guid = str(uuid.uuid1())
     createtime = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-    sql = sql % (guid, createtime, node_prefix, node_brother_count, node_likely_count, 1, 1, 1, 1)
+    # sql = sql % (guid, createtime, node_prefix, node_brother_count, node_likely_count, 1, 1, 1, 1)
     try:
-        # 执行sql语句
-        cursor.execute(sql)
+        # 执行sql语句,这种写法防止注入
+        cursor.execute(sql, (guid, createtime, node_prefix, node_brother_count, node_likely_count, 1, 1, 1, 1))
         # 提交到数据库执行
         db.commit()
-    except:
+    except Exception:
+        print(Exception)
         # Rollback in case there is any error
         db.rollback()
 
@@ -124,7 +125,7 @@ def check_img(soup):
 
 # 分析html结构，递归
 def analyzedom(soup):
-    if str(soup).find('e5725ca4baa8e71a3f4a9ef4ce060fda25a317da') != -1:
+    if str(soup).find('6eb4b65c0bee25bfee69b69c55547732c6c03bf9') != -1:
         print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     # print(type(soup))
     # 判定是否是img节点
