@@ -53,7 +53,8 @@ def main():
     cengci_count += 1
     search_list = result.find('ul', class_='a-product_list search_list')
     cengci_count += 1
-    list = search_list.find_all('li', class_='item')
+    list = search_list.find_all('ol', class_='item')
+    length = len(list)
     cengci_count += 1
     imgcengcicount = 0
     for i in list:
