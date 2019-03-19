@@ -27,7 +27,13 @@ db = MySQLdb.connect("120.79.117.64", "root", "123456", "internet_product_collec
 cursor = db.cursor()
 # html = 'https://www.rong360.com/nantong/s_tp9m5t12?guarantee_type=2'
 # html = 'http://www.caiqi.com/'
-html = 'https://www.p2peye.com/'
+# html = 'https://www.p2peye.com/'
+# html = 'http://licai.jd.com/?from=jrad_950119&loc=2'
+# html = 'https://jr.mi.com/finance.html'
+# html = 'http://www.jinrongchaoshi.com/'
+# html = 'http://www.fminers.com/'
+# html = 'http://www.xfkou.com/bank.html'
+html = 'http://trust.xfkou.com/'
 # 定义主流的标签，用于后面匹配
 # taglist = ['div', 'a', 'span', 'ul', 'img', 'li', 'table', 'th', 'td', 'script']
 totalcengci = 0

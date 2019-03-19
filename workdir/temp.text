@@ -1,0 +1,1510 @@
+﻿#########################################################################################################################################################
+<body>
+<style>
+.navitemList a.navitemccc{display:none;}
+.quanbu1{ display:none;}
+.shawdowh{
+   background: #24262b;
+    opacity: 0.80;
+    filter: alpha(opacity=95);
+    position: absolute;
+    position: fixed !important;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 9999;
+    display: block;
+}
+#gr-boxh {
+    width: 750px;
+    height: 340px;
+    padding: 10px;
+    color: #333;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -375px;
+    margin-top: -170px;
+    z-index: 10000;
+    box-sizing: border-box;
+}
+#gr-left-box {
+    width: 313px;text-align:center;font-family:宋体;font-family:Arial, Helvetica, sans-serif;
+    height: 320px;
+    float: left;
+    background:url(http://www.xfkou.com/static/images/web/tcleft.jpg);
+   
+}
+#gr-main-box {
+    background-color: #fff;
+    width: 417px;
+    height: 320px;
+    float: left; position:relative;
+}
+#gr-tip-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: normal;
+    color: #500b0b;
+    margin: 19px 0 11px;
+    line-height: 1;
+    padding: 0;
+    font-weight: 600;
+}
+#gr-tip-content {
+    padding-left: 19px;
+    padding-right: 19px;
+}
+#gr-tip-content .xiaotent {
+    font-size: 12px;
+    margin: 0;
+    line-height: 23px;
+   
+   
+    color: #404040;
+}
+#dianxiao{width:320px; margin-left:auto;margin-right:auto; overflow:hidden;}
+#dianxiao1{ font-size:12px; color:#fff; background:#ff4455; width:100px; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:10px;float:left;}
+.back_pre{display:block;font-size:12px; color:#fff; background:#ff4455; width:100px; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:10px;float:left;}
+#dianxiao3{ font-size:12px; color:#fff; background:#ff4455; width:100px; height:23px; line-height:23px; margin-top:30px;text-align:center;float:left;}
+
+.xiangq{ color:#333;font-family:楷体; line-height:30px; font-size:20px; font-weight:300; margin-top:15px;}
+.xiangq1{ color:#333; line-height:25px;font-family:楷体; font-size:20px; font-weight:300; margin-top:10px;}
+.xquanbu{ display:none;}
+.xquanbu1{display:none;}
+.xshawdow{
+   background: #24262b;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+    position: absolute;
+    position: fixed !important;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 9999;
+    display: block;
+}
+#xgr-box {
+	border-radius: 8px;
+    width: 320px;
+    height:180px;
+    background: #f1efef;
+    
+    color: #333;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -160px;
+    margin-top: -100px;
+    z-index: 10000;
+    box-sizing: border-box;
+}
+.gundong{width:500px;position:absolute;top:0;left:370px;line-height:40px;overflow:hidden;}
+.gundong1{float:left;}
+.gundong2{width:100%;position:absolute;top:0;left:5px;line-height:20px;overflow:hidden;}
+.gundong2{display:none;}
+@media screen and (max-width: 1230px) {
+.gundong{display:none;}
+	
+}
+@media screen and (max-width: 768px) {
+.gundong2{display:block;}
+.navitemList a.navitemccc{display:block;}
+#dianxiao{width:100%; margin-left:auto;margin-right:auto; overflow:hidden;}
+#dianxiao1{ font-size:12px; color:#fff; background:#ff4455; width:30%; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:5%;float:left;}
+#dianxiao2{ font-size:12px; color:#fff; background:#ff4455; width:30%; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:5%;float:left;}
+#dianxiao3{ font-size:12px; color:#fff; background:#ff4455; width:30%; height:23px; line-height:23px; margin-top:30px;text-align:center;float:left;}
+
+.quanbu1{ display:block;}
+.quanbu{ display:none;}
+#gr-box1 {
+    width: 260px;
+    height: 360px;
+    background: #fff;
+    padding: 10px;
+    color: #333;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -130px;
+    margin-top: -180px;
+    z-index: 10000;
+    box-sizing: border-box;
+}
+#gr-main-box1 {
+    background-color: #fff; margin-top:10px;
+    width: 240px;
+    height: 200px; overflow:auto;
+  
+}
+#gr-tip-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: normal;
+    color: #500b0b;
+    margin: 0px 0 11px;
+    line-height: 1;
+    padding: 0;
+    font-weight: 600;
+}
+</style>
+<script>
+    function getRandom(){
+	var myDate = new Date();
+	var day = myDate.getDay();
+	var hour = myDate.getHours();
+	if(0<day && day<6)
+	{
+		if(8<=hour && hour<10)
+		{	
+		var i = Math.random()*30+1000;
+		 document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(10<=hour && hour<12)
+		{
+			  var i = Math.random()*30+1200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(12<=hour && hour<14)
+		{
+			  var i = Math.random()*30+1000;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(14<=hour && hour<15)
+		{
+			  var i = Math.random()*30+1200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(15<=hour && hour<17)
+		{
+			  var i = Math.random()*30+1400;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(17<=hour && hour<18)
+		{
+			  var i = Math.random()*30+1200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(18<=hour && hour<23)
+		{
+			  var i = Math.random()*30+500;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(23<=hour && hour<24)
+		{
+			  var i = Math.random()*30+300;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(0<=hour && hour<8)
+		{
+			  var i = Math.random()*30+100;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else
+		{
+			 var i = Math.random()*10+50;
+			  document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+	}
+	else
+	{
+	   if(8<=hour && hour<10)
+		{	
+		var i = Math.random()*30+500;
+		 document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(10<=hour && hour<12)
+		{
+			  var i = Math.random()*30+600;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(12<=hour && hour<14)
+		{
+			  var i = Math.random()*30+500;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(14<=hour && hour<15)
+		{
+			  var i = Math.random()*30+600;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(15<=hour && hour<17)
+		{
+			  var i = Math.random()*30+700;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(17<=hour && hour<18)
+		{
+			  var i = Math.random()*30+600;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(18<=hour && hour<23)
+		{
+			  var i = Math.random()*30+200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}else if(23<=hour && hour<24)
+		{
+			  var i = Math.random()*30+50;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(0<=hour && hour<8)
+		{
+			  var i = Math.random()*30+50;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else{
+			 var i = Math.random()*10+50;
+			  document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+	}
+  
+}
+window.setInterval("getRandom()",8000);
+</script>
+<header>
+<script>
+	$(function(){
+        $.post('/Account/usertime',function (result) {
+			if (result.success) {
+				if(result.message>0){
+				$('#xzhanshi').show();
+				}else{
+					
+				}
+			} else {
+				
+			}
+		}, 'json');		
+		$.post('http://www.xfkou.com/Account/checkMssg',function (result) {
+			if (result.success) {
+				if(result.message>0){
+				$('#zhanneixin').text(result.message);
+				$('#huiyuanduanxin').text(result.message);
+				}else{
+					$('#zhanneixin').text(0);
+					$('#huiyuanduanxin').text(0);
+					
+				}
+			} else {
+				
+			}
+		}, 'json');
+		
+	})
+	</script>
+<script>
+	  function entersearch(){
+		 
+		  var event = window.event || arguments.callee.caller.arguments[0];
+        if (event.keyCode == 13)
+        {
+            $('#searchBtn').click();
+        }
+		  
+		  
+	  }
+	</script>
+<div id="warp-header">
+<div class="top">
+<div class="top-in" style="position: relative;">
+<div class="gundong">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="fl top-fl">
+<a class="kf-a" href="javascript:void(0)"><i class="icon"></i><span><em>17717414798</em></span></a>
+<a class="kf-b" href="javascript:void(0)"><i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i><span><em>2742655465</em></span></a>
+<a class="kf-c" href="javascript:void(0)"><i class="icon"></i><span><em>xfkoucom</em></span></a>
+</div>
+<div class="fr top-fr">
+<a class="login" href="http://www.xfkou.com/login/index" rel="nofollow">登录</a>
+<a class="register" href="http://www.xfkou.com/register/index" rel="nofollow">注册</a>
+</div>
+</div>
+</div>
+<div class="search clearfix" style="position:relative;">
+<div class="gundong2">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="search-in clearfix">
+<a href="http://www.xfkou.com" id="logo" style="width:400px;overflow:hidden;" target="_blank">
+<img alt="鑫风口" src="http://www.xfkou.com/logox.png" style="float:left;margin-top:-3px;" width="121"/>
+<div style="text-align:center;width:240px;font-size:12px;float:left;margin-top:15px;font-weight:bold;">
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+</div>
+</a>
+<div class="search-fr fr">
+<div class="search-box">
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+</div>
+<a class="addinfo" href="http://www.xfkou.com/financial/vipzx" rel="nofollow" style="background-color:#ef3729;" target="_blank">vip尊享产品</a>
+<a class="addinfo" href="http://www.xfkou.com/account/chongzhi" onclick="alertMsg('请申请并认证成为理财师后，才可发布',function(){window.location.href='http://www.xfkou.com/login/index'});return false;" rel="nofollow" target="_blank">免费发布理财产品</a>
+</div>
+</div>
+</div>
+<div class="nav clearfix">
+<div class="nav-in">
+<ul>
+<li><a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a></li>
+<li class="active"><a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+</li>
+<li><a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+<!--  <div class="navitemList clearfix">
+                                <a target="_blank" href="http://www.xfkou.com/project.html">融资项目</a>
+                                <a target="_blank" href="http://www.xfkou.com/money.html">资金信息</a>
+                            </div>-->
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+</li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a></li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+</li>
+</ul></div></div></div></header></body>
+#########################################################################################################################################################
+<style>
+.navitemList a.navitemccc{display:none;}
+.quanbu1{ display:none;}
+.shawdowh{
+   background: #24262b;
+    opacity: 0.80;
+    filter: alpha(opacity=95);
+    position: absolute;
+    position: fixed !important;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 9999;
+    display: block;
+}
+#gr-boxh {
+    width: 750px;
+    height: 340px;
+    padding: 10px;
+    color: #333;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -375px;
+    margin-top: -170px;
+    z-index: 10000;
+    box-sizing: border-box;
+}
+#gr-left-box {
+    width: 313px;text-align:center;font-family:宋体;font-family:Arial, Helvetica, sans-serif;
+    height: 320px;
+    float: left;
+    background:url(http://www.xfkou.com/static/images/web/tcleft.jpg);
+   
+}
+#gr-main-box {
+    background-color: #fff;
+    width: 417px;
+    height: 320px;
+    float: left; position:relative;
+}
+#gr-tip-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: normal;
+    color: #500b0b;
+    margin: 19px 0 11px;
+    line-height: 1;
+    padding: 0;
+    font-weight: 600;
+}
+#gr-tip-content {
+    padding-left: 19px;
+    padding-right: 19px;
+}
+#gr-tip-content .xiaotent {
+    font-size: 12px;
+    margin: 0;
+    line-height: 23px;
+   
+   
+    color: #404040;
+}
+#dianxiao{width:320px; margin-left:auto;margin-right:auto; overflow:hidden;}
+#dianxiao1{ font-size:12px; color:#fff; background:#ff4455; width:100px; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:10px;float:left;}
+.back_pre{display:block;font-size:12px; color:#fff; background:#ff4455; width:100px; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:10px;float:left;}
+#dianxiao3{ font-size:12px; color:#fff; background:#ff4455; width:100px; height:23px; line-height:23px; margin-top:30px;text-align:center;float:left;}
+
+.xiangq{ color:#333;font-family:楷体; line-height:30px; font-size:20px; font-weight:300; margin-top:15px;}
+.xiangq1{ color:#333; line-height:25px;font-family:楷体; font-size:20px; font-weight:300; margin-top:10px;}
+.xquanbu{ display:none;}
+.xquanbu1{display:none;}
+.xshawdow{
+   background: #24262b;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+    position: absolute;
+    position: fixed !important;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 9999;
+    display: block;
+}
+#xgr-box {
+	border-radius: 8px;
+    width: 320px;
+    height:180px;
+    background: #f1efef;
+    
+    color: #333;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -160px;
+    margin-top: -100px;
+    z-index: 10000;
+    box-sizing: border-box;
+}
+.gundong{width:500px;position:absolute;top:0;left:370px;line-height:40px;overflow:hidden;}
+.gundong1{float:left;}
+.gundong2{width:100%;position:absolute;top:0;left:5px;line-height:20px;overflow:hidden;}
+.gundong2{display:none;}
+@media screen and (max-width: 1230px) {
+.gundong{display:none;}
+	
+}
+@media screen and (max-width: 768px) {
+.gundong2{display:block;}
+.navitemList a.navitemccc{display:block;}
+#dianxiao{width:100%; margin-left:auto;margin-right:auto; overflow:hidden;}
+#dianxiao1{ font-size:12px; color:#fff; background:#ff4455; width:30%; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:5%;float:left;}
+#dianxiao2{ font-size:12px; color:#fff; background:#ff4455; width:30%; height:23px; line-height:23px; margin-top:30px;text-align:center; margin-right:5%;float:left;}
+#dianxiao3{ font-size:12px; color:#fff; background:#ff4455; width:30%; height:23px; line-height:23px; margin-top:30px;text-align:center;float:left;}
+
+.quanbu1{ display:block;}
+.quanbu{ display:none;}
+#gr-box1 {
+    width: 260px;
+    height: 360px;
+    background: #fff;
+    padding: 10px;
+    color: #333;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -130px;
+    margin-top: -180px;
+    z-index: 10000;
+    box-sizing: border-box;
+}
+#gr-main-box1 {
+    background-color: #fff; margin-top:10px;
+    width: 240px;
+    height: 200px; overflow:auto;
+  
+}
+#gr-tip-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: normal;
+    color: #500b0b;
+    margin: 0px 0 11px;
+    line-height: 1;
+    padding: 0;
+    font-weight: 600;
+}
+</style>
+#########################################################################################################################################################
+<script>
+    function getRandom(){
+	var myDate = new Date();
+	var day = myDate.getDay();
+	var hour = myDate.getHours();
+	if(0<day && day<6)
+	{
+		if(8<=hour && hour<10)
+		{	
+		var i = Math.random()*30+1000;
+		 document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(10<=hour && hour<12)
+		{
+			  var i = Math.random()*30+1200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(12<=hour && hour<14)
+		{
+			  var i = Math.random()*30+1000;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(14<=hour && hour<15)
+		{
+			  var i = Math.random()*30+1200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(15<=hour && hour<17)
+		{
+			  var i = Math.random()*30+1400;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(17<=hour && hour<18)
+		{
+			  var i = Math.random()*30+1200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(18<=hour && hour<23)
+		{
+			  var i = Math.random()*30+500;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(23<=hour && hour<24)
+		{
+			  var i = Math.random()*30+300;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(0<=hour && hour<8)
+		{
+			  var i = Math.random()*30+100;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else
+		{
+			 var i = Math.random()*10+50;
+			  document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+	}
+	else
+	{
+	   if(8<=hour && hour<10)
+		{	
+		var i = Math.random()*30+500;
+		 document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(10<=hour && hour<12)
+		{
+			  var i = Math.random()*30+600;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(12<=hour && hour<14)
+		{
+			  var i = Math.random()*30+500;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(14<=hour && hour<15)
+		{
+			  var i = Math.random()*30+600;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(15<=hour && hour<17)
+		{
+			  var i = Math.random()*30+700;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(17<=hour && hour<18)
+		{
+			  var i = Math.random()*30+600;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(18<=hour && hour<23)
+		{
+			  var i = Math.random()*30+200;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}else if(23<=hour && hour<24)
+		{
+			  var i = Math.random()*30+50;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else if(0<=hour && hour<8)
+		{
+			  var i = Math.random()*30+50;
+			   document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+		else{
+			 var i = Math.random()*10+50;
+			  document.getElementById("zaixian").innerText = window.parseInt(i);
+		}
+	}
+  
+}
+window.setInterval("getRandom()",8000);
+</script>
+#########################################################################################################################################################
+<header>
+<script>
+	$(function(){
+        $.post('/Account/usertime',function (result) {
+			if (result.success) {
+				if(result.message>0){
+				$('#xzhanshi').show();
+				}else{
+					
+				}
+			} else {
+				
+			}
+		}, 'json');		
+		$.post('http://www.xfkou.com/Account/checkMssg',function (result) {
+			if (result.success) {
+				if(result.message>0){
+				$('#zhanneixin').text(result.message);
+				$('#huiyuanduanxin').text(result.message);
+				}else{
+					$('#zhanneixin').text(0);
+					$('#huiyuanduanxin').text(0);
+					
+				}
+			} else {
+				
+			}
+		}, 'json');
+		
+	})
+	</script>
+<script>
+	  function entersearch(){
+		 
+		  var event = window.event || arguments.callee.caller.arguments[0];
+        if (event.keyCode == 13)
+        {
+            $('#searchBtn').click();
+        }
+		  
+		  
+	  }
+	</script>
+<div id="warp-header">
+<div class="top">
+<div class="top-in" style="position: relative;">
+<div class="gundong">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="fl top-fl">
+<a class="kf-a" href="javascript:void(0)"><i class="icon"></i><span><em>17717414798</em></span></a>
+<a class="kf-b" href="javascript:void(0)"><i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i><span><em>2742655465</em></span></a>
+<a class="kf-c" href="javascript:void(0)"><i class="icon"></i><span><em>xfkoucom</em></span></a>
+</div>
+<div class="fr top-fr">
+<a class="login" href="http://www.xfkou.com/login/index" rel="nofollow">登录</a>
+<a class="register" href="http://www.xfkou.com/register/index" rel="nofollow">注册</a>
+</div>
+</div>
+</div>
+<div class="search clearfix" style="position:relative;">
+<div class="gundong2">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="search-in clearfix">
+<a href="http://www.xfkou.com" id="logo" style="width:400px;overflow:hidden;" target="_blank">
+<img alt="鑫风口" src="http://www.xfkou.com/logox.png" style="float:left;margin-top:-3px;" width="121"/>
+<div style="text-align:center;width:240px;font-size:12px;float:left;margin-top:15px;font-weight:bold;">
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+</div>
+</a>
+<div class="search-fr fr">
+<div class="search-box">
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+</div>
+<a class="addinfo" href="http://www.xfkou.com/financial/vipzx" rel="nofollow" style="background-color:#ef3729;" target="_blank">vip尊享产品</a>
+<a class="addinfo" href="http://www.xfkou.com/account/chongzhi" onclick="alertMsg('请申请并认证成为理财师后，才可发布',function(){window.location.href='http://www.xfkou.com/login/index'});return false;" rel="nofollow" target="_blank">免费发布理财产品</a>
+</div>
+</div>
+</div>
+<div class="nav clearfix">
+<div class="nav-in">
+<ul>
+<li><a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a></li>
+<li class="active"><a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+</li>
+<li><a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+<!--  <div class="navitemList clearfix">
+                                <a target="_blank" href="http://www.xfkou.com/project.html">融资项目</a>
+                                <a target="_blank" href="http://www.xfkou.com/money.html">资金信息</a>
+                            </div>-->
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+</li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a></li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+</li>
+</ul></div></div></div></header>
+#########################################################################################################################################################
+<script>
+	$(function(){
+        $.post('/Account/usertime',function (result) {
+			if (result.success) {
+				if(result.message>0){
+				$('#xzhanshi').show();
+				}else{
+					
+				}
+			} else {
+				
+			}
+		}, 'json');		
+		$.post('http://www.xfkou.com/Account/checkMssg',function (result) {
+			if (result.success) {
+				if(result.message>0){
+				$('#zhanneixin').text(result.message);
+				$('#huiyuanduanxin').text(result.message);
+				}else{
+					$('#zhanneixin').text(0);
+					$('#huiyuanduanxin').text(0);
+					
+				}
+			} else {
+				
+			}
+		}, 'json');
+		
+	})
+	</script>
+#########################################################################################################################################################
+<script>
+	  function entersearch(){
+		 
+		  var event = window.event || arguments.callee.caller.arguments[0];
+        if (event.keyCode == 13)
+        {
+            $('#searchBtn').click();
+        }
+		  
+		  
+	  }
+	</script>
+#########################################################################################################################################################
+<div id="warp-header">
+<div class="top">
+<div class="top-in" style="position: relative;">
+<div class="gundong">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="fl top-fl">
+<a class="kf-a" href="javascript:void(0)"><i class="icon"></i><span><em>17717414798</em></span></a>
+<a class="kf-b" href="javascript:void(0)"><i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i><span><em>2742655465</em></span></a>
+<a class="kf-c" href="javascript:void(0)"><i class="icon"></i><span><em>xfkoucom</em></span></a>
+</div>
+<div class="fr top-fr">
+<a class="login" href="http://www.xfkou.com/login/index" rel="nofollow">登录</a>
+<a class="register" href="http://www.xfkou.com/register/index" rel="nofollow">注册</a>
+</div>
+</div>
+</div>
+<div class="search clearfix" style="position:relative;">
+<div class="gundong2">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="search-in clearfix">
+<a href="http://www.xfkou.com" id="logo" style="width:400px;overflow:hidden;" target="_blank">
+<img alt="鑫风口" src="http://www.xfkou.com/logox.png" style="float:left;margin-top:-3px;" width="121"/>
+<div style="text-align:center;width:240px;font-size:12px;float:left;margin-top:15px;font-weight:bold;">
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+</div>
+</a>
+<div class="search-fr fr">
+<div class="search-box">
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+</div>
+<a class="addinfo" href="http://www.xfkou.com/financial/vipzx" rel="nofollow" style="background-color:#ef3729;" target="_blank">vip尊享产品</a>
+<a class="addinfo" href="http://www.xfkou.com/account/chongzhi" onclick="alertMsg('请申请并认证成为理财师后，才可发布',function(){window.location.href='http://www.xfkou.com/login/index'});return false;" rel="nofollow" target="_blank">免费发布理财产品</a>
+</div>
+</div>
+</div>
+<div class="nav clearfix">
+<div class="nav-in">
+<ul>
+<li><a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a></li>
+<li class="active"><a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+</li>
+<li><a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+<!--  <div class="navitemList clearfix">
+                                <a target="_blank" href="http://www.xfkou.com/project.html">融资项目</a>
+                                <a target="_blank" href="http://www.xfkou.com/money.html">资金信息</a>
+                            </div>-->
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+</li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a></li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+</li>
+</ul></div></div></div>
+#########################################################################################################################################################
+<div class="top">
+<div class="top-in" style="position: relative;">
+<div class="gundong">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="fl top-fl">
+<a class="kf-a" href="javascript:void(0)"><i class="icon"></i><span><em>17717414798</em></span></a>
+<a class="kf-b" href="javascript:void(0)"><i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i><span><em>2742655465</em></span></a>
+<a class="kf-c" href="javascript:void(0)"><i class="icon"></i><span><em>xfkoucom</em></span></a>
+</div>
+<div class="fr top-fr">
+<a class="login" href="http://www.xfkou.com/login/index" rel="nofollow">登录</a>
+<a class="register" href="http://www.xfkou.com/register/index" rel="nofollow">注册</a>
+</div>
+</div>
+</div>
+#########################################################################################################################################################
+<div class="top-in" style="position: relative;">
+<div class="gundong">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="fl top-fl">
+<a class="kf-a" href="javascript:void(0)"><i class="icon"></i><span><em>17717414798</em></span></a>
+<a class="kf-b" href="javascript:void(0)"><i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i><span><em>2742655465</em></span></a>
+<a class="kf-c" href="javascript:void(0)"><i class="icon"></i><span><em>xfkoucom</em></span></a>
+</div>
+<div class="fr top-fr">
+<a class="login" href="http://www.xfkou.com/login/index" rel="nofollow">登录</a>
+<a class="register" href="http://www.xfkou.com/register/index" rel="nofollow">注册</a>
+</div>
+</div>
+#########################################################################################################################################################
+<div class="gundong">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+#########################################################################################################################################################
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：134******71升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：134******71升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：185******39升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：136******67升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******61升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：156******72升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******91升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：130******22升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：******升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：133******95升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：133******95升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：133******95升级vip，</span>
+#########################################################################################################################################################
+<div class="fl top-fl">
+<a class="kf-a" href="javascript:void(0)"><i class="icon"></i><span><em>17717414798</em></span></a>
+<a class="kf-b" href="javascript:void(0)"><i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i><span><em>2742655465</em></span></a>
+<a class="kf-c" href="javascript:void(0)"><i class="icon"></i><span><em>xfkoucom</em></span></a>
+</div>
+#########################################################################################################################################################
+<a class="kf-a" href="javascript:void(0)"><i class="icon"></i><span><em>17717414798</em></span></a>
+#########################################################################################################################################################
+<i class="icon"></i>
+#########################################################################################################################################################
+<span><em>17717414798</em></span>
+#########################################################################################################################################################
+<em>17717414798</em>
+#########################################################################################################################################################
+<a class="kf-b" href="javascript:void(0)"><i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i><span><em>2742655465</em></span></a>
+#########################################################################################################################################################
+<i class="icon" style="background:url(http://www.xfkou.com/static/images/web/qqtu.png) 0px 0px no-repeat;"></i>
+#########################################################################################################################################################
+<span><em>2742655465</em></span>
+#########################################################################################################################################################
+<em>2742655465</em>
+#########################################################################################################################################################
+<a class="kf-c" href="javascript:void(0)"><i class="icon"></i><span><em>xfkoucom</em></span></a>
+#########################################################################################################################################################
+<i class="icon"></i>
+#########################################################################################################################################################
+<span><em>xfkoucom</em></span>
+#########################################################################################################################################################
+<em>xfkoucom</em>
+#########################################################################################################################################################
+<div class="fr top-fr">
+<a class="login" href="http://www.xfkou.com/login/index" rel="nofollow">登录</a>
+<a class="register" href="http://www.xfkou.com/register/index" rel="nofollow">注册</a>
+</div>
+#########################################################################################################################################################
+<a class="login" href="http://www.xfkou.com/login/index" rel="nofollow">登录</a>
+#########################################################################################################################################################
+<a class="register" href="http://www.xfkou.com/register/index" rel="nofollow">注册</a>
+#########################################################################################################################################################
+<div class="search clearfix" style="position:relative;">
+<div class="gundong2">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+<div class="search-in clearfix">
+<a href="http://www.xfkou.com" id="logo" style="width:400px;overflow:hidden;" target="_blank">
+<img alt="鑫风口" src="http://www.xfkou.com/logox.png" style="float:left;margin-top:-3px;" width="121"/>
+<div style="text-align:center;width:240px;font-size:12px;float:left;margin-top:15px;font-weight:bold;">
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+</div>
+</a>
+<div class="search-fr fr">
+<div class="search-box">
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+</div>
+<a class="addinfo" href="http://www.xfkou.com/financial/vipzx" rel="nofollow" style="background-color:#ef3729;" target="_blank">vip尊享产品</a>
+<a class="addinfo" href="http://www.xfkou.com/account/chongzhi" onclick="alertMsg('请申请并认证成为理财师后，才可发布',function(){window.location.href='http://www.xfkou.com/login/index'});return false;" rel="nofollow" target="_blank">免费发布理财产品</a>
+</div>
+</div>
+</div>
+#########################################################################################################################################################
+<div class="gundong2">
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee></div>
+#########################################################################################################################################################
+<marquee direction="left" scrollamount="5" scrolldelay="60">
+<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了财通资产—阳光保险集团股权收益权投资特定多个客户专享资产计划					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了同兴政信1号宜宾金润收益权转让资产管理计划					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：134******71升级vip，</span>关注了天金所-艾科路1号定向融资工具					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了广东LH路桥-空港市政工程定向融资计划					 					<span style="color:#ef3729;">会员：135******66升级vip，</span>关注了中经宏熙-政信 13 号私募投资基金					 					<span style="color:#ef3729;">会员：185******39升级vip，</span>关注了贺天繁茂应收5号私募基金					 					<span style="color:#ef3729;">会员：136******67升级vip，</span>关注了利凯雪松聚富 2 号私募基金					 					<span style="color:#ef3729;">会员：135******61升级vip，</span>关注了疆亘长青8号二期私募投资基金					 					<span style="color:#ef3729;">会员：156******72升级vip，</span>关注了天玑聚盈十五号投资基金					 					<span style="color:#ef3729;">会员：135******91升级vip，</span>关注了大湾区-海华大桥私募投资基金（一期）					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：150******96升级vip，</span>关注了阜宁县宁通公路工程建设有限公司2018年定向债务融资工具					 					<span style="color:#ef3729;">会员：130******22升级vip，</span>关注了重交所-瑞熙贰号电影《边境巡逻》收益权产品(二期)					 					<span style="color:#ef3729;">会员：******升级vip，</span>关注了福盈 6 号银票私募投资基金					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					 					<span style="color:#ef3729;">会员：133******95升级vip，</span>关注了金诚1号收益权转让计划					   
+				  </marquee>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：134******71升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：134******71升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******66升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：185******39升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：136******67升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******61升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：156******72升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：135******91升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：150******96升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：130******22升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：******升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：133******95升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：133******95升级vip，</span>
+#########################################################################################################################################################
+<span style="color:#ef3729;">会员：133******95升级vip，</span>
+#########################################################################################################################################################
+<div class="search-in clearfix">
+<a href="http://www.xfkou.com" id="logo" style="width:400px;overflow:hidden;" target="_blank">
+<img alt="鑫风口" src="http://www.xfkou.com/logox.png" style="float:left;margin-top:-3px;" width="121"/>
+<div style="text-align:center;width:240px;font-size:12px;float:left;margin-top:15px;font-weight:bold;">
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+</div>
+</a>
+<div class="search-fr fr">
+<div class="search-box">
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+</div>
+<a class="addinfo" href="http://www.xfkou.com/financial/vipzx" rel="nofollow" style="background-color:#ef3729;" target="_blank">vip尊享产品</a>
+<a class="addinfo" href="http://www.xfkou.com/account/chongzhi" onclick="alertMsg('请申请并认证成为理财师后，才可发布',function(){window.location.href='http://www.xfkou.com/login/index'});return false;" rel="nofollow" target="_blank">免费发布理财产品</a>
+</div>
+</div>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com" id="logo" style="width:400px;overflow:hidden;" target="_blank">
+<img alt="鑫风口" src="http://www.xfkou.com/logox.png" style="float:left;margin-top:-3px;" width="121"/>
+<div style="text-align:center;width:240px;font-size:12px;float:left;margin-top:15px;font-weight:bold;">
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+</div>
+</a>
+#########################################################################################################################################################
+<img alt="鑫风口" src="http://www.xfkou.com/logox.png" style="float:left;margin-top:-3px;" width="121"/>
+#########################################################################################################################################################
+<div style="text-align:center;width:240px;font-size:12px;float:left;margin-top:15px;font-weight:bold;">
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+</div>
+#########################################################################################################################################################
+<div style="color:#ef3729;">投融资及财富管理金融信息服务平台</div>
+#########################################################################################################################################################
+<div style="margin-top:4px;color:#3297fe;">高端健康投资理财平台及理财师平台</div>
+#########################################################################################################################################################
+<div class="search-fr fr">
+<div class="search-box">
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+</div>
+<a class="addinfo" href="http://www.xfkou.com/financial/vipzx" rel="nofollow" style="background-color:#ef3729;" target="_blank">vip尊享产品</a>
+<a class="addinfo" href="http://www.xfkou.com/account/chongzhi" onclick="alertMsg('请申请并认证成为理财师后，才可发布',function(){window.location.href='http://www.xfkou.com/login/index'});return false;" rel="nofollow" target="_blank">免费发布理财产品</a>
+</div>
+#########################################################################################################################################################
+<div class="search-box">
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+</div>
+#########################################################################################################################################################
+<select id="wangzhi" name="wangzhi" style="float:left;width:80px;border:0;height: 36px;line-height: 36px;color: #999;border: 0;">
+<option selected="selected" value="1">站内搜索</option>
+<option value="2">网站查询</option>
+</select>
+#########################################################################################################################################################
+<option selected="selected" value="1">站内搜索</option>
+#########################################################################################################################################################
+<option value="2">网站查询</option>
+#########################################################################################################################################################
+<input class="searchTxt" id="keywords" onkeydown="entersearch()" placeholder="请输入关键字" type="text"/>
+#########################################################################################################################################################
+<input class="searchBtn icon" id="searchBtn" type="button"/>
+#########################################################################################################################################################
+<a class="addinfo" href="http://www.xfkou.com/financial/vipzx" rel="nofollow" style="background-color:#ef3729;" target="_blank">vip尊享产品</a>
+#########################################################################################################################################################
+<a class="addinfo" href="http://www.xfkou.com/account/chongzhi" onclick="alertMsg('请申请并认证成为理财师后，才可发布',function(){window.location.href='http://www.xfkou.com/login/index'});return false;" rel="nofollow" target="_blank">免费发布理财产品</a>
+#########################################################################################################################################################
+<div class="nav clearfix">
+<div class="nav-in">
+<ul>
+<li><a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a></li>
+<li class="active"><a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+</li>
+<li><a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+<!--  <div class="navitemList clearfix">
+                                <a target="_blank" href="http://www.xfkou.com/project.html">融资项目</a>
+                                <a target="_blank" href="http://www.xfkou.com/money.html">资金信息</a>
+                            </div>-->
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+</li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a></li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+</li>
+</ul></div></div>
+#########################################################################################################################################################
+<div class="nav-in">
+<ul>
+<li><a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a></li>
+<li class="active"><a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+</li>
+<li><a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+<!--  <div class="navitemList clearfix">
+                                <a target="_blank" href="http://www.xfkou.com/project.html">融资项目</a>
+                                <a target="_blank" href="http://www.xfkou.com/money.html">资金信息</a>
+                            </div>-->
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+</li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a></li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+</li>
+</ul></div>
+#########################################################################################################################################################
+<ul>
+<li><a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a></li>
+<li class="active"><a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+</li>
+<li><a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+<!--  <div class="navitemList clearfix">
+                                <a target="_blank" href="http://www.xfkou.com/project.html">融资项目</a>
+                                <a target="_blank" href="http://www.xfkou.com/money.html">资金信息</a>
+                            </div>-->
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+</li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+</li>
+<li><a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a></li>
+<li><a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+</li>
+</ul>
+#########################################################################################################################################################
+<li><a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a></li>
+#########################################################################################################################################################
+<a class="navitem" href="http://www.xfkou.com" target="_blank">网站首页</a>
+#########################################################################################################################################################
+<li class="active"><a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+</li>
+#########################################################################################################################################################
+<a class="navitem" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+#########################################################################################################################################################
+<div class="navitemList clearfix">
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+<a href="http://trust.xfkou.com">信托产品</a>
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+<!--<a  href="http://www.xfkou.com/simu.html">阳光私募</a>
+                                <a  href="http://www.xfkou.com/pevc.html">PE/VC</a>
+                                <a  href="http://fund.xfkou.com">私募基金</a>
+                                <a  href="http://www.xfkou.com/insurance.html">海外保险</a>-->
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+</div>
+#########################################################################################################################################################
+<a class="navitemccc" href="http://www.xfkou.com/financial.html" target="_blank">理财平台</a>
+#########################################################################################################################################################
+<a href="http://trust.xfkou.com">信托产品</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/plans.html">资管计划</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/bank.html">互联理财</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/other.html">定融计划</a>
+#########################################################################################################################################################
+<li><a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+</li>
+#########################################################################################################################################################
+<a class="navitem" href="http://fund.xfkou.com" target="_blank">私募基金</a>
+#########################################################################################################################################################
+<div class="navitemList clearfix">
+<a href="http://fund.xfkou.com">债权类基金</a>
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+</div>
+#########################################################################################################################################################
+<a href="http://fund.xfkou.com">债权类基金</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/pevc.html">股权类基金</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/simu.html">证券类基金</a>
+#########################################################################################################################################################
+<li><a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+<!--  <div class="navitemList clearfix">
+                                <a target="_blank" href="http://www.xfkou.com/project.html">融资项目</a>
+                                <a target="_blank" href="http://www.xfkou.com/money.html">资金信息</a>
+                            </div>-->
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+</li>
+#########################################################################################################################################################
+<a class="navitem" href="http://www.xfkou.com/money.html" target="_blank">融资服务</a>
+#########################################################################################################################################################
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+</div>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/trfs.html" target="_blank">方式有哪些</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/trqd.html" target="_blank">有哪些渠道</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/trpt.html" target="_blank">平台是什么</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/trnx.html" target="_blank">平台有哪些</a>
+#########################################################################################################################################################
+<li><a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+</li>
+#########################################################################################################################################################
+<a class="navitem" href="javascript:void(0)" target="_blank">保险服务</a>
+#########################################################################################################################################################
+<div class="navitemList clearfix">
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+</div>
+#########################################################################################################################################################
+<a href="https://cps.qixin18.com/myj1026463" rel="nofollow" target="_blank">保险产品</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/bx.html" target="_blank">保险资讯</a>
+#########################################################################################################################################################
+<li><a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a></li>
+#########################################################################################################################################################
+<a class="navitem" href="http://www.xfkou.com/finance.html" target="_blank">理财师</a>
+#########################################################################################################################################################
+<li><a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+</li>
+#########################################################################################################################################################
+<a class="navitem" href="javascript:void(0)" target="_blank">论坛交流</a>
+#########################################################################################################################################################
+<div class="navitemList clearfix">
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
+</div>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/finance/luntan/fenlei/1" target="_blank">网站论坛</a>
+#########################################################################################################################################################
+<a href="http://www.xfkou.com/daohang.html" target="_blank">网站大全</a>
