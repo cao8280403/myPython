@@ -6,6 +6,7 @@ import difflib
 import sys
 import json
 import requests
+import chardet
 import os
 import time
 import datetime
@@ -25,7 +26,8 @@ db = MySQLdb.connect("120.79.117.64", "root", "123456", "internet_product_collec
 # 使用cursor()方法获取操作游标
 cursor = db.cursor()
 # html = 'https://www.rong360.com/nantong/s_tp9m5t12?guarantee_type=2'
-html = 'http://www.caiqi.com/'
+# html = 'http://www.caiqi.com/'
+html = 'https://www.p2peye.com/'
 # 定义主流的标签，用于后面匹配
 # taglist = ['div', 'a', 'span', 'ul', 'img', 'li', 'table', 'th', 'td', 'script']
 totalcengci = 0
@@ -87,7 +89,15 @@ def getcontent():
     # 需要使用url和headers生成一个Request对象，然后将其传入urlopen方法中
     req = request.Request(html, headers=headers)
     resp = request.urlopen(req)
-    content = resp.read().decode('utf-8')
+    content = resp.read()
+    # chardet解析网页
+    chardet1 = chardet.detect(content)
+    codetype = chardet1['encoding']
+    print(codetype)
+    if codetype == 'utf-8':
+        content = content.decode("utf-8", "ignore")
+    else:
+        content = content.decode("GB2312", "ignore")
     with open('rong360.html', 'w', encoding='utf_8_sig') as f:
         f.write(str(content))
         f.close()
