@@ -103,7 +103,7 @@ def main():
     create_dir('pic')
     queue = [i for i in range(1, 72)]  # 构造 url 链接 页码。
 
-    url = 'https://nhentai.net/artist/kuroharuto/'
+    url = ''
     execute(url)
 
 if __name__ == '__main__':
