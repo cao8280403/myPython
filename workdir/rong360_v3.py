@@ -41,16 +41,16 @@ totaltext = ''
 yezicount = 0
 cengshulist = []
 
-def insert_sql(node_prefix, node_brother_count, node_likely_count, imgcount, julilist, cengshu):
-    sql = """INSERT INTO node_list(guid,
-             create_time, website, node_prefix, node_brother_count, node_likely_brother_count,node_depth,node_img,node_to_img,node_total_depth)
-             VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """
+def insert_sql(node_prefix, node_brother_count, node_likely_count, imgcount, julilist, cengshu, nodepath, isproduct):
+    sql = """INSERT INTO node_list_copy(guid,
+             create_time, website, node_prefix, node_brother_count, node_likely_brother_count,node_depth,node_img,node_to_img,node_total_depth,nodepath,isproduct)
+             VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """
     guid = str(uuid.uuid1())
     createtime = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
     # sql = sql % (guid, createtime, node_prefix, node_brother_count, node_likely_count, 1, 1, 1, 1)
     try:
         # 执行sql语句,这种写法防止注入
-        cursor.execute(sql, (guid, createtime, html, node_prefix, node_brother_count, node_likely_count, cengshu, imgcount, julilist, 1))
+        cursor.execute(sql, (guid, createtime, html, node_prefix, node_brother_count, node_likely_count, cengshu, imgcount, julilist, 1, nodepath, isproduct))
         # 提交到数据库执行
         db.commit()
     except Exception:
@@ -191,10 +191,13 @@ def analyzedom(soup):
 
     #统计此节点所在层数
     cengshu = 1
+    nodepath = "<" + soup.name + ">"
     tempparent = soup.parent
     while not str(tempparent).startswith('<html'):
         tempparent = tempparent.parent
         cengshu = cengshu +1
+        nodepath = "<" + tempparent.name + ">" + nodepath
+        print(nodepath)
     cengshulist.append(cengshu)
     if (isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
         parentnode = soup.parent
@@ -210,7 +213,7 @@ def analyzedom(soup):
     likenodecount = comparenodes(brothernodeslist, soup)
     length = min(60, len(str(soup)))
     node_prefix = str(soup)[:length]
-    insert_sql(node_prefix, brothernodescount, likenodecount, imgcount, str(julilist), cengshu)
+    insert_sql(node_prefix, brothernodescount, likenodecount, imgcount, str(julilist), cengshu, nodepath, "0")
     if (isinstance(soup, BeautifulSoup) | isinstance(soup, Tag)):  # 只解析有用的节点 tag标签
         # if (soup.string == None):  # 如果有多个子节点，返回null
         nodes = soup.contents  # 获取每一个子节点，其中换行算都算做一个，注释也算做一个，所以总数是标签个数x2+1
