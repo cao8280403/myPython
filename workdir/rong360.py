@@ -21,7 +21,7 @@ headers = {
         # 'Accept-Encoding': 'gzip, deflate, br',
         # 'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7'
     }
-html = 'https://www.rong360.com/nantong/s_tp9m5t12?guarantee_type=2'
+html = 'http://www.0755400.cn/news/5820.html'
 # 需要使用url和headers生成一个Request对象，然后将其传入urlopen方法中
 req = request.Request(html, headers=headers)
 resp = request.urlopen(req)
