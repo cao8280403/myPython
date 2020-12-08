@@ -11,6 +11,8 @@ import win32api
 import random
 from selenium.webdriver.common.action_chains import ActionChains
 import pyautogui
+
+
 # pyautogui.moveTo(1, 1, duration=1)
 # 创建一个谷歌浏览器对象
 
@@ -32,12 +34,13 @@ def setDisplay():
     dm.BitsPerPel = 32
     dm.DisplayFixedOutput = 0
     win32api.ChangeDisplaySettings(dm, 0)
-setDisplay()
+
+
+# setDisplay()
 
 driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get("https://www.baidu.com")
-
 
 # time.sleep(30)
 # options = webdriver.ChromeOptions()
@@ -56,7 +59,6 @@ try:
     driver.get("https://www.baidu.com")
 
     # newwindow = 'window.open("https://www.baidu.com");'
-
 
     driver.delete_all_cookies()
     # aaabb = driver.get_cookies()
@@ -84,12 +86,7 @@ try:
     # 在输入框中填入'Python'
     site = "www.kf400.cn"
     word = "400电话"
-    inputs.send_keys('4')
-    # time.sleep(1)
-    inputs.send_keys('0')
-    inputs.send_keys('0')
-    # time.sleep(1)
-    inputs.send_keys('电话')
+    inputs.send_keys(word)
     # '按下'回车键（第一种）
     inputs.send_keys(Keys.ENTER)
     # 点击'百度一下'（第二种）
@@ -99,30 +96,109 @@ try:
 
     # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
     wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-    # for i in range(10):
-    #     js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(i)
-    #     driver.execute_script(js)
-    #     time.sleep(2)  # 休眠
-    #     js2 = "document.documentElement.scrollTop=document.body.scrollHeight/7*" + str(i)
-    #     driver.execute_script(js2)
-    #     time.sleep(2)  # 休眠
+    for i in range(10):
+        js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(i)
+        driver.execute_script(js)
+        time.sleep(2)  # 休眠
+        js2 = "document.documentElement.scrollTop=document.body.scrollHeight/7*" + str(i)
+        driver.execute_script(js2)
+        time.sleep(2)  # 休眠
 
     # driver.switchTo().fame("id")
     # driver.switchTo().fame("")
     # driver.switchTo().fame("selector")
-    hold = driver.find_element_by_id('su')
+    # hold = driver.find_element_by_id('su')
     # slider = driver.find_element_by_xpath("//div[@id='content_left']/div[1]/a")
-    ac.click_and_hold(hold).perform()
+    # ac.click_and_hold(hold).perform()
     # ac = ActionChains(driver)
-    divs = driver.find_element_by_xpath("//div[@id='content_left']")
-    one = divs.find_element_by_xpath("./div[1]//a[1]")
+    # one = driver.find_element_by_xpath("//div[@id='content_left']/div[1]")
+    #
+    # c_tools = one.find_elements_by_xpath(".//div[@class='c-tools']")
+    # data_baobiao = one.find_elements_by_xpath(".//a[@data-baobiao]")
+    # data_bao = one.find_elements_by_xpath(".//span[@data-bao]")
+    # if len(data_baobiao) > 0:
+    #     baobiao = data_baobiao[0]
+    #     ac.move_to_element(baobiao).perform()
+    # if len(data_bao) > 0:
+    #     bao = data_bao[0]
+    #     ac.move_to_element(bao).perform()
+    # time.sleep(20)
+    # if len(c_tools) > 0:
+    #     xiangxia = c_tools[0]
+    #     ac.move_to_element(xiangxia).perform()
+
+    dict1 = {}
+    dict2 = {}
+    divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+    for div in divs:
+        divas = div.find_elements_by_xpath(".//div//a")
+        for diva in divas:
+            if diva.text == "www.kf400.cn/":
+                tmp = divs.index(div)
+                dict1[tmp] = diva.text
+            if "www.kf400.cn" in diva.text:
+                tmp = divs.index(div)
+                dict2[tmp] = diva.text
+    if dict1.__len__() > 0:
+        index = sorted(dict1.items())[0][0]
+        dest = divs[index]
+        driver.execute_script("arguments[0].scrollIntoView();", dest)
+        time.sleep(2)
+        random_num = random.randint(1, 100)
+        # 标题
+        if random_num > 20:
+            index = sorted(dict1.items())[0][0]
+            dest = divs[index]
+            a = dest.find_element_by_xpath(".//a[1]")
+            ActionChains(driver).click(dest).perform()
+        # 网址
+        elif random_num < 6:
+            index = sorted(dict1.items())[0][0]
+            dest = divs[index]
+            node_div = dest.find_elements_by_xpath("./div")
+            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+            if node_div.__len__() == 1:
+                a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                # ActionChains(driver).move_to_element(a).perform()
+                # time.sleep(300)
+                ActionChains(driver).click(a).perform()
+            else:
+                a = dest.find_element_by_xpath("./div[2]/a[1]")
+                # ActionChains(driver).move_to_element(a).perform()
+                # time.sleep(300)
+                ActionChains(driver).click(a).perform()
+
+        # 图片
+        else:
+            index = sorted(dict1.items())[0][0]
+            dest = divs[index]
+            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+            node_div = dest.find_elements_by_xpath("./div")
+            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+            if node_div.__len__() == 1:
+                a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                # ActionChains(driver).move_to_element(a).perform()
+                # time.sleep(300)
+                ActionChains(driver).click(a).perform()
+
+
+
+    elif dict2.__len__() > 0:
+        index = sorted(dict2.items())[0][0]
+        dest = divs[index]
+        driver.execute_script("arguments[0].scrollIntoView();", dest)
+        time.sleep(200)
+
+    time.sleep(100)
+    one = driver.find_element_by_xpath("//div[@id='content_left']/div[1]//a[1]")
+    # one = divs.find_element_by_xpath("./div[1]//a[1]")
+    # ac.move_to_element(one).perform()
     # ac.click_and_hold(one).perform()
     ac.click(one).perform()
     windows = driver.window_handles
-    driver.switch_to.window(windows[-1]) #切换到新窗口
+    driver.switch_to.window(windows[-1])  # 切换到新窗口
     print(driver.window_handles)  # 查看所有window handles
-
-
+    driver.close()
     # driver.find_element_by_class_name("s_tab_inner")
     # slider = driver.find_element_by_id("content_left")
     # for y in range(6):
@@ -148,7 +224,7 @@ else:
     # 打印所有cookies
     print(driver.get_cookies())
 
-    newurl = driver.current_url + '&si='+site+"&ct=2097152"
+    newurl = driver.current_url + '&si=' + site + "&ct=2097152"
     driver.get(newurl)
 
 finally:
