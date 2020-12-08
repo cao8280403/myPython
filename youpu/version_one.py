@@ -27,7 +27,7 @@ class myThread(threading.Thread):
         random_count = self.one_circle(self.words[0], "1", driver)
 
         if random_count == 1:
-            # time.sleep(random.randint(30, 200))
+            time.sleep(random.randint(30, 200))
             windows = driver.window_handles
             if windows.__len__() ==2:
                 driver.switch_to.window(windows[-1])  # 切换到新窗口
@@ -68,7 +68,6 @@ class myThread(threading.Thread):
         if count == "2":
             return 2
         else:
-            return 1
             # 随机返回一个值
             random_count = random.randint(0, 1)
             if random_count == 1:
