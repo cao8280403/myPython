@@ -27,9 +27,9 @@ class myThread(threading.Thread):
         random_count = self.one_circle(self.words[0], "1", driver)
 
         if random_count == 1:
-            time.sleep(random.randint(30, 200))
+            time.sleep(random.randint(3, 20))
             windows = driver.window_handles
-            if windows.__len__() ==2:
+            if windows.__len__() == 2:
                 driver.switch_to.window(windows[-1])  # 切换到新窗口
                 print(driver.window_handles)  # 查看所有window handles
                 driver.close()
@@ -41,7 +41,7 @@ class myThread(threading.Thread):
                     inputs.send_keys(Keys.BACKSPACE)
                     time.sleep(random.randint(1, 3) / 10)
                 self.one_circle(self.words[1], "2", driver)
-            elif windows.__len__() ==1:
+            elif windows.__len__() == 1:
                 # driver.switch_to.window(windows[-1])  # 切换到新窗口
                 # print(driver.window_handles)  # 查看所有window handles
                 # driver.close()
@@ -90,6 +90,11 @@ class myThread(threading.Thread):
         time.sleep(random.randint(0, 1))
         ActionChains(driver).click(su).perform()
         time.sleep(random.randint(1, 3))
+        wait = WebDriverWait(driver, 10, 0.5)
+        # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+        wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+        newurl = driver.current_url + '&si=' + 'www.kf400.cn' + "&ct=2097152"
+        driver.get(newurl)
         wait = WebDriverWait(driver, 10, 0.5)
         # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
         wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
@@ -162,6 +167,8 @@ class myThread(threading.Thread):
 
         dict1 = {}
         dict2 = {}
+        all_divs = driver.find_elements_by_xpath("//div/h3")
+        ad_count = all_divs.__len__()-10
         divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
         for div in divs:
             divas = div.find_elements_by_xpath(".//div//a")
@@ -175,15 +182,24 @@ class myThread(threading.Thread):
         if dict1.__len__() > 0:
             index = sorted(dict1.items())[0][0]
             dest = divs[index]
-            driver.execute_script("arguments[0].scrollIntoView();", dest)
-            time.sleep(random.randint(1, 3))
+            js = "document.documentElement.scrollTop=document.body.scrollHeight*" + str((index + ad_count - 1)/all_divs.__len__())
+            driver.execute_script(js)
+
+            # if index==0:
+            #     driver.execute_script("arguments[0].scrollIntoView();", divs[index])
+            #     time.sleep(random.randint(1, 3))
+            # else:
+            #     driver.execute_script("arguments[0].scrollIntoView();", divs[index-1])
+            #     time.sleep(random.randint(1, 3))
+
             random_num = random.randint(1, 100)
             # 标题
             if random_num > 20:
                 index = sorted(dict1.items())[0][0]
                 dest = divs[index]
                 a = dest.find_element_by_xpath(".//a[1]")
-                ActionChains(driver).click(dest).perform()
+                ActionChains(driver).click(a).perform()
+                time.sleep(random.randint(1, 3))
             # 网址
             elif random_num < 6:
                 index = sorted(dict1.items())[0][0]
@@ -195,11 +211,13 @@ class myThread(threading.Thread):
                     # ActionChains(driver).move_to_element(a).perform()
                     # time.sleep(300)
                     ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
                 else:
                     a = dest.find_element_by_xpath("./div[2]/a[1]")
                     # ActionChains(driver).move_to_element(a).perform()
                     # time.sleep(300)
                     ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
 
             # 图片
             else:
@@ -213,6 +231,7 @@ class myThread(threading.Thread):
                     # ActionChains(driver).move_to_element(a).perform()
                     # time.sleep(300)
                     ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
         elif dict2.__len__() > 0:
             index = sorted(dict2.items())[0][0]
             dest = divs[index]
@@ -224,7 +243,8 @@ class myThread(threading.Thread):
                 index = sorted(dict2.items())[0][0]
                 dest = divs[index]
                 a = dest.find_element_by_xpath(".//a[1]")
-                ActionChains(driver).click(dest).perform()
+                ActionChains(driver).click(a).perform()
+                time.sleep(random.randint(1, 3))
             # 网址
             elif random_num < 6:
                 index = sorted(dict2.items())[0][0]
@@ -236,11 +256,13 @@ class myThread(threading.Thread):
                     # ActionChains(driver).move_to_element(a).perform()
                     # time.sleep(300)
                     ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
                 else:
                     a = dest.find_element_by_xpath("./div[2]/a[1]")
                     # ActionChains(driver).move_to_element(a).perform()
                     # time.sleep(300)
                     ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
 
             # 图片
             else:
@@ -254,13 +276,23 @@ class myThread(threading.Thread):
                     # ActionChains(driver).move_to_element(a).perform()
                     # time.sleep(300)
                     ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
 
 
 def main():
     print("start __main__")
     words = ["400电话", "400电话办理"]
     thread1 = myThread(words)
+    thread2 = myThread(words)
+    thread3 = myThread(words)
+    thread4 = myThread(words)
+    thread5 = myThread(words)
+
     thread1.start()
+    thread2.start()
+    thread3.start()
+    thread4.start()
+    thread5.start()
     print("end __main__")
 
 

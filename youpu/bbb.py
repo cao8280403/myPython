@@ -1,39 +1,44 @@
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium import webdriver
-from time import sleep
+#!/usr/bin/python3
 
-filters = ['招聘', '诚聘', '社招']
-contents = [
-    '独自等待安全团队诚聘, https://www.jb51.net/',
-    '独自等待安全团队招聘, https://www.jb51.net/',
-    '独自等待安全团队社招, https://www.jb51.net/',
-    '独自等待信息安全博客, https://www.jb51.net/',
-]
+import threading
+import time
 
-for content in contents:
-    if any(keyword in content for keyword in filters): continue
-    print(content)
+class myThread (threading.Thread):
+    def __init__(self, threadID, name, counter):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+    def run(self):
+        print ("开启线程： " + self.name)
+        # 获取锁，用于线程同步
+        threadLock.acquire()
+        print_time(self.name, self.counter, 3)
+        # 释放锁，开启下一个线程
+        threadLock.release()
 
+def print_time(threadName, delay, counter):
+    while counter:
+        time.sleep(delay)
+        print ("%s: %s" % (threadName, time.ctime(time.time())))
+        counter -= 1
 
-abc = "abc"
+threadLock = threading.Lock()
+threads = []
 
-mmm = "abcde"
-var = abc in mmm
-print(var)
-#
-# get_12306 = webdriver.Chrome()
-# get_12306.get('https://www.12306.cn/index/index.html')
-#
-# g_href = get_12306.find_element_by_xpath('//*[@id="J-index"]/a')
-# Action = ActionChains(get_12306)
-#
-#
-# for x in range(9):
-#     x = x * 145
-#     print(x)
-#     Action.move_to_element_with_offset(g_href, x, 0).perform()
-#     sleep(0.5)
-#
-# sleep(2)
-#
-# get_12306.quit()
+# 创建新线程
+thread1 = myThread(1, "Thread-1", 1)
+thread2 = myThread(2, "Thread-2", 2)
+
+# 开启新线程
+thread1.start()
+thread2.start()
+
+# 添加线程到线程列表
+threads.append(thread1)
+threads.append(thread2)
+
+# 等待所有线程完成
+for t in threads:
+    t.join()
+print ("退出主线程")

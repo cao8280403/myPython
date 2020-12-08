@@ -96,6 +96,11 @@ try:
 
     # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
     wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+
+    all_divs = driver.find_elements_by_xpath("//div/h3")
+
+
+
     for i in range(10):
         js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(i)
         driver.execute_script(js)
