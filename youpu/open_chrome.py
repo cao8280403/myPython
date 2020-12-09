@@ -13,52 +13,55 @@ from selenium.webdriver.common.action_chains import ActionChains
 import threading
 
 
-class myThread(threading.Thread):
-    def __init__(self, words):
+class oneThread(threading.Thread):
+    def __init__(self, words,site,driver):
         threading.Thread.__init__(self)
         self.words = words
+        self.site = site
+        self.driver = driver
 
     def run(self):
+        #初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
         print("begin thread：")
-        driver = webdriver.Chrome()
-        driver.get("https://www.baidu.com")
-        driver.delete_all_cookies()
+        # driver = webdriver.Chrome()
+        self.driver.get("https://www.baidu.com")
+        self.driver.delete_all_cookies()
         # print_time(self.name, self.counter, 5)
-        random_count = self.one_circle(self.words[0], "1", driver)
+        random_count = self.one_circle(self.words[0], "1", self.driver)
 
         if random_count == 1:
-            time.sleep(random.randint(3, 20))
-            windows = driver.window_handles
+            time.sleep(random.randint(30, 100))
+            windows = self.driver.window_handles
             if windows.__len__() == 2:
-                driver.switch_to.window(windows[-1])  # 切换到新窗口
-                print(driver.window_handles)  # 查看所有window handles
-                driver.close()
-                driver.switch_to.window(windows[0])
+                self.driver.switch_to.window(windows[-1])  # 切换到新窗口
+                print(self.driver.window_handles)  # 查看所有window handles
+                self.driver.close()
+                self.driver.switch_to.window(windows[0])
                 # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
-                inputs = driver.find_element_by_id("kw")
-                ActionChains(driver).click(inputs).perform()
+                inputs = self.driver.find_element_by_id("kw")
+                ActionChains(self.driver).click(inputs).perform()
                 for i in range(10):
                     inputs.send_keys(Keys.BACKSPACE)
                     time.sleep(random.randint(1, 3) / 10)
-                self.one_circle(self.words[1], "2", driver)
+                self.one_circle(self.words[1], "2", self.driver)
             elif windows.__len__() == 1:
                 # driver.switch_to.window(windows[-1])  # 切换到新窗口
                 # print(driver.window_handles)  # 查看所有window handles
                 # driver.close()
                 # driver.switch_to.window(windows[0])
                 # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
-                inputs = driver.find_element_by_id("kw")
-                ActionChains(driver).click(inputs).perform()
+                inputs = self.driver.find_element_by_id("kw")
+                ActionChains(self.driver).click(inputs).perform()
                 for i in range(10):
                     inputs.send_keys(Keys.BACKSPACE)
                     time.sleep(random.randint(1, 3) / 10)
-                self.one_circle(self.words[1], "2", driver)
+                self.one_circle(self.words[1], "2", self.driver)
             print("two circle over")
         else:
             print("only one circle over")
         # 修改关键词后再次执行方法one_circle
         print("end thread：")
-        driver.quit()
+        self.driver.quit()
 
     def one_circle(self, word, count, driver):
         print("begin circle：word is " + word + " count is " + count)
@@ -68,14 +71,15 @@ class myThread(threading.Thread):
         if count == "2":
             return 2
         else:
+            return 1
             # 随机返回一个值
-            random_count = random.randint(0, 1)
-            if random_count == 1:
-                print("return 1")
-                return 1
-            else:
-                print("go on")
-                return 0
+            # random_count = random.randint(0, 1)
+            # if random_count == 1:
+            #     print("return 1")
+            #     return 1
+            # else:
+            #     print("go on")
+            #     return 0
 
     def normal_step(self, word, driver):
         print("normal_step")
@@ -93,13 +97,13 @@ class myThread(threading.Thread):
         wait = WebDriverWait(driver, 10, 0.5)
         # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
         wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-        newurl = driver.current_url + '&si=' + 'www.kf400.cn' + "&ct=2097152"
+        newurl = driver.current_url + '&si=' + self.site + "&ct=2097152"
         driver.get(newurl)
         wait = WebDriverWait(driver, 10, 0.5)
         # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
         wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
         # 找到第一个元素，看是否有保障和向下按钮
-        one = driver.find_element_by_xpath("//div[@id='content_left']/div[1]")
+        one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
         c_tools = one.find_elements_by_xpath(".//div[@class='c-tools']")  # 向下
         data_baobiao = one.find_elements_by_xpath(".//a[@data-baobiao]")  # 广告的保障
         data_bao = one.find_elements_by_xpath(".//span[@data-bao]")  # 普通的保障
@@ -173,10 +177,10 @@ class myThread(threading.Thread):
         for div in divs:
             divas = div.find_elements_by_xpath(".//div//a")
             for diva in divas:
-                if diva.text == "www.kf400.cn/":
+                if diva.text == self.site+"/":
                     tmp = divs.index(div)
                     dict1[tmp] = diva.text
-                if "www.kf400.cn" in diva.text:
+                if self.site in diva.text:
                     tmp = divs.index(div)
                     dict2[tmp] = diva.text
         if dict1.__len__() > 0:
@@ -281,18 +285,18 @@ class myThread(threading.Thread):
 
 def main():
     print("start __main__")
-    words = ["400电话", "400电话办理"]
-    thread1 = myThread(words)
-    thread2 = myThread(words)
-    thread3 = myThread(words)
-    thread4 = myThread(words)
-    thread5 = myThread(words)
-
-    thread1.start()
-    thread2.start()
-    thread3.start()
-    thread4.start()
-    thread5.start()
+    # words = ["400电话", "400电话办理"]
+    # thread1 = myThread(words)
+    # thread2 = myThread(words)
+    # thread3 = myThread(words)
+    # thread4 = myThread(words)
+    # thread5 = myThread(words)
+    #
+    # thread1.start()
+    # thread2.start()
+    # thread3.start()
+    # thread4.start()
+    # thread5.start()
     print("end __main__")
 
 
