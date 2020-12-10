@@ -14,54 +14,63 @@ import threading
 
 
 class oneThread(threading.Thread):
-    def __init__(self, words,site,driver):
+    def __init__(self, words, site, arg1, arg2, arg3, arg4):
         threading.Thread.__init__(self)
         self.words = words
         self.site = site
-        self.driver = driver
+        self.arg1 = arg1
+        self.arg2 = arg2
+        self.arg3 = arg3
+        self.arg4 = arg4
 
     def run(self):
-        #初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
+        # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
         print("begin thread：")
-        # driver = webdriver.Chrome()
-        self.driver.get("https://www.baidu.com")
-        self.driver.delete_all_cookies()
+        options = webdriver.ChromeOptions()  # 设置代理
+        options.add_argument(self.arg1)
+        options.add_argument('lang=zh_CN.UTF-8')
+        options.add_argument(self.arg2)
+        driver = webdriver.Chrome(options=options)
+        driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
+
+        driver.get("https://www.baidu.com")
+        driver.delete_all_cookies()
         # print_time(self.name, self.counter, 5)
-        random_count = self.one_circle(self.words[0], "1", self.driver)
+        random_count = self.one_circle(self.words[0], "1", driver)
 
         if random_count == 1:
             time.sleep(random.randint(30, 100))
-            windows = self.driver.window_handles
+            windows = driver.window_handles
             if windows.__len__() == 2:
-                self.driver.switch_to.window(windows[-1])  # 切换到新窗口
-                print(self.driver.window_handles)  # 查看所有window handles
-                self.driver.close()
-                self.driver.switch_to.window(windows[0])
+                driver.switch_to.window(windows[-1])  # 切换到新窗口
+                print(driver.window_handles)  # 查看所有window handles
+                driver.close()
+                driver.switch_to.window(windows[0])
                 # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
-                inputs = self.driver.find_element_by_id("kw")
-                ActionChains(self.driver).click(inputs).perform()
+                inputs = driver.find_element_by_id("kw")
+                ActionChains(driver).click(inputs).perform()
                 for i in range(10):
                     inputs.send_keys(Keys.BACKSPACE)
                     time.sleep(random.randint(1, 3) / 10)
-                self.one_circle(self.words[1], "2", self.driver)
+                self.one_circle(self.words[1], "2", driver)
             elif windows.__len__() == 1:
                 # driver.switch_to.window(windows[-1])  # 切换到新窗口
                 # print(driver.window_handles)  # 查看所有window handles
                 # driver.close()
                 # driver.switch_to.window(windows[0])
                 # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
-                inputs = self.driver.find_element_by_id("kw")
-                ActionChains(self.driver).click(inputs).perform()
+                inputs = driver.find_element_by_id("kw")
+                ActionChains(driver).click(inputs).perform()
                 for i in range(10):
                     inputs.send_keys(Keys.BACKSPACE)
                     time.sleep(random.randint(1, 3) / 10)
-                self.one_circle(self.words[1], "2", self.driver)
+                self.one_circle(self.words[1], "2", driver)
             print("two circle over")
         else:
             print("only one circle over")
         # 修改关键词后再次执行方法one_circle
         print("end thread：")
-        self.driver.quit()
+        driver.quit()
 
     def one_circle(self, word, count, driver):
         print("begin circle：word is " + word + " count is " + count)
@@ -172,12 +181,12 @@ class oneThread(threading.Thread):
         dict1 = {}
         dict2 = {}
         all_divs = driver.find_elements_by_xpath("//div/h3")
-        ad_count = all_divs.__len__()-10
+        ad_count = all_divs.__len__() - 10
         divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
         for div in divs:
             divas = div.find_elements_by_xpath(".//div//a")
             for diva in divas:
-                if diva.text == self.site+"/":
+                if diva.text == self.site + "/":
                     tmp = divs.index(div)
                     dict1[tmp] = diva.text
                 if self.site in diva.text:
@@ -186,7 +195,8 @@ class oneThread(threading.Thread):
         if dict1.__len__() > 0:
             index = sorted(dict1.items())[0][0]
             dest = divs[index]
-            js = "document.documentElement.scrollTop=document.body.scrollHeight*" + str((index + ad_count - 1)/all_divs.__len__())
+            js = "document.documentElement.scrollTop=document.body.scrollHeight*" + str(
+                (index + ad_count - 1) / all_divs.__len__())
             driver.execute_script(js)
 
             # if index==0:
