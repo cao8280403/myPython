@@ -14,7 +14,7 @@ import threading
 
 
 class oneThread(threading.Thread):
-    def __init__(self, words, site, arg1, arg2, arg3, arg4):
+    def __init__(self, words, site, arg1, arg2, arg3, arg4, show_window, cookie):
         threading.Thread.__init__(self)
         self.words = words
         self.site = site
@@ -22,6 +22,8 @@ class oneThread(threading.Thread):
         self.arg2 = arg2
         self.arg3 = arg3
         self.arg4 = arg4
+        self.show_window = show_window
+        self.cookie = cookie
 
     def run(self):
         # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
@@ -29,12 +31,29 @@ class oneThread(threading.Thread):
         options = webdriver.ChromeOptions()  # 设置代理
         options.add_argument(self.arg1)
         options.add_argument('lang=zh_CN.UTF-8')
+        # options.add_argument('--disable-infobars')  # 不显示正在受自动化软件控制  失效
+        if self.show_window != "yes":
+            options.headless = True
+        options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制
         options.add_argument(self.arg2)
         driver = webdriver.Chrome(options=options)
         driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
 
         driver.get("https://www.baidu.com")
         driver.delete_all_cookies()
+        cookie_list_array = self.cookie.split(";")
+        for tmp_cookie in cookie_list_array:
+            cookie_dict = {
+                "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
+                'name': tmp_cookie.split("=")[0],
+                'value': tmp_cookie.split("=")[1],
+                "expires": "",
+                'path': '/',
+                'httpOnly': False,
+                'HostOnly': False,
+                'Secure': False}
+            driver.add_cookie(cookie_dict)
+        driver.refresh()
         # print_time(self.name, self.counter, 5)
         random_count = self.one_circle(self.words[0], "1", driver)
 
@@ -75,7 +94,7 @@ class oneThread(threading.Thread):
     def one_circle(self, word, count, driver):
         print("begin circle：word is " + word + " count is " + count)
 
-        self.normal_step(word, driver)
+        self.normal_step(word, count, driver)
         # 最后的走向判断
         if count == "2":
             return 2
@@ -90,7 +109,7 @@ class oneThread(threading.Thread):
             #     print("go on")
             #     return 0
 
-    def normal_step(self, word, driver):
+    def normal_step(self, word, count, driver):
         print("normal_step")
 
         inputs = driver.find_element_by_id("kw")
@@ -106,11 +125,12 @@ class oneThread(threading.Thread):
         wait = WebDriverWait(driver, 10, 0.5)
         # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
         wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-        newurl = driver.current_url + '&si=' + self.site + "&ct=2097152"
-        driver.get(newurl)
-        wait = WebDriverWait(driver, 10, 0.5)
-        # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
-        wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+        if count == "1":
+            newurl = driver.current_url + '&si=' + self.site + "&ct=2097152"
+            driver.get(newurl)
+            wait = WebDriverWait(driver, 10, 0.5)
+            # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+            wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
         # 找到第一个元素，看是否有保障和向下按钮
         one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
         c_tools = one.find_elements_by_xpath(".//div[@class='c-tools']")  # 向下
@@ -135,26 +155,29 @@ class oneThread(threading.Thread):
                 xiangxia = c_tools[0]
                 ActionChains(driver).move_to_element(xiangxia).perform()
                 time.sleep(random.randint(1, 2))
-        # 50 % 几率点击第1条的标题位置，1~3秒后关闭
-        if random.randint(1, 2) == 1:
-            a1 = one.find_element_by_xpath(".//a[1]")
-            ActionChains(driver).click(a1).perform()
-            time.sleep(random.randint(1, 3))
-            windows = driver.window_handles
-            driver.switch_to.window(windows[-1])
-            driver.close()
-            driver.switch_to.window(windows[0])
-            time.sleep(random.randint(1, 3))
-        # 20 % 几率点击第2条的标题位置，1~3秒后关闭
-        if random.randint(1, 5) == 1:
-            a1 = driver.find_element_by_xpath("//div[@id='content_left']/div[2]//a[1]")
-            ActionChains(driver).click(a1).perform()
-            time.sleep(random.randint(1, 3))
-            windows = driver.window_handles
-            driver.switch_to.window(windows[-1])
-            driver.close()
-            driver.switch_to.window(windows[0])
-            time.sleep(random.randint(1, 3))
+
+        # 判断第一条是不是广告，不是就不用点了 data-ecimtimesign style
+        if one.get_attribute("style") != '':
+            # 50 % 几率点击第1条的标题位置，1~3秒后关闭
+            if random.randint(1, 2) == 1:
+                a1 = one.find_element_by_xpath(".//a[1]")
+                ActionChains(driver).click(a1).perform()
+                time.sleep(random.randint(1, 3))
+                windows = driver.window_handles
+                driver.switch_to.window(windows[-1])
+                driver.close()
+                driver.switch_to.window(windows[0])
+                time.sleep(random.randint(1, 3))
+            # 20 % 几率点击第2条的标题位置，1~3秒后关闭
+            if random.randint(1, 5) == 1:
+                a1 = driver.find_element_by_xpath("//div[@id='content_left']/div[2]//a[1]")
+                ActionChains(driver).click(a1).perform()
+                time.sleep(random.randint(1, 3))
+                windows = driver.window_handles
+                driver.switch_to.window(windows[-1])
+                driver.close()
+                driver.switch_to.window(windows[0])
+                time.sleep(random.randint(1, 3))
         # 执行向下滚动1次，幅度随机20 % ~60 % 高度，后停留1~3秒
         now_height = random.randint(2, 6)
         js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)

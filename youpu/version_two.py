@@ -21,24 +21,44 @@ class Myspider:
     def get_window_size(self):
         return self.readConfig.get_window_size()
 
+    def get_keyword(self):
+        return self.readConfig.get_keyword()
+
+    def get_site(self):
+        return self.readConfig.get_site()
+
+    def get_pram(self):
+        return self.readConfig.get_pram()
+
+    def get_url(self):
+        return self.readConfig.get_url()
+
 
 if __name__ == '__main__':
     myspider = Myspider()  # 读取配置文件
     window_size = myspider.get_window_size().split(",")
-    for i in range(3):
+    keyword = myspider.get_keyword().split(",")
+    site = myspider.get_site()
+    url = myspider.get_url()
+    pram = myspider.get_pram()
+    for m in range(int(pram[0])):
         time.sleep(1)
-        sql = "select * from ua order by rand() limit 10"
+        sql = "select * from ua order by rand() limit 20"
         ua = []
         for i in myspider.get_config(sql):
             ua.append(i)
 
-        request = requests.get(
-            "http://route.xiongmaodaili.com/xiongmao-web/api/glip?secret=88d304d14273946c00cd3cabc7d25199&orderNo=GL20201208142456Pe5sEDu6&count=10&isTxt=0&proxyType=1")
+        sql = "select cookie from cookie order by rand() limit 20"
+        cookies = []
+        for j in myspider.get_config(sql):
+            cookies.append(j)
+
+        request = requests.get(url)
         ip_port = json.loads(request.text)
-        words = ["400电话代理", "400电话代理"]
-        site = "www.4006.com"
+        # words = ["400电话代理", "400电话代理"]
+
         # 新建线程，每个线程单独使用一个尺寸，UA，和IP PORT
-        for i in range(10):
+        for i in range(int(pram[1])):
             # rand = random.randint(0, ip_port['obj'].__len__() - 1)
             port = ip_port['obj'][i - 1]['port']
             ip = ip_port['obj'][i - 1]['ip']
@@ -49,9 +69,11 @@ if __name__ == '__main__':
             # driver = webdriver.Chrome(options=options)
             # driver.set_window_size(window_size[random.randint(0, window_size.__len__() - 1)].split("*")[0], window_size[random.randint(0, window_size.__len__() - 1)].split("*")[1])  # 分辨率 1024*768
             # one = oneThread(words, site, driver)
-            one = oneThread(words, site, "--proxy-server=http://" + ip + ":" + port,
+            one = oneThread(keyword, site, "--proxy-server=http://" + ip + ":" + port,
                             'user-agent="' + ua[random.randint(0, ua.__len__() - 1)][0] + '"',
                             window_size[random.randint(0, window_size.__len__() - 1)].split("*")[0],
-                            window_size[random.randint(0, window_size.__len__() - 1)].split("*")[1])
+                            window_size[random.randint(0, window_size.__len__() - 1)].split("*")[1],
+                            pram[3],
+                            cookies[random.randint(0, cookies.__len__() - 1)][0])
             one.start()
-            time.sleep(0.5)
+            time.sleep(float(pram[2]))
