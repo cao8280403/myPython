@@ -37,7 +37,8 @@ class oneThread(threading.Thread):
         options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制
         options.add_argument(self.arg2)
         driver = webdriver.Chrome(options=options)
-        driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
+        # driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
+        driver.maximize_window()
 
         driver.get("https://www.baidu.com")
         driver.delete_all_cookies()
@@ -131,6 +132,41 @@ class oneThread(threading.Thread):
             wait = WebDriverWait(driver, 10, 0.5)
             # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
             wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+
+        #判断第一页是否有广告，没有则点百度一下，再下一页，上一页，后面只点百度一下重复五次
+        guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
+        if guanggaos.__len__()==0 :
+            time.sleep(random.randint(2, 5))
+            su = driver.find_element_by_id("su")
+            ActionChains(driver).click(su).perform()
+            guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
+            if guanggaos.__len__() == 0:
+                time.sleep(random.randint(1, 3))
+                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
+                driver.execute_script(js)
+                time.sleep(random.randint(1, 3))
+                js = "document.documentElement.scrollTop=document.body.scrollHeight"
+                driver.execute_script(js)
+                # 点下一页
+                time.sleep(random.randint(1, 3))
+                next_page = driver.find_elements_by_xpath("//a[@class='n']")[0]
+                ActionChains(driver).click(next_page).perform()
+                # windows = driver.window_handles
+                # driver.switch_to.window(windows[-1])  # 切换到新窗口
+                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
+                driver.execute_script(js)
+                pre_page = driver.find_elements_by_xpath("//a[@class='n']")[0]
+                ActionChains(driver).click(pre_page).perform()
+                for p in range(20):
+                    time.sleep(random.randint(2, 4))
+                    su = driver.find_element_by_id("su")
+                    ActionChains(driver).click(su).perform()
+                    guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
+                    if guanggaos.__len__() > 0:
+                        break
+
+
+
         # 找到第一个元素，看是否有保障和向下按钮
         one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
         c_tools = one.find_elements_by_xpath(".//div[@class='c-tools']")  # 向下
@@ -157,6 +193,7 @@ class oneThread(threading.Thread):
                 time.sleep(random.randint(1, 2))
 
         # 判断第一条是不是广告，不是就不用点了 data-ecimtimesign style
+        one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
         if one.get_attribute("style") != '':
             # 50 % 几率点击第1条的标题位置，1~3秒后关闭
             if random.randint(1, 2) == 1:
