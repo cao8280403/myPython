@@ -37,33 +37,35 @@ if __name__ == '__main__':
     # 查出所有的cookie 依次给他赋值 最后保存
     # objs = session.query(City_cookies).filter(City_cookies.ua.isnot(None)).limit(10).all()
     while True:
-        uas = session.query(Ua).order_by(func.random()).limit(200).all()
-        city_cookies = session.query(City_cookies).filter(City_cookies.ua == None).limit(len(uas)).all()
-        if len(city_cookies) == 0:
-            break
-        obj_fetchip = Fetchip()
-        ips = obj_fetchip.requesturl()
-        threads = []
-        results = []
-        for i in range(len(city_cookies)):
-            getali_thread = Getali_thread(ips[i]["origin_ip"])
-            threads.append(getali_thread)
+        try:
+            uas = session.query(Ua).order_by(func.random()).limit(200).all()
+            city_cookies = session.query(City_cookies).filter(City_cookies.ua == None).limit(len(uas)).all()
+            if len(city_cookies) == 0:
+                break
+            obj_fetchip = Fetchip()
+            ips = obj_fetchip.requesturl()
+            threads = []
+            results = []
+            for i in range(len(city_cookies)):
+                getali_thread = Getali_thread(ips[i]["origin_ip"])
+                threads.append(getali_thread)
 
-        for tmp in threads:
-            tmp.start()
+            for tmp in threads:
+                tmp.start()
 
-        for tmp in threads:
-            tmp.join()
-            results.append(tmp.getResult())
+            for tmp in threads:
+                tmp.join()
+                results.append(tmp.getResult())
 
-        for i in range(min(len(uas),len(city_cookies)) ):
-            city_cookies[i].city = results[i]["City"]
-            city_cookies[i].zone = results[i]["County"]
-            city_cookies[i].ua = uas[i].content
+            for i in range(min(len(uas),len(city_cookies)) ):
+                city_cookies[i].city = results[i]["City"]
+                city_cookies[i].zone = results[i]["County"]
+                city_cookies[i].ua = uas[i].content
 
-        save_objs = [{'id': obj.id, 'cookie': obj.cookie, 'city': obj.city, 'zone': obj.zone, 'ua': obj.ua} for obj in
-                     city_cookies]
-        session.bulk_update_mappings(City_cookies, save_objs)
-        session.commit()
-
+            save_objs = [{'id': obj.id, 'cookie': obj.cookie, 'city': obj.city, 'zone': obj.zone, 'ua': obj.ua} for obj in
+                         city_cookies]
+            session.bulk_update_mappings(City_cookies, save_objs)
+            session.commit()
+        except Exception as err:
+            print(err)
     print("end process")
