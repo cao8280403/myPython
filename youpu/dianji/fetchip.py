@@ -8,7 +8,8 @@ se = requests.session()
 
 class Fetchip:
     def __init__(self):
-        self.url = "http://api.zhuzhaiip.com:498/GetIpPort?passageId=1335483186719006722&num=8&protocol=2&province=&city=&minute=1&format=2&split=&splitChar=&reset=true&secret=1RN6xR"
+        # self.url = "http://api.zhuzhaiip.com:498/GetIpPort?passageId=1335483186719006722&num=10&protocol=2&province=&city=&minute=1&format=2&split=&splitChar=&reset=true&secret=1RN6xR"
+        self.url = "http://api.zhuzhaiip.com:498/GetIpPort?passageId=1335483186735783938&num=10&protocol=2&province=&city=&minute=1&format=2&split=&splitChar=&reset=true&secret=CZj0Zd"
 
     def requesturl(self):
         # Post_data = {

@@ -31,7 +31,7 @@ class oneThread(threading.Thread):
     def run(self):
         try:
             # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
-            print("begin thread：")
+            # print("begin thread：")
             options = webdriver.ChromeOptions()  # 设置代理
             options.add_argument(self.arg1)
             options.add_argument('lang=zh_CN.UTF-8')
@@ -85,7 +85,7 @@ class oneThread(threading.Thread):
                 windows = driver.window_handles
                 if windows.__len__() == 2:
                     driver.switch_to.window(windows[-1])  # 切换到新窗口
-                    print(driver.window_handles)  # 查看所有window handles
+                    # print(driver.window_handles)  # 查看所有window handles
                     driver.close()
                     driver.switch_to.window(windows[0])
                     # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
@@ -109,14 +109,15 @@ class oneThread(threading.Thread):
                         time.sleep(random.randint(1, 3) / 10)
                     if self.word_two != "":
                         self.one_circle(self.word_two, "2", driver)
-                print("two circle over")
+                # print("two circle over")
             else:
                 print("only one circle over")
             # 修改关键词后再次执行方法one_circle
-            print("end thread：")
+            # print("end thread：")
             driver.quit()
         except Exception as err:
-            print(err)
+            a=1
+            # print(err)
     def one_circle(self, word, count, driver):
         try:
             # print("begin circle：word is " + word + " count is " + count)
@@ -136,10 +137,12 @@ class oneThread(threading.Thread):
                 #     print("go on")
                 #     return 0
         except Exception as err:
-            print(err)
+            a=1
+            # print(err)
     def normal_step(self, word, count, driver):
+        global g_ids
         try:
-            print("normal_step")
+            # print("normal_step")
 
             inputs = driver.find_element_by_id("kw")
             for keyword in word["keyword"]:
@@ -220,7 +223,7 @@ class oneThread(threading.Thread):
 
             # 判断第一条是不是广告，不是就不用点了 data-ecimtimesign style
             one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
-            if one.get_attribute("style") != '':
+            if 1==1 or one.get_attribute("style") != '':
                 # 50 % 几率点击第1条的标题位置，1~3秒后关闭
                 if random.randint(1, 2) == 1:
                     a1 = one.find_element_by_xpath(".//a[1]")
@@ -299,8 +302,10 @@ class oneThread(threading.Thread):
                     dest = divs[index]
                     a = dest.find_element_by_xpath(".//a[1]")
                     ActionChains(driver).click(a).perform()
+                    threadLock.acquire()
                     self.bclass = Bclass()
                     self.bclass.add(word)
+                    threadLock.release()
                     time.sleep(random.randint(1, 3))
                 # 网址
                 elif random_num < 6:
@@ -315,6 +320,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         self.bclass = Bclass()
                         self.bclass.add(word)
+                        g_ids.append(word)
                         time.sleep(random.randint(1, 3))
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
@@ -323,6 +329,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         self.bclass = Bclass()
                         self.bclass.add(word)
+                        g_ids.append(word)
                         time.sleep(random.randint(1, 3))
 
                 # 图片
@@ -352,6 +359,7 @@ class oneThread(threading.Thread):
                     ActionChains(driver).click(a).perform()
                     self.bclass = Bclass()
                     self.bclass.add(word)
+                    g_ids.append(word)
                     time.sleep(random.randint(1, 3))
                 # 网址
                 elif random_num < 6:
@@ -366,6 +374,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         self.bclass = Bclass()
                         self.bclass.add(word)
+                        g_ids.append(word)
                         time.sleep(random.randint(1, 3))
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
@@ -374,6 +383,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         self.bclass = Bclass()
                         self.bclass.add(word)
+                        g_ids.append(word)
                         time.sleep(random.randint(1, 3))
 
                 # 图片
@@ -390,9 +400,11 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         self.bclass = Bclass()
                         self.bclass.add(word)
+                        g_ids.append(word)
                         time.sleep(random.randint(1, 3))
         except Exception as err:
-            print(err)
+            a=1
+            # print(err)
 
 def main():
     print("start __main__")
