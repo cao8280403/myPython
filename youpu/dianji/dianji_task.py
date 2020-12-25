@@ -22,6 +22,8 @@ from aliip import Aliip
 from Bclass import Bclass
 
 gids = []
+delete_cookies = []
+
 
 class oneThread(threading.Thread):
     def __init__(self, word_one, word_two, site, arg1, ip, citycookies):
@@ -29,103 +31,122 @@ class oneThread(threading.Thread):
         self.word_one = word_one
         if word_two != "":
             self.word_two = word_two
+            print(2)
         else:
             self.word_two = ""
+            print(1)
         self.site = site
         self.arg1 = arg1
         self.ip = ip
         self.citycookies = citycookies
 
     def run(self):
+        global delete_cookies
         try:
             # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
             # print("begin thread：")
             options = webdriver.ChromeOptions()  # 设置代理
             options.add_argument(self.arg1)
             options.add_argument('lang=zh_CN.UTF-8')
+            # options.add_argument('--ignore-certificate-errors')
             # options.add_argument('--disable-infobars')  # 不显示正在受自动化软件控制  失效
-            # options.headless = True
+            options.headless = True
             options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制
             # 根据ip获取阿里ip的地域
             aliip = Aliip()
             ali_result = aliip.requesturl(self.ip)
             json_result = json.loads(ali_result)
             # 如果地域不全，就随机拿个ua，否则根据城市和地区选一个随机的cookie
-            cookie_list_array = []
+            cookie_list_str = ''
+            tmp_city_cookie = ''
             ua = ""
-            if json_result["City"]!='' and json_result["County"]!='':
+            if json_result["City"] != '' and json_result["County"] != '':
                 tmp_cookies = []
                 for tmp in self.citycookies:
-                    if tmp["city"]==json_result["City"] and tmp["zone"]==json_result["County"]:
+                    if tmp.city == json_result["City"] and tmp.zone == json_result["County"]:
                         tmp_cookies.append(tmp)
                 city_cookie = tmp_cookies[random.randint(0, tmp_cookies.__len__() - 1)]
-                ua =city_cookie["ua"]
-                cookie_list_array =city_cookie["cookie"]
+                ua = city_cookie.ua
+                tmp_city_cookie = city_cookie
+                cookie_list_str = city_cookie.cookie
             else:
                 ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
             # 'user-agent="' + ua[random.randint(0, ua.__len__() - 1)][0] + '"',
             options.add_argument('user-agent="' + ua + '"')
             driver = webdriver.Chrome(options=options)
-            # driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
-            driver.maximize_window()
+            try:
+                # driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
+                # driver.maximize_window()
 
-            driver.get("https://www.baidu.com")
-            driver.delete_all_cookies()
+                driver.get("https://www.baidu.com")
+                driver.delete_all_cookies()
 
-            # cookie_list_array = self.cookie.split(";")
-            for tmp_cookie in cookie_list_array:
-                cookie_dict = {
-                    "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
-                    'name': tmp_cookie.split("=")[0],
-                    'value': tmp_cookie.split("=")[1],
-                    "expires": "",
-                    'path': '/',
-                    'httpOnly': False,
-                    'HostOnly': False,
-                    'Secure': False}
-                driver.add_cookie(cookie_dict)
-            driver.refresh()
-            # print_time(self.name, self.counter, 5)
-            random_count = self.one_circle(self.word_one, "1", driver)
+                if cookie_list_str != '':
+                    cookie_list_array = cookie_list_str.split(";")
+                    for tmp_cookie in cookie_list_array:
+                        cookie_dict = {
+                            "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
+                            'name': tmp_cookie.split("=")[0],
+                            'value': tmp_cookie.split("=")[1],
+                            "expires": "",
+                            'path': '/',
+                            'httpOnly': False,
+                            'HostOnly': False,
+                            'Secure': False}
+                        driver.add_cookie(cookie_dict)
+                driver.refresh()
+                # print_time(self.name, self.counter, 5)
+                random_count = self.one_circle(self.word_one, "1", driver)
 
-            if random_count == 1:
-                time.sleep(random.randint(30, 100))
-                windows = driver.window_handles
-                if windows.__len__() == 2:
-                    driver.switch_to.window(windows[-1])  # 切换到新窗口
-                    # print(driver.window_handles)  # 查看所有window handles
-                    driver.close()
-                    driver.switch_to.window(windows[0])
-                    # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
-                    inputs = driver.find_element_by_id("kw")
-                    ActionChains(driver).click(inputs).perform()
-                    for i in range(10):
-                        inputs.send_keys(Keys.BACKSPACE)
-                        time.sleep(random.randint(1, 3) / 10)
-                    if self.word_two != "":
-                        self.one_circle(self.word_two, "2", driver)
-                elif windows.__len__() == 1:
-                    # driver.switch_to.window(windows[-1])  # 切换到新窗口
-                    # print(driver.window_handles)  # 查看所有window handles
-                    # driver.close()
-                    # driver.switch_to.window(windows[0])
-                    # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
-                    inputs = driver.find_element_by_id("kw")
-                    ActionChains(driver).click(inputs).perform()
-                    for i in range(10):
-                        inputs.send_keys(Keys.BACKSPACE)
-                        time.sleep(random.randint(1, 3) / 10)
-                    if self.word_two != "":
-                        self.one_circle(self.word_two, "2", driver)
-                # print("two circle over")
-            else:
-                print("only one circle over")
-            # 修改关键词后再次执行方法one_circle
-            # print("end thread：")
+                if random_count == 1:
+                    time.sleep(random.randint(30, 100))
+                    windows = driver.window_handles
+                    if windows.__len__() == 2:
+                        driver.switch_to.window(windows[-1])  # 切换到新窗口
+                        # print(driver.window_handles)  # 查看所有window handles
+                        driver.close()
+                        driver.switch_to.window(windows[0])
+                        # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
+                        inputs = driver.find_element_by_id("kw")
+                        ActionChains(driver).click(inputs).perform()
+                        for i in range(10):
+                            inputs.send_keys(Keys.BACKSPACE)
+                            time.sleep(random.randint(1, 3) / 10)
+                        if self.word_two != "":
+                            self.one_circle(self.word_two, "2", driver)
+                    elif windows.__len__() == 1:
+                        # driver.switch_to.window(windows[-1])  # 切换到新窗口
+                        # print(driver.window_handles)  # 查看所有window handles
+                        # driver.close()
+                        # driver.switch_to.window(windows[0])
+                        # 关闭第二个页面，回到第一个页面，鼠标移动到搜索输入框，点击一下，按键盘删除10下，每下间隔0.1~0.3秒
+                        inputs = driver.find_element_by_id("kw")
+                        ActionChains(driver).click(inputs).perform()
+                        for i in range(10):
+                            inputs.send_keys(Keys.BACKSPACE)
+                            time.sleep(random.randint(1, 3) / 10)
+                        if self.word_two != "":
+                            self.one_circle(self.word_two, "2", driver)
+                            # print("two circle over")
+                        # else:
+                        #     a = 1
+                        #     print("only one circle over")
+                # 修改关键词后再次执行方法one_circle
+                # print("end thread：")
+
+            except Exception as err:
+                a = 1
+                print(err)
+                # print("ua ===>"+ua)
+                # print("cookie ===>"+cookie_list_str)
+                delete_cookies.append(tmp_city_cookie)
+                driver.quit()
+
             driver.quit()
         except Exception as err:
-            a=1
-            # print(err)
+            a = 1
+            print(err)
+
     def one_circle(self, word, count, driver):
         try:
             # print("begin circle：word is " + word + " count is " + count)
@@ -145,8 +166,9 @@ class oneThread(threading.Thread):
                 #     print("go on")
                 #     return 0
         except Exception as err:
-            a=1
+            a = 1
             # print(err)
+
     def normal_step(self, word, count, driver):
         global gids
         try:
@@ -173,36 +195,36 @@ class oneThread(threading.Thread):
                 wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
 
             # 判断第一页是否有广告，没有则点百度一下，再下一页，上一页，后面只点百度一下重复五次
-            guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
-            if guanggaos.__len__() == 0:
-                time.sleep(random.randint(2, 5))
-                su = driver.find_element_by_id("su")
-                ActionChains(driver).click(su).perform()
-                guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
-                if guanggaos.__len__() == 0:
-                    time.sleep(random.randint(1, 3))
-                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
-                    driver.execute_script(js)
-                    time.sleep(random.randint(1, 3))
-                    js = "document.documentElement.scrollTop=document.body.scrollHeight"
-                    driver.execute_script(js)
-                    # 点下一页
-                    time.sleep(random.randint(1, 3))
-                    next_page = driver.find_elements_by_xpath("//a[@class='n']")[0]
-                    ActionChains(driver).click(next_page).perform()
-                    # windows = driver.window_handles
-                    # driver.switch_to.window(windows[-1])  # 切换到新窗口
-                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
-                    driver.execute_script(js)
-                    pre_page = driver.find_elements_by_xpath("//a[@class='n']")[0]
-                    ActionChains(driver).click(pre_page).perform()
-                    for p in range(20):
-                        time.sleep(random.randint(2, 4))
-                        su = driver.find_element_by_id("su")
-                        ActionChains(driver).click(su).perform()
-                        guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
-                        if guanggaos.__len__() > 0:
-                            break
+            # guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
+            # if guanggaos.__len__() == 0:
+            #     time.sleep(random.randint(2, 5))
+            #     su = driver.find_element_by_id("su")
+            #     ActionChains(driver).click(su).perform()
+            #     guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
+            #     if guanggaos.__len__() == 0:
+            #         time.sleep(random.randint(1, 3))
+            #         js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
+            #         driver.execute_script(js)
+            #         time.sleep(random.randint(1, 3))
+            #         js = "document.documentElement.scrollTop=document.body.scrollHeight"
+            #         driver.execute_script(js)
+            #         # 点下一页
+            #         time.sleep(random.randint(1, 3))
+            #         next_page = driver.find_elements_by_xpath("//a[@class='n']")[0]
+            #         ActionChains(driver).click(next_page).perform()
+            #         # windows = driver.window_handles
+            #         # driver.switch_to.window(windows[-1])  # 切换到新窗口
+            #         js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
+            #         driver.execute_script(js)
+            #         pre_page = driver.find_elements_by_xpath("//a[@class='n']")[0]
+            #         ActionChains(driver).click(pre_page).perform()
+            #         for p in range(20):
+            #             time.sleep(random.randint(2, 4))
+            #             su = driver.find_element_by_id("su")
+            #             ActionChains(driver).click(su).perform()
+            #             guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
+            #             if guanggaos.__len__() > 0:
+            #                 break
 
             # 找到第一个元素，看是否有保障和向下按钮
             one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
@@ -231,7 +253,7 @@ class oneThread(threading.Thread):
 
             # 判断第一条是不是广告，不是就不用点了 data-ecimtimesign style
             one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
-            if 1==1 or one.get_attribute("style") != '':
+            if one.get_attribute("style") != '':
                 # 50 % 几率点击第1条的标题位置，1~3秒后关闭
                 if random.randint(1, 2) == 1:
                     a1 = one.find_element_by_xpath(".//a[1]")
@@ -397,7 +419,7 @@ class oneThread(threading.Thread):
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         # ActionChains(driver).move_to_element(a).perform()
                         # time.sleep(300)
-                        # ActionChains(driver).click(a).perform()
+                        ActionChains(driver).click(a).perform()
                         # threadLock.acquire()
                         # self.bclass = Bclass()
                         # self.bclass.add(word)
@@ -416,7 +438,7 @@ class oneThread(threading.Thread):
                         a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
                         # ActionChains(driver).move_to_element(a).perform()
                         # time.sleep(300)
-                        # ActionChains(driver).click(a).perform()
+                        ActionChains(driver).click(a).perform()
                         # threadLock.acquire()
                         # self.bclass = Bclass()
                         # self.bclass.add(word)
@@ -424,8 +446,10 @@ class oneThread(threading.Thread):
                         gids.append(word)
                         time.sleep(random.randint(1, 3))
         except Exception as err:
-            a=1
+            a = 1
+            driver.quit()
             # print(err)
+
 
 class Aclass(object):
     def __init__(self):
@@ -433,6 +457,9 @@ class Aclass(object):
         self.citycookies = []
 
     def fetch_fabao(self):
+        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()  # 创建session
         cursor = session.execute(
             "select a.* from (select * from mipcms_fabao_history where time > UNIX_TIMESTAMP(date_format(now(),'%Y-%m-%d'))) a  left join mipcms_fabao b on a.site = b.site and a.keyword=b.keyword and a.count<b.mubiao order by rand()")
         result = cursor.fetchall()
@@ -440,6 +467,9 @@ class Aclass(object):
         self.fabaos = result
 
     def fetch_cookies(self):
+        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()  # 创建session
         citycookies = session.query(City_cookies).all()
         print(len(citycookies))
         self.citycookies = citycookies
@@ -447,29 +477,38 @@ class Aclass(object):
 
 if __name__ == '__main__':
     print("begin process")
-    threadLock = threading.Lock()
     try:
-        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()  # 创建session
         aclass = Aclass()
         aclass.fetch_cookies()
         while True:
             if len(gids) >= 10:
                 aaa = gids
                 try:
+                    engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+                    DBSession = sessionmaker(bind=engine)
+                    session = DBSession()  # 创建session
                     save_objs = [{'id': obj.id, 'site': obj.site, 'keyword': obj.keyword, 'count': obj.count + 1,
                                   'time': obj.time} for obj in
                                  gids]
                     session.bulk_update_mappings(Mipcms_fabao_history, save_objs)
                     session.commit()
+                    # 顺便删除cookies
+                    if len(delete_cookies) > 0:
+                        bbb = []
+                        for tmp in delete_cookies:
+                            if tmp != '':
+                                bbb.append(tmp.id)
+                        ccc = tuple(bbb)
+                        delete_count = session.query(City_cookies).filter(City_cookies.id.in_(ccc)).delete(
+                            synchronize_session=False)
+                        session.commit()
+                        print(delete_count)
                 except Exception as err:
                     print(err)
                 for i in aaa:
                     print(i)
                 gids = []
             if len(aclass.fabaos) > 0 and len(aclass.fabaos[0]) > 0:
-                time.sleep(60)
                 # aclass.fabaos.pop(0)
                 obj_fetchip = Fetchip()
                 ips = obj_fetchip.requesturl()
@@ -481,14 +520,17 @@ if __name__ == '__main__':
                         site = fabaos_one["site"]
                         for word in aclass.fabaos:
                             if word["site"] == site:
-                                word_two = aclass.fabaos.pop(aclass.fabaos.index(word))
+                                fabaos_two = aclass.fabaos.pop(aclass.fabaos.index(word))
                                 break
                         one = oneThread(fabaos_one, fabaos_two, site,
-                                        "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["ip"], aclass.citycookies)
+                                        "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
+                                        aclass.citycookies)
                         threads.append(one)
                 for thread in threads:
+                    # time.sleep(1)
                     thread.start()
                 print("threads")
+                time.sleep(20)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
