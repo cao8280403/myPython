@@ -12,14 +12,16 @@ from selenium.webdriver.common.by import By  # 定位器
 from selenium.webdriver.common.keys import Keys  # 键盘对象
 from selenium.webdriver.support import expected_conditions as EC  # 判断器
 from selenium.webdriver.support.wait import WebDriverWait  # 浏览器等待对像
+from selenium.webdriver.chrome.service import Service
 import time
 import json
-import win32api
+import os
 import random
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
 from aliip import Aliip
 from Bclass import Bclass
+import psutil
 
 gids = []
 delete_cookies = []
@@ -31,10 +33,8 @@ class oneThread(threading.Thread):
         self.word_one = word_one
         if word_two != "":
             self.word_two = word_two
-            print(2)
         else:
             self.word_two = ""
-            print(1)
         self.site = site
         self.arg1 = arg1
         self.ip = ip
@@ -50,8 +50,10 @@ class oneThread(threading.Thread):
             options.add_argument('lang=zh_CN.UTF-8')
             # options.add_argument('--ignore-certificate-errors')
             # options.add_argument('--disable-infobars')  # 不显示正在受自动化软件控制  失效
-            options.headless = True
-            options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制
+            # options.headless = True
+            options.add_argument('log-level=3')
+            # options.add_experimental_option('excludeSwitches', ['enable-logging'])#禁止打印日志
+            options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制#跟上面只能选一个
             # 根据ip获取阿里ip的地域
             aliip = Aliip()
             ali_result = aliip.requesturl(self.ip)
@@ -73,6 +75,7 @@ class oneThread(threading.Thread):
                 ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
             # 'user-agent="' + ua[random.randint(0, ua.__len__() - 1)][0] + '"',
             options.add_argument('user-agent="' + ua + '"')
+            options.add_argument('Connection="close"')
             driver = webdriver.Chrome(options=options)
             try:
                 # driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
@@ -136,16 +139,23 @@ class oneThread(threading.Thread):
 
             except Exception as err:
                 a = 1
-                print(err)
+                print("error 1: " + str(err))
                 # print("ua ===>"+ua)
                 # print("cookie ===>"+cookie_list_str)
                 delete_cookies.append(tmp_city_cookie)
+                # os.system("taskkill /f  chromedriver.exe")
+                # os.system('taskkill /im chromedriver.exe /F')
+                # os.system('taskkill /pid chromedriver.exe /f')
+                # os.system('taskkill /im chromedriver.exe /F')
+                # os.system('taskkill /im chrome.exe /F')
+                print(driver.window_handles)  # 查看所有window handles
+                # driver.close()
                 driver.quit()
 
             driver.quit()
         except Exception as err:
             a = 1
-            print(err)
+            print("error 2: " + str(err))
 
     def one_circle(self, word, count, driver):
         try:
@@ -180,6 +190,7 @@ class oneThread(threading.Thread):
                 random_count = random.randint(1, 10)
                 time.sleep(random_count / 10)
             time.sleep(random.randint(1, 2))
+            # inputs.send_keys("联通电话费查询")
             su = driver.find_element_by_id("su")
             time.sleep(random.randint(0, 1))
             ActionChains(driver).click(su).perform()
@@ -188,12 +199,14 @@ class oneThread(threading.Thread):
             # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
             wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
             if count == "1":
+                # print(1)
                 newurl = driver.current_url + '&si=' + self.site + "&ct=2097152"
                 driver.get(newurl)
                 wait = WebDriverWait(driver, 10, 0.5)
                 # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
                 wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-
+            # else:
+            #     print(2)
             # 判断第一页是否有广告，没有则点百度一下，再下一页，上一页，后面只点百度一下重复五次
             # guanggaos = driver.find_elements_by_xpath("//span[@data-tuiguang]")
             # if guanggaos.__len__() == 0:
@@ -282,21 +295,29 @@ class oneThread(threading.Thread):
             # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
             for i in range(random.randint(1, 5)):
                 if random.randint(1, 2) == 1:
-                    now_height = now_height + random.randint(2, 6)
-                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                    now_height = min(now_height + random.randint(1, 5), 10)
+                    if now_height == 0:
+                        js = "document.documentElement.scrollTop=document.body.scrollTop"
+                    else:
+                        js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                    print(js)
                     driver.execute_script(js)
                     time.sleep(random.randint(1, 3))
                 else:
-                    tmp = random.randint(2, 6)
+                    tmp = random.randint(1, 5)
                     now_height = now_height - tmp if now_height > tmp else 0
-                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                    if now_height == 0:
+                        js = "document.documentElement.scrollTop=document.body.scrollTop"
+                    else:
+                        js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                    print(js)
                     driver.execute_script(js)
                     time.sleep(random.randint(1, 3))
-            js = "document.documentElement.scrollTop=0"
+            js = "document.documentElement.scrollTop=document.body.scrollTop"
             driver.execute_script(js)
             # 判断目标网站的地址需要为正好www.kf400.cn / 斜杠后面没有后缀的，判断这是第几名，就滚到【第几名 / 总位数】的位置，停留随机1~3秒.如果都是带后缀的内页就点击第一个带www.kf400.cn的目标网站
             # 获取所有带目标网站的地址
-
+            time.sleep(random.randint(2, 3))
             dict1 = {}
             dict2 = {}
             all_divs = driver.find_elements_by_xpath("//div/h3")
@@ -314,16 +335,18 @@ class oneThread(threading.Thread):
             if dict1.__len__() > 0:
                 index = sorted(dict1.items())[0][0]
                 dest = divs[index]
-                js = "document.documentElement.scrollTop=document.body.scrollHeight*" + str(
-                    (index + ad_count - 1) / all_divs.__len__())
+                driver.execute_script("arguments[0].scrollIntoView();", dest)
+                # 再向上移动200
+                js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
                 driver.execute_script(js)
-
-                # if index==0:
-                #     driver.execute_script("arguments[0].scrollIntoView();", divs[index])
-                #     time.sleep(random.randint(1, 3))
-                # else:
-                #     driver.execute_script("arguments[0].scrollIntoView();", divs[index-1])
-                #     time.sleep(random.randint(1, 3))
+                # js = "alert(document.body.scrollTop)"
+                # driver.execute_script(js)
+                # js = "alert(document.body.scrollHeight)"
+                # driver.execute_script(js)
+                # if (index + ad_count - 1) > 2:
+                #     js = "document.documentElement.scrollTop=document.body.scrollHeight*" + str(
+                #         (index + ad_count - 2) / all_divs.__len__())
+                #     driver.execute_script(js)
 
                 random_num = random.randint(1, 100)
                 # 标题
@@ -384,6 +407,9 @@ class oneThread(threading.Thread):
                 index = sorted(dict2.items())[0][0]
                 dest = divs[index]
                 driver.execute_script("arguments[0].scrollIntoView();", dest)
+                # 再向上移动200
+                js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                driver.execute_script(js)
                 time.sleep(random.randint(1, 3))
                 random_num = random.randint(1, 100)
                 # 标题
@@ -448,7 +474,7 @@ class oneThread(threading.Thread):
         except Exception as err:
             a = 1
             driver.quit()
-            # print(err)
+            print("error 3: " + str(err))
 
 
 class Aclass(object):
@@ -475,12 +501,24 @@ class Aclass(object):
         self.citycookies = citycookies
 
 
+def close_chrome():
+    process_list = list(psutil.process_iter())
+    pids = []
+    for p in process_list:
+        if p.name() == "chrome.exe" and p.create_time() + 5 * 60 < time.time():
+            pids.append(p.pid)
+    print("close pids count:"+str(len(pids)))
+    for pid in pids:
+        os.system('taskkill /pid '+str(pid)+' /f')
+
+
 if __name__ == '__main__':
     print("begin process")
     try:
         aclass = Aclass()
         aclass.fetch_cookies()
         while True:
+            close_chrome()
             if len(gids) >= 10:
                 aaa = gids
                 try:
@@ -530,10 +568,10 @@ if __name__ == '__main__':
                     # time.sleep(1)
                     thread.start()
                 print("threads")
-                time.sleep(20)
+                time.sleep(120)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
     except Exception as err:
-        print(err)
+        print("error 4: " + str(err))
 print("end process")
