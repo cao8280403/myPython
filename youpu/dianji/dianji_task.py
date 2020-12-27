@@ -50,7 +50,7 @@ class oneThread(threading.Thread):
             options.add_argument('lang=zh_CN.UTF-8')
             # options.add_argument('--ignore-certificate-errors')
             # options.add_argument('--disable-infobars')  # 不显示正在受自动化软件控制  失效
-            # options.headless = True
+            options.headless = True
             options.add_argument('log-level=3')
             # options.add_experimental_option('excludeSwitches', ['enable-logging'])#禁止打印日志
             options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制#跟上面只能选一个
@@ -505,7 +505,7 @@ def close_chrome():
     process_list = list(psutil.process_iter())
     pids = []
     for p in process_list:
-        if p.name() == "chrome.exe" and p.create_time() + 5 * 60 < time.time():
+        if p.name() == "chrome.exe" and p.create_time() + 3 * 60 < time.time():
             pids.append(p.pid)
     print("close pids count:"+str(len(pids)))
     for pid in pids:
@@ -568,7 +568,7 @@ if __name__ == '__main__':
                     # time.sleep(1)
                     thread.start()
                 print("threads")
-                time.sleep(120)
+                time.sleep(10)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
