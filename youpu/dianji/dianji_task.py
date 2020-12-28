@@ -542,7 +542,7 @@ if __name__ == '__main__':
         aclass.fetch_cookies()
         while True:
             close_chrome()
-            if len(gids) >= 10:
+            if len(gids) >= 100:
                 aaa = gids
                 try:
                     engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
@@ -570,33 +570,35 @@ if __name__ == '__main__':
                     print(i)
                 gids = []
             if len(aclass.fabaos) > 0 and len(aclass.fabaos[0]) > 0:
-                # aclass.fabaos.pop(0)
-                obj_fetchip = Fetchip()
-                ips = obj_fetchip.requesturl()
-                threads = []
-                for ip in ips:
-                    if len(aclass.fabaos) > 0:
-                        fabaos_one = aclass.fabaos.pop(0)
-                        fabaos_two = ""
-                        site = fabaos_one["site"]
-                        for word in aclass.fabaos:
-                            if word["site"] == site:
-                                fabaos_two = aclass.fabaos.pop(aclass.fabaos.index(word))
-                                break
-                        one = oneThread(fabaos_one, fabaos_two, site,
-                                        "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
-                                        aclass.citycookies)
-                        threads.append(one)
-                for thread in threads:
-                    # time.sleep(1)
-                    thread.start()
-                print("threads")
-
+                try:
+                    # aclass.fabaos.pop(0)
+                    obj_fetchip = Fetchip()
+                    ips = obj_fetchip.requesturl()
+                    threads = []
+                    for ip in ips:
+                        if len(aclass.fabaos) > 0:
+                            fabaos_one = aclass.fabaos.pop(0)
+                            fabaos_two = ""
+                            site = fabaos_one["site"]
+                            for word in aclass.fabaos:
+                                if word["site"] == site:
+                                    fabaos_two = aclass.fabaos.pop(aclass.fabaos.index(word))
+                                    break
+                            one = oneThread(fabaos_one, fabaos_two, site,
+                                            "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
+                                            aclass.citycookies)
+                            threads.append(one)
+                    for thread in threads:
+                        # time.sleep(1)
+                        thread.start()
+                    print("threads")
+                except Exception as err:
+                    print("error 8: " + str(err))
                 # time.sleep(120)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
-            time.sleep(10)
+            time.sleep(2)
     except Exception as err:
         print("error 4: " + str(err))
 print("end process")
