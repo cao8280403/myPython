@@ -82,6 +82,9 @@ class oneThread(threading.Thread):
                 # driver.maximize_window()
 
                 driver.get("https://www.baidu.com")
+                element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
+                )
                 driver.delete_all_cookies()
 
                 if cookie_list_str != '':
@@ -148,7 +151,7 @@ class oneThread(threading.Thread):
                 # os.system('taskkill /pid chromedriver.exe /f')
                 # os.system('taskkill /im chromedriver.exe /F')
                 # os.system('taskkill /im chrome.exe /F')
-                print(driver.window_handles)  # 查看所有window handles
+                # print(driver.window_handles)  # 查看所有window handles
                 # driver.close()
                 driver.quit()
 
@@ -300,7 +303,6 @@ class oneThread(threading.Thread):
                         js = "document.documentElement.scrollTop=document.body.scrollTop"
                     else:
                         js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
-                    print(js)
                     driver.execute_script(js)
                     time.sleep(random.randint(1, 3))
                 else:
@@ -310,7 +312,6 @@ class oneThread(threading.Thread):
                         js = "document.documentElement.scrollTop=document.body.scrollTop"
                     else:
                         js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
-                    print(js)
                     driver.execute_script(js)
                     time.sleep(random.randint(1, 3))
             js = "document.documentElement.scrollTop=document.body.scrollTop"
@@ -504,13 +505,35 @@ class Aclass(object):
 def close_chrome():
     process_list = list(psutil.process_iter())
     pids = []
+    cmd_pids = []
+    conhost_pids = []
     for p in process_list:
-        if p.name() == "chrome.exe" and p.create_time() + 3 * 60 < time.time():
+        if p.name() == "chrome.exe" and p.create_time() + 5 * 60 < time.time():
             pids.append(p.pid)
+        if p.name() == "cmd.exe":
+            cmd_pids.append(p)
+        if p.name() == "conhost.exe":
+            conhost_pids.append(p)
     print("close pids count:"+str(len(pids)))
     for pid in pids:
-        os.system('taskkill /pid '+str(pid)+' /f')
-
+        try:
+            os.system('taskkill /pid '+str(pid)+' /f')
+        except Exception as error:
+            print("error 5: " + str(error))
+    cmd_pids.sort(key=lambda x: x.create_time())
+    conhost_pids.sort(key=lambda x: x.create_time())
+    cmd_pids2 = cmd_pids[6:]
+    conhost_pids3 = conhost_pids[8:]
+    for pid in cmd_pids2:
+        try:
+            os.system('taskkill /pid '+str(pid.pid)+' /f')
+        except Exception as error:
+            print("error 6: " + str(error))
+    for pid in conhost_pids3:
+        try:
+            os.system('taskkill /pid '+str(pid.pid)+' /f')
+        except Exception as error:
+            print("error 7: " + str(error))
 
 if __name__ == '__main__':
     print("begin process")
@@ -568,10 +591,12 @@ if __name__ == '__main__':
                     # time.sleep(1)
                     thread.start()
                 print("threads")
-                time.sleep(10)
+
+                # time.sleep(120)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
+            time.sleep(10)
     except Exception as err:
         print("error 4: " + str(err))
 print("end process")
