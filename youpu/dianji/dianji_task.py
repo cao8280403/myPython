@@ -590,8 +590,8 @@ class Aclass(object):
 
 def change_fbl(x, y):
     dm = win32api.EnumDisplaySettings(None, 0)
-    dm.PelsHeight = x
-    dm.PelsWidth = y
+    dm.PelsHeight = int(y)
+    dm.PelsWidth = int(x)
     dm.BitsPerPel = 32
     dm.DisplayFixedOutput = 0
     win32api.ChangeDisplaySettings(dm, 0)
@@ -645,7 +645,8 @@ if __name__ == '__main__':
         show_window = prams[1]
         open_chrome_sec = prams[2]
         sizelist = get_window_size.split(",")
-
+        tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
+        change_fbl(tmp.split("*")[0], tmp.split("*")[1])
         aclass = Aclass()
         aclass.fetch_cookies()
         loop_count = 0
