@@ -645,8 +645,6 @@ if __name__ == '__main__':
         show_window = prams[1]
         open_chrome_sec = prams[2]
         sizelist = get_window_size.split(",")
-        tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-        change_fbl(tmp.split("*")[0], tmp.split("*")[1])
         aclass = Aclass()
         aclass.fetch_cookies()
         loop_count = 0
