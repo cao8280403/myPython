@@ -29,7 +29,8 @@ class ReadConfig:
     def get_pram(self):
         time_sleep = self.cf.get("Pram", "time_sleep")
         show_window = self.cf.get("Pram", "show_window")
-        return [time_sleep,show_window]
+        open_chrome_sec = self.cf.get("Pram", "open_chrome_sec")
+        return [time_sleep,show_window,open_chrome_sec]
 
 
 if __name__ == '__main__':

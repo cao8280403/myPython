@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 from sqlalchemy import Column, String, create_engine, ForeignKey, func
 from fetchip import Fetchip
 from sqlalchemy.orm import sessionmaker, relationship
@@ -25,6 +25,7 @@ from aliip import Aliip
 from Bclass import Bclass
 import psutil
 import traceback
+import win32api, win32con
 from readconfig import ReadConfig
 
 gids = []
@@ -33,7 +34,7 @@ success_count = 0
 
 
 class oneThread(threading.Thread):
-    def __init__(self, word_one, word_two, site, arg1, ip, citycookies,show_window):
+    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window):
         threading.Thread.__init__(self)
         self.word_one = word_one
         if word_two != "":
@@ -587,6 +588,15 @@ class Aclass(object):
         self.citycookies = citycookies
 
 
+def change_fbl(x, y):
+    dm = win32api.EnumDisplaySettings(None, 0)
+    dm.PelsHeight = x
+    dm.PelsWidth = y
+    dm.BitsPerPel = 32
+    dm.DisplayFixedOutput = 0
+    win32api.ChangeDisplaySettings(dm, 0)
+
+
 def close_chrome():
     try:
         process_list = list(psutil.process_iter())
@@ -630,14 +640,18 @@ if __name__ == '__main__':
         readConfig = ReadConfig()
         num = readConfig.get_url()
         prams = readConfig.get_pram()
+        get_window_size = readConfig.get_window_size()
         sleep_time = prams[0]
         show_window = prams[1]
+        open_chrome_sec = prams[2]
+        sizelist = get_window_size.split(",")
 
         aclass = Aclass()
         aclass.fetch_cookies()
         loop_count = 0
         while True:
             # close_chrome()
+
             if len(gids) >= 100:
                 aaa = gids
                 try:
@@ -685,21 +699,23 @@ if __name__ == '__main__':
                                     break
                             one = oneThread(fabaos_one, fabaos_two, site,
                                             "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
-                                            aclass.citycookies,show_window)
+                                            aclass.citycookies, show_window)
                             threads.append(one)
                     for thread in threads:
-                        # time.sleep(1)
+                        time.sleep(open_chrome_sec)
                         thread.start()
                     print("threads")
                     print("loop_count ***************************************************: " + str(loop_count))
                     print("success_count ***************************************************: " + str(success_count))
                 except Exception as err:
                     print("error 8: " + str(err))
-                time.sleep(600)
+                # time.sleep(600)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
-            # time.sleep(int(sleep_time))
+                tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
+                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+            time.sleep(int(sleep_time))
     except Exception as err:
         print("error 4: " + str(err))
 print("end process")
