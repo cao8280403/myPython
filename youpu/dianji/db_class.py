@@ -1,7 +1,6 @@
 from sqlalchemy import Column, String, create_engine, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-import MySQLdb
 import time
 
 # 创建对象的基类:
