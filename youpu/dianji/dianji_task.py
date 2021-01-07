@@ -393,7 +393,8 @@ class oneThread(threading.Thread):
                         # print(nowurl)
                         if 'baidu.com' not in nowurl:
                             gids.append(word)
-                            break
+                            time.sleep(random.randint(80, 120))
+                            driver.quit()
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict1.items())[0][0]
@@ -416,7 +417,8 @@ class oneThread(threading.Thread):
                             # print(nowurl)
                             if 'baidu.com' not in nowurl:
                                 gids.append(word)
-                                break
+                                time.sleep(random.randint(80, 120))
+                                driver.quit()
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         # ActionChains(driver).move_to_element(a).perform()
@@ -435,7 +437,8 @@ class oneThread(threading.Thread):
                             # print(nowurl)
                             if 'baidu.com' not in nowurl:
                                 gids.append(word)
-                                break
+                                time.sleep(random.randint(80, 120))
+                                driver.quit()
 
                 # 图片
                 else:
@@ -460,7 +463,8 @@ class oneThread(threading.Thread):
                             # print(nowurl)
                             if 'baidu.com' not in nowurl:
                                 gids.append(word)
-                                break
+                                time.sleep(random.randint(80, 120))
+                                driver.quit()
             elif dict2.__len__() > 0:
                 index = sorted(dict2.items())[0][0]
                 dest = divs[index]
@@ -489,7 +493,8 @@ class oneThread(threading.Thread):
                         # print(nowurl)
                         if 'baidu.com' not in nowurl:
                             gids.append(word)
-                            break
+                            time.sleep(random.randint(80, 120))
+                            driver.quit()
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict2.items())[0][0]
@@ -512,7 +517,8 @@ class oneThread(threading.Thread):
                             # print(nowurl)
                             if 'baidu.com' not in nowurl:
                                 gids.append(word)
-                                break
+                                time.sleep(random.randint(80, 120))
+                                driver.quit()
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         ActionChains(driver).click(a).perform()
@@ -529,7 +535,8 @@ class oneThread(threading.Thread):
                             # print(nowurl)
                             if 'baidu.com' not in nowurl:
                                 gids.append(word)
-                                break
+                                time.sleep(random.randint(80, 120))
+                                driver.quit()
 
                 # 图片
                 else:
@@ -554,12 +561,14 @@ class oneThread(threading.Thread):
                             # print(nowurl)
                             if 'baidu.com' not in nowurl:
                                 gids.append(word)
-                                break
+                                time.sleep(random.randint(80, 120))
+                                driver.quit()
         except Exception as error:
             a = 1
+            if 'HTTPConnectionPool' not in str(error):
+                print("error 3: " + str(error))
             driver.quit()
-            print("error 3: " + str(error))
-            # print('traceback.print_exc():' + str(traceback.print_exc()))
+
 
 
 class Aclass(object):
@@ -573,7 +582,7 @@ class Aclass(object):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
         cursor = session.execute(
-            "select c.* from ( select a.*,b.mubiao from (select * from mipcms_fabao_history where time > UNIX_TIMESTAMP(date_format(now(),'%Y-%m-%d'))) a  left join mipcms_fabao b on a.site = b.site and a.keyword=b.keyword where a.count<b.mubiao) c order by (mubiao * rand() ) desc limit 1000")
+            "select c.* from ( select a.*,b.mubiao from (select * from mipcms_fabao_history where time >= UNIX_TIMESTAMP(date_format(now(),'%Y-%m-%d'))) a  left join mipcms_fabao b on a.site = b.site and a.keyword=b.keyword where a.count<b.mubiao) c order by (mubiao * rand() ) desc limit 1000")
         result = cursor.fetchall()
         print(len(result))
         self.fabaos = result
@@ -701,14 +710,15 @@ if __name__ == '__main__':
                                             aclass.citycookies, show_window)
                             threads.append(one)
                     for thread in threads:
-                        time.sleep(open_chrome_sec)
+                        time.sleep(int(open_chrome_sec)/1000)
                         thread.start()
                     print("threads")
                     print("loop_count ***************************************************: " + str(loop_count))
                     print("success_count ***************************************************: " + str(success_count))
                 except Exception as err:
                     print("error 8: " + str(err))
-                # time.sleep(600)
+                    # print('traceback.print_exc():' + str(traceback.print_exc()))
+                # time.sleep(60)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
