@@ -30,7 +30,9 @@ from readconfig import ReadConfig
 
 gids = []
 delete_cookies = []
+update_cookies = []
 success_count = 0
+httpIP = 0
 
 
 class oneThread(threading.Thread):
@@ -49,6 +51,8 @@ class oneThread(threading.Thread):
 
     def run(self):
         global delete_cookies
+        global update_cookies
+        global httpIP
         try:
             # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
             # print("begin thread：")
@@ -89,11 +93,13 @@ class oneThread(threading.Thread):
                     tmp_city_cookie = city_cookie
                     cookie_list_str = city_cookie.cookie
             else:
-                ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
+                return
+                # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
             # 'user-agent="' + ua[random.randint(0, ua.__len__() - 1)][0] + '"',
             options.add_argument('user-agent="' + ua + '"')
             options.add_argument('Connection="close"')
             driver = webdriver.Chrome(options=options)
+            httpIP = httpIP + 1
             try:
                 # driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
                 driver.maximize_window()
@@ -103,7 +109,6 @@ class oneThread(threading.Thread):
                     EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
                 )
                 driver.delete_all_cookies()
-
                 if cookie_list_str != '':
                     cookie_list_array = cookie_list_str.split(";")
                     for tmp_cookie in cookie_list_array:
@@ -118,6 +123,12 @@ class oneThread(threading.Thread):
                             'Secure': False}
                         driver.add_cookie(cookie_dict)
                 driver.refresh()
+                # 判断是否登录，右上角是否存在那个登录按钮
+                usernames = driver.find_elements_by_class_name("user-name")
+                if len(usernames) == 0:
+                    delete_cookies.append(tmp_city_cookie)
+                    # driver.quit()
+
                 # print_time(self.name, self.counter, 5)
                 random_count = self.one_circle(self.word_one, "1", driver)
 
@@ -164,7 +175,7 @@ class oneThread(threading.Thread):
                 # print("ua ===>"+ua)
                 # print("cookie ===>"+cookie_list_str)
                 if 'Connection aborted' in str(error):
-                    delete_cookies.append(tmp_city_cookie)
+                    update_cookies.append(tmp_city_cookie)
                 # os.system("taskkill /f  chromedriver.exe")
                 # os.system('taskkill /im chromedriver.exe /F')
                 # os.system('taskkill /pid chromedriver.exe /f')
@@ -570,7 +581,6 @@ class oneThread(threading.Thread):
             driver.quit()
 
 
-
 class Aclass(object):
     def __init__(self):
         self.fabaos = []
@@ -672,6 +682,21 @@ if __name__ == '__main__':
                                  gids]
                     session.bulk_update_mappings(Mipcms_fabao_history, save_objs)
                     session.commit()
+
+                    if len(update_cookies) > 0:
+                        eee = []
+                        for tmp in update_cookies:
+                            if tmp != '':
+                                eee.append(tmp.id)
+                        fff = tuple(eee)
+                        tmp_city_cookies = session.query(City_cookies).filter(City_cookies.id.in_(fff)).all()
+                        save_objs = [
+                            {'id': obj.id, 'cookie': obj.cookie, 'city': obj.city, 'error_count': obj.error_count + 1,
+                             'zone': obj.zone, 'ua': obj.ua} for obj in
+                            tmp_city_cookies]
+                        session.bulk_update_mappings(City_cookies, save_objs)
+                        session.commit()
+                        update_cookies = []
                     # 顺便删除cookies
                     if len(delete_cookies) > 0:
                         bbb = []
@@ -682,7 +707,7 @@ if __name__ == '__main__':
                         delete_count = session.query(City_cookies).filter(City_cookies.id.in_(ccc)).delete(
                             synchronize_session=False)
                         session.commit()
-                        print(delete_count)
+                        delete_cookies = []
                 except Exception as err:
                     print(err)
                 for i in aaa:
@@ -710,11 +735,19 @@ if __name__ == '__main__':
                                             aclass.citycookies, show_window)
                             threads.append(one)
                     for thread in threads:
-                        time.sleep(int(open_chrome_sec)/1000)
+                        time.sleep(int(open_chrome_sec) / 1000)
                         thread.start()
                     print("threads")
-                    print("loop_count ***************************************************: " + str(loop_count))
-                    print("success_count ***************************************************: " + str(success_count))
+                    print("loop :  " + str(loop_count) + " ; update_cookies :  " + str(len(update_cookies)))
+                    if httpIP == 0:
+                        print(
+                            "httpIP --- : " + str(httpIP) + " ; success --- : " + str(
+                                success_count) + " ; rate --- : 0 ;")
+                    else:
+                        print(
+                            "httpIP --- : " + str(httpIP) + " ; success --- : " + str(
+                                success_count) + " ; rate --- : " + str(
+                                round(100 * success_count / httpIP, 2)) + "% ;")
                 except Exception as err:
                     print("error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))

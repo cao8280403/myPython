@@ -31,6 +31,7 @@ class City_cookies(Base):
     city = Column(String(255))
     zone = Column(String(255))
     ua = Column(String(255))
+    error_count = Column(String(255))
 
 
 class Updatedb():
