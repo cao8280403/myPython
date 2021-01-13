@@ -23,6 +23,13 @@ class Mipcms_fabao(Base):
     mubiao = Column(String(255))
     keyword = Column(String(255))
 
+class Mipcms_fabao_list(Base):
+    __tablename__ = 'mipcms_fabao_list'
+    id = Column(String(255), primary_key=True)
+    site = Column(String(255))
+    state = Column(String(255))
+    keyword = Column(String(255))
+
 
 class City_cookies(Base):
     __tablename__ = 'city_cookies'

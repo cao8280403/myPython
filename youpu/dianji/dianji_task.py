@@ -4,10 +4,11 @@ from sqlalchemy import Column, String, create_engine, ForeignKey, func
 from fetchip import Fetchip
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies
+from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list
 from aliip import Aliip
 from dianji_thread import Dianji_thread
 import time
+import requests
 import threading
 from selenium import webdriver  # 浏览器驱动器
 from selenium.webdriver.common.by import By  # 定位器
@@ -36,7 +37,7 @@ httpIP = 0
 
 
 class oneThread(threading.Thread):
-    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window):
+    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies,n):
         threading.Thread.__init__(self)
         self.word_one = word_one
         if word_two != "":
@@ -48,6 +49,8 @@ class oneThread(threading.Thread):
         self.ip = ip
         self.citycookies = citycookies
         self.show_window = show_window
+        self.proxies = proxies
+        self.sleep_time = n
 
     def run(self):
         global delete_cookies
@@ -123,6 +126,7 @@ class oneThread(threading.Thread):
                             'Secure': False}
                         driver.add_cookie(cookie_dict)
                 driver.refresh()
+                time.sleep(2)
                 # 判断是否登录，右上角是否存在那个登录按钮
                 usernames = driver.find_elements_by_class_name("user-name")
                 if len(usernames) == 0:
@@ -175,7 +179,7 @@ class oneThread(threading.Thread):
                 # print("ua ===>"+ua)
                 # print("cookie ===>"+cookie_list_str)
                 if 'Connection aborted' in str(error):
-                    update_cookies.append(tmp_city_cookie)
+                    delete_cookies.append(tmp_city_cookie)
                 # os.system("taskkill /f  chromedriver.exe")
                 # os.system('taskkill /im chromedriver.exe /F')
                 # os.system('taskkill /pid chromedriver.exe /f')
@@ -330,6 +334,13 @@ class oneThread(threading.Thread):
             js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
             driver.execute_script(js)
             time.sleep(random.randint(1, 3))
+            try:
+                proxies = {'http': self.proxies}
+                # 恶意访问将ip拉入黑名单
+                r = requests.get("http://" + self.site + "/www.zip", proxies=proxies, timeout=3)
+                r = requests.get("http://" + self.site + "/www.zip", proxies=proxies, timeout=3)
+            except Exception as error:
+                print("error 404: " + str(error))
             # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
             for i in range(random.randint(1, 5)):
                 if random.randint(1, 2) == 1:
@@ -391,21 +402,14 @@ class oneThread(threading.Thread):
                     dest = divs[index]
                     a = dest.find_element_by_xpath(".//a[1]")
                     ActionChains(driver).click(a).perform()
-                    for m in range(10):
-                        time.sleep(0.1)
-                        windows = driver.window_handles
-                        if windows.__len__() == 2:
-                            driver.switch_to.window(windows[-1])
-                            break
-
-                    for m in range(20):
-                        time.sleep(0.1)
-                        nowurl = driver.current_url
-                        # print(nowurl)
-                        if 'baidu.com' not in nowurl:
-                            gids.append(word)
-                            time.sleep(random.randint(80, 120))
-                            driver.quit()
+                    time.sleep(3)
+                    windows = driver.window_handles
+                    driver.switch_to.window(windows[-1])
+                    nowurl = driver.current_url
+                    if 'baidu.com' not in nowurl:
+                        gids.append(word)
+                        time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                        driver.quit()
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict1.items())[0][0]
@@ -415,41 +419,27 @@ class oneThread(threading.Thread):
                     if node_div.__len__() == 1:
                         a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
                         ActionChains(driver).click(a).perform()
-                        for m in range(10):
-                            time.sleep(0.1)
-                            windows = driver.window_handles
-                            if windows.__len__() == 2:
-                                driver.switch_to.window(windows[-1])
-                                break
-
-                        for m in range(20):
-                            time.sleep(0.1)
-                            nowurl = driver.current_url
-                            # print(nowurl)
-                            if 'baidu.com' not in nowurl:
-                                gids.append(word)
-                                time.sleep(random.randint(80, 120))
-                                driver.quit()
+                        time.sleep(3)
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        nowurl = driver.current_url
+                        if 'baidu.com' not in nowurl:
+                            gids.append(word)
+                            time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                            driver.quit()
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         # ActionChains(driver).move_to_element(a).perform()
                         # time.sleep(300)
                         ActionChains(driver).click(a).perform()
-                        for m in range(10):
-                            time.sleep(0.1)
-                            windows = driver.window_handles
-                            if windows.__len__() == 2:
-                                driver.switch_to.window(windows[-1])
-                                break
-
-                        for m in range(20):
-                            time.sleep(0.1)
-                            nowurl = driver.current_url
-                            # print(nowurl)
-                            if 'baidu.com' not in nowurl:
-                                gids.append(word)
-                                time.sleep(random.randint(80, 120))
-                                driver.quit()
+                        time.sleep(3)
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        nowurl = driver.current_url
+                        if 'baidu.com' not in nowurl:
+                            gids.append(word)
+                            time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                            driver.quit()
 
                 # 图片
                 else:
@@ -461,21 +451,14 @@ class oneThread(threading.Thread):
                     if node_div.__len__() == 1:
                         a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
                         ActionChains(driver).click(a).perform()
-                        for m in range(10):
-                            time.sleep(0.1)
-                            windows = driver.window_handles
-                            if windows.__len__() == 2:
-                                driver.switch_to.window(windows[-1])
-                                break
-
-                        for m in range(20):
-                            time.sleep(0.1)
-                            nowurl = driver.current_url
-                            # print(nowurl)
-                            if 'baidu.com' not in nowurl:
-                                gids.append(word)
-                                time.sleep(random.randint(80, 120))
-                                driver.quit()
+                        time.sleep(3)
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        nowurl = driver.current_url
+                        if 'baidu.com' not in nowurl:
+                            gids.append(word)
+                            time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                            driver.quit()
             elif dict2.__len__() > 0:
                 index = sorted(dict2.items())[0][0]
                 dest = divs[index]
@@ -491,21 +474,14 @@ class oneThread(threading.Thread):
                     dest = divs[index]
                     a = dest.find_element_by_xpath(".//a[1]")
                     ActionChains(driver).click(a).perform()
-                    for m in range(10):
-                        time.sleep(0.1)
-                        windows = driver.window_handles
-                        if windows.__len__() == 2:
-                            driver.switch_to.window(windows[-1])
-                            break
-
-                    for m in range(20):
-                        time.sleep(0.1)
-                        nowurl = driver.current_url
-                        # print(nowurl)
-                        if 'baidu.com' not in nowurl:
-                            gids.append(word)
-                            time.sleep(random.randint(80, 120))
-                            driver.quit()
+                    time.sleep(3)
+                    windows = driver.window_handles
+                    driver.switch_to.window(windows[-1])
+                    nowurl = driver.current_url
+                    if 'baidu.com' not in nowurl:
+                        gids.append(word)
+                        time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                        driver.quit()
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict2.items())[0][0]
@@ -515,40 +491,25 @@ class oneThread(threading.Thread):
                     if node_div.__len__() == 1:
                         a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
                         ActionChains(driver).click(a).perform()
-                        for m in range(10):
-                            time.sleep(0.1)
-                            windows = driver.window_handles
-                            if windows.__len__() == 2:
-                                driver.switch_to.window(windows[-1])
-                                break
-
-                        for m in range(20):
-                            time.sleep(0.1)
-                            nowurl = driver.current_url
-                            # print(nowurl)
-                            if 'baidu.com' not in nowurl:
-                                gids.append(word)
-                                time.sleep(random.randint(80, 120))
-                                driver.quit()
+                        time.sleep(3)
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        nowurl = driver.current_url
+                        if 'baidu.com' not in nowurl:
+                            gids.append(word)
+                            time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                            driver.quit()
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         ActionChains(driver).click(a).perform()
-                        for m in range(10):
-                            time.sleep(0.1)
-                            windows = driver.window_handles
-                            if windows.__len__() == 2:
-                                driver.switch_to.window(windows[-1])
-                                break
-
-                        for m in range(20):
-                            time.sleep(0.1)
-                            nowurl = driver.current_url
-                            # print(nowurl)
-                            if 'baidu.com' not in nowurl:
-                                gids.append(word)
-                                time.sleep(random.randint(80, 120))
-                                driver.quit()
-
+                        time.sleep(3)
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        nowurl = driver.current_url
+                        if 'baidu.com' not in nowurl:
+                            gids.append(word)
+                            time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                            driver.quit()
                 # 图片
                 else:
                     index = sorted(dict2.items())[0][0]
@@ -559,21 +520,15 @@ class oneThread(threading.Thread):
                     if node_div.__len__() == 1:
                         a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
                         ActionChains(driver).click(a).perform()
-                        for m in range(10):
-                            time.sleep(0.1)
-                            windows = driver.window_handles
-                            if windows.__len__() == 2:
-                                driver.switch_to.window(windows[-1])
-                                break
+                        time.sleep(3)
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        nowurl = driver.current_url
+                        if 'baidu.com' not in nowurl:
+                            gids.append(word)
+                            time.sleep(random.randint(110, 120)-self.sleep_time*10)
+                            driver.quit()
 
-                        for m in range(20):
-                            time.sleep(0.1)
-                            nowurl = driver.current_url
-                            # print(nowurl)
-                            if 'baidu.com' not in nowurl:
-                                gids.append(word)
-                                time.sleep(random.randint(80, 120))
-                                driver.quit()
         except Exception as error:
             a = 1
             if 'HTTPConnectionPool' not in str(error):
@@ -592,7 +547,9 @@ class Aclass(object):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
         cursor = session.execute(
-            "select c.* from ( select a.*,b.mubiao from (select * from mipcms_fabao_history where time >= UNIX_TIMESTAMP(date_format(now(),'%Y-%m-%d'))) a  left join mipcms_fabao b on a.site = b.site and a.keyword=b.keyword where a.count<b.mubiao) c order by (mubiao * rand() ) desc limit 1000")
+            "select * from mipcms_fabao_list where state = 0 order by rand() limit 1000")
+        # cursor = session.execute(
+        #     "select c.* from ( select a.*,b.mubiao from (select * from mipcms_fabao_history where time >= UNIX_TIMESTAMP(date_format(now(),'%Y-%m-%d'))) a  left join mipcms_fabao b on a.site = b.site and a.keyword=b.keyword where a.count<b.mubiao) c order by (mubiao * rand() ) desc limit 1000")
         result = cursor.fetchall()
         print(len(result))
         self.fabaos = result
@@ -663,6 +620,7 @@ if __name__ == '__main__':
         sleep_time = prams[0]
         show_window = prams[1]
         open_chrome_sec = prams[2]
+        pool_num = prams[3]
         sizelist = get_window_size.split(",")
         aclass = Aclass()
         aclass.fetch_cookies()
@@ -677,10 +635,9 @@ if __name__ == '__main__':
                     engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
                     DBSession = sessionmaker(bind=engine)
                     session = DBSession()  # 创建session
-                    save_objs = [{'id': obj.id, 'site': obj.site, 'keyword': obj.keyword, 'count': obj.count + 1,
-                                  'time': obj.time} for obj in
-                                 gids]
-                    session.bulk_update_mappings(Mipcms_fabao_history, save_objs)
+                    save_objs = [{'id': obj.id, 'site': obj.site, 'keyword': obj.keyword, 'state': obj.state + 1} for
+                                 obj in gids]
+                    session.bulk_update_mappings(Mipcms_fabao_list, save_objs)
                     session.commit()
 
                     if len(update_cookies) > 0:
@@ -720,23 +677,28 @@ if __name__ == '__main__':
                     obj_fetchip = Fetchip(num)
                     ips = obj_fetchip.requesturl()
                     loop_count = loop_count + 1
-                    threads = []
-                    for ip in ips:
-                        if len(aclass.fabaos) > 0:
-                            fabaos_one = aclass.fabaos.pop(0)
-                            fabaos_two = ""
-                            site = fabaos_one["site"]
-                            for word in aclass.fabaos:
-                                if word["site"] == site:
-                                    fabaos_two = aclass.fabaos.pop(aclass.fabaos.index(word))
-                                    break
-                            one = oneThread(fabaos_one, fabaos_two, site,
-                                            "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
-                                            aclass.citycookies, show_window)
-                            threads.append(one)
-                    for thread in threads:
-                        time.sleep(int(open_chrome_sec) / 1000)
-                        thread.start()
+                    # 这批ip使用10次
+                    for n in range(int(pool_num)):
+
+                        threads = []
+                        for ip in ips:
+                            if len(aclass.fabaos) > 0:
+                                fabaos_one = aclass.fabaos.pop(0)
+                                fabaos_two = ""
+                                site = fabaos_one["site"]
+                                for word in aclass.fabaos:
+                                    if word["site"] == site:
+                                        fabaos_two = aclass.fabaos.pop(aclass.fabaos.index(word))
+                                        break
+                                one = oneThread(fabaos_one, fabaos_two, site,
+                                                "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
+                                                aclass.citycookies, show_window,
+                                                "http://" + ip["ip"] + ":" + ip["port"],n)
+                                threads.append(one)
+                        for thread in threads:
+                            time.sleep(int(open_chrome_sec) / 1000)
+                            thread.start()
+
                     print("threads")
                     print("loop :  " + str(loop_count) + " ; update_cookies :  " + str(len(update_cookies)))
                     if httpIP == 0:
@@ -751,7 +713,7 @@ if __name__ == '__main__':
                 except Exception as err:
                     print("error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                # time.sleep(60)
+                # time.sleep(20)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
