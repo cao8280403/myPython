@@ -38,7 +38,7 @@ not_exist_zone = []
 
 
 class oneThread(threading.Thread):
-    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n,arg_x):
+    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x):
         threading.Thread.__init__(self)
         self.word_one = word_one
         if word_two != "":
@@ -68,7 +68,7 @@ class oneThread(threading.Thread):
             prefs = {"profile.managed_default_content_settings.images": 2}
             options.add_experimental_option("prefs", prefs)
             options.add_argument("--disable-gpu")  # 禁用gpu
-            options.add_argument("--disable-cache")  # 禁用缓存
+            # options.add_argument("--disable-cache")  # 禁用缓存
             # options.add_argument('--incognito')  # 隐身模式（无痕模式）
             options.add_argument("disable-blink-features=AutomationControlled")  # 就是这一行告诉chrome去掉了webdriver痕迹
             # options.add_argument('--ignore-certificate-errors')
@@ -226,6 +226,81 @@ class oneThread(threading.Thread):
             a = 1
             # print(err)
 
+    # 判断1-5页是否有此站点
+    def judge(self, driver):
+        global gids
+        # 上下滚几次
+        now_height = random.randint(2, 6)
+        js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+        driver.execute_script(js)
+        time.sleep(random.randint(1, 3))
+        for i in range(random.randint(1, 3)):
+            if random.randint(1, 2) == 1:
+                now_height = min(now_height + random.randint(1, 5), 10)
+                if now_height == 0:
+                    js = "document.documentElement.scrollTop=document.body.scrollTop"
+                else:
+                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                driver.execute_script(js)
+                time.sleep(random.randint(1, 3))
+            else:
+                tmp = random.randint(1, 5)
+                now_height = now_height - tmp if now_height > tmp else 0
+                if now_height == 0:
+                    js = "document.documentElement.scrollTop=document.body.scrollTop"
+                else:
+                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                driver.execute_script(js)
+                time.sleep(random.randint(1, 3))
+        js = "document.documentElement.scrollTop=document.body.scrollTop"
+        driver.execute_script(js)
+        # 50%随机打开一个网页，停留2-3秒
+        if random.randint(1, 2) == 1:
+            all_divs = driver.find_elements_by_xpath("//div/h3")
+            rand_count = random.randint(0, all_divs.__len__() - 1)
+            dest = all_divs[rand_count]
+            driver.execute_script("arguments[0].scrollIntoView();", dest)
+            # 再向上移动200
+            js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+            driver.execute_script(js)
+            a = dest.find_element_by_xpath(".//a[1]")
+            ActionChains(driver).click(a).perform()
+            windows = driver.window_handles
+            driver.switch_to.window(windows[-1])
+            time.sleep(random.randint(3, 5))
+            driver.close()
+            driver.switch_to.window(windows[0])
+        # 判断1-5页是否有此站点
+        dict = {}
+        divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+        for div in divs:
+            divas = div.find_elements_by_xpath(".//div//a")
+            for diva in divas:
+                if self.site in diva.text:
+                    tmp = divs.index(div)
+                    dict[tmp] = diva.text
+        if dict.__len__() > 0:
+            index = sorted(dict.items())[0][0]
+            dest = divs[index]
+            driver.execute_script("arguments[0].scrollIntoView();", dest)
+            # 再向上移动200
+            js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+            driver.execute_script(js)
+            a = dest.find_element_by_xpath(".//a[1]")
+            ActionChains(driver).click(a).perform()
+            windows = driver.window_handles
+            driver.switch_to.window(windows[-1])
+            element = WebDriverWait(driver, 10, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '/html')))
+            driver.execute_script("window.open();")
+            driver.close()
+            gids.append(word)
+            time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+            driver.quit()
+        else:
+            # 点下一页
+            return 1
+
     def normal_step(self, word, count, driver):
         global gids
         try:
@@ -246,47 +321,80 @@ class oneThread(threading.Thread):
             # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
             wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
 
-            # 判断是否存在site的网址，如果有，则先点广告,再点site站
-            dict = {}
-            all_divs = driver.find_elements_by_xpath("//div/h3")
-            divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-            for div in divs:
-                divas = div.find_elements_by_xpath(".//div//a")
-                for diva in divas:
-                    if self.site in diva.text:
-                        tmp = divs.index(div)
-                        dict[tmp] = diva.text
-            if dict.__len__() > 0:
-                # 判断第一条是不是广告，不是就不用点了 data-ecimtimesign style
-                one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
-                if one.get_attribute("style") != '':
-                    a1 = one.find_element_by_xpath(".//a[1]")
-                    ActionChains(driver).click(a1).perform()
-                    time.sleep(random.randint(1, 3))
-                    windows = driver.window_handles
-                    driver.switch_to.window(windows[-1])
-                    driver.close()
-                    driver.switch_to.window(windows[0])
-                    time.sleep(random.randint(1, 3))
+            # 先判断1-5页是否有此站点，每页都一半概率打开一个网页，再点击目标站点，然后关闭
+            for x in range(5):
+                have_next = self.judge(driver)
+                if x == 0 and have_next == 1:
+                    next_pages = driver.find_elements_by_xpath("//a[@class='n']")
+                    if next_pages.__len__() > 0:
+                        js = "document.documentElement.scrollTop=document.documentElement.scrollHeight"
+                        driver.execute_script(js)
+                        time.sleep(1)
+                        ActionChains(driver).click(next_pages[0]).perform()
+                elif x < 4 and have_next == 1:
+                    next_pages = driver.find_elements_by_xpath("//a[@class='n']")
+                    if next_pages.__len__() > 1:
+                        js = "document.documentElement.scrollTop=document.documentElement.scrollHeight"
+                        driver.execute_script(js)
+                        time.sleep(1)
+                        ActionChains(driver).click(next_pages[1]).perform()
 
-                index = sorted(dict.items())[0][0]
-                dest = divs[index]
-                driver.execute_script("arguments[0].scrollIntoView();", dest)
-                # 再向上移动200
-                js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                driver.execute_script(js)
-                a = dest.find_element_by_xpath(".//a[1]")
-                ActionChains(driver).click(a).perform()
-                windows = driver.window_handles
-                driver.switch_to.window(windows[-1])
-                element = WebDriverWait(driver, 10, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '/html')))
-                driver.execute_script("window.open();")
-                driver.close()
-                gids.append(word)
-                time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
-                driver.quit()
+            # # 随机点击一个
+            # all_divs = driver.find_elements_by_xpath("//div/h3")
+            # rand_count = random.randint(0, all_divs.__len__() - 1)
+            # dest = all_divs[rand_count]
+            # driver.execute_script("arguments[0].scrollIntoView();", dest)
+            # # 再向上移动200
+            # js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+            # driver.execute_script(js)
+            # a = dest.find_element_by_xpath(".//a[1]")
+            # ActionChains(driver).click(a).perform()
+            # windows = driver.window_handles
+            # driver.switch_to.window(windows[-1])
+            # time.sleep(3)
+            # driver.close()
+            # driver.switch_to.window(windows[0])
 
+            # # 判断是否存在site的网址，如果有，则先点广告,再点site站
+            # dict = {}
+            #
+            # divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+            # for div in divs:
+            #     divas = div.find_elements_by_xpath(".//div//a")
+            #     for diva in divas:
+            #         if self.site in diva.text:
+            #             tmp = divs.index(div)
+            #             dict[tmp] = diva.text
+            # if dict.__len__() > 0:
+            #     # 判断第一条是不是广告，不是就不用点了 data-ecimtimesign style
+            #     one = driver.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
+            #     if one.get_attribute("style") != '':
+            #         a1 = one.find_element_by_xpath(".//a[1]")
+            #         ActionChains(driver).click(a1).perform()
+            #         time.sleep(random.randint(1, 3))
+            #         windows = driver.window_handles
+            #         driver.switch_to.window(windows[-1])
+            #         driver.close()
+            #         driver.switch_to.window(windows[0])
+            #         time.sleep(random.randint(1, 3))
+            #
+            #     index = sorted(dict.items())[0][0]
+            #     dest = divs[index]
+            #     driver.execute_script("arguments[0].scrollIntoView();", dest)
+            #     # 再向上移动200
+            #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+            #     driver.execute_script(js)
+            #     a = dest.find_element_by_xpath(".//a[1]")
+            #     ActionChains(driver).click(a).perform()
+            #     windows = driver.window_handles
+            #     driver.switch_to.window(windows[-1])
+            #     element = WebDriverWait(driver, 10, 0.5).until(
+            #         EC.presence_of_element_located((By.XPATH, '/html')))
+            #     driver.execute_script("window.open();")
+            #     driver.close()
+            #     gids.append(word)
+            #     time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+            #     driver.quit()
 
             if count == "1":
                 # print(1)
@@ -394,7 +502,7 @@ class oneThread(threading.Thread):
             # except Exception as error:
             #     print("error 404: " + str(error))
             # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
-            for i in range(random.randint(1, 5)):
+            for i in range(random.randint(1, 3)):
                 if random.randint(1, 2) == 1:
                     now_height = min(now_height + random.randint(1, 5), 10)
                     if now_height == 0:
@@ -780,7 +888,7 @@ if __name__ == '__main__':
                 except Exception as err:
                     print("error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                # time.sleep(20)
+                # time.sleep(120)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()

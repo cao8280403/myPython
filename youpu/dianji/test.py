@@ -37,6 +37,7 @@ def consumer(arg):
         print("消费者吃包子")
 
 
-for i in range(1, 3):
+for i in range(5):
+    print("i"+str(i))
     t = threading.Thread(target=consumer, args=(i,))
     t.start()
