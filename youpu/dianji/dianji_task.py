@@ -68,7 +68,7 @@ class oneThread(threading.Thread):
             # prefs = {"profile.managed_default_content_settings.images": 2}
             # options.add_experimental_option("prefs", prefs)
             # options.add_argument('--host-resolver-rules=MAP ' + self.site + ' 127.0.0.1')
-            options.add_argument("--disable-gpu")  # 禁用gpu
+            # options.add_argument("--disable-gpu")  # 禁用gpu
             # options.add_argument("--disable-cache")  # 禁用缓存
             # options.add_argument('--incognito')  # 隐身模式（无痕模式）
             options.add_argument("disable-blink-features=AutomationControlled")  # 就是这一行告诉chrome去掉了webdriver痕迹
@@ -889,13 +889,13 @@ if __name__ == '__main__':
                 except Exception as err:
                     print("error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                time.sleep(120)
+                # time.sleep(120)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-                # change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            # time.sleep(int(sleep_time))
+                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+            time.sleep(int(sleep_time))
     except Exception as err:
         print("error 4: " + str(err))
 print("end process")

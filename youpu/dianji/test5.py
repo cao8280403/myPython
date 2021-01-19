@@ -15,15 +15,19 @@ options = webdriver.ChromeOptions()  # 设置代理
 # options.add_argument("--user-data-dir="+r"C:/Users/Caoyang/AppData/Local/Google/Chrome/User Data/")
 # extension_path = "C:/Users/Caoyang/AppData/Local/Google/Chrome/User Data/Default/Extensions/eiimnmioipafcokbfikbljfdeojpcgbh/4.5.0.1_0.crx"
 # options.add_extension(extension_path)
-prefs = {"profile.managed_default_content_settings.images": 2}
-options.add_experimental_option("prefs", prefs)
-
-options.add_argument("--disable-cache")  # 禁用缓存
+# prefs = {"profile.managed_default_content_settings.images": 2}
+# options.add_experimental_option("prefs", prefs)
+# --host-rules=MAP xxx.xxx.com 127.0.0.1,MAP xxx.xxx.com 127.0.0.1
+options.add_argument('--host-resolver-rules=MAP www.kf400.cn 127.0.0.1')
+options.add_argument("--proxy-server=http://222.186.180.95:40243")
+options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制#跟上面只能选一个
+options.add_argument("disable-blink-features=AutomationControlled")  # 就是这一行告诉chrome去掉了webdriver痕迹
+# options.add_argument("--disable-cache")  # 禁用缓存
 # 启动浏览器，并设置好wait
 browser = webdriver.Chrome(options=options)
 
-url = 'http://www.goldyuesao.cn/'
-browser.get(url)
+# url = 'http://www.goldyuesao.cn/'
+# browser.get(url)
 # print(r)
 # print(r.text)
 # print(r.content)
@@ -45,38 +49,39 @@ browser.get(url)
 
 # browser.set_page_load_timeout(1)
 
-# try:
-#     browser.get("http://www.baidu.cn/")
-#     inputs = browser.find_element_by_id("kw")
-#     inputs.send_keys("www.kf400.cn")
-#     su = browser.find_element_by_id("su")
-#     time.sleep(3)
-#     ActionChains(browser).click(su).perform()
-#     time.sleep(1)
-#     one = browser.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
-#     a1 = one.find_element_by_xpath(".//a[1]")
-#     ActionChains(browser).click(a1).perform()
-#     windows = browser.window_handles
-#     browser.switch_to.window(windows[-1])
-#     # wait = WebDriverWait(browser, 3, 0.5)
-#     # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
-#     # wait.until(EC.presence_of_all_elements_located((By.ID, "website")))
-#     element = WebDriverWait(browser, 3, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html')))
-#     # element = WebDriverWait(browser, 3, 0.1).until(EC.presence_of_element_located((By.ID, "div_company_mini")))
-#     # browser.close()
-#     # ActionChains(browser).send_keys(Keys.CONTROL + "t").perform()
-#     # browser.find_element_by_xpath("").sendKeys(Keys.CONTROL + "t")
-#     browser.execute_script("window.open();")
-#     windows = browser.window_handles
-#     # browser.switch_to.window(windows[-1])
-#     # browser.switch_to.window(windows[1])
-#     browser.close()
-#     # for m in range(20):
-#     #     time.sleep(0.1)
-#     #     title=browser.title
-#     #     print( str(m)+ title)
-#     #     browser.quit()
-#
-# finally:
-#     print(11)
-#     browser.quit()
+try:
+    browser.get("http://www.baidu.cn/")
+    inputs = browser.find_element_by_id("kw")
+    # inputs.send_keys("www.goldyuesao.cn")
+    inputs.send_keys("www.kf400.cn")
+    su = browser.find_element_by_id("su")
+    time.sleep(3)
+    ActionChains(browser).click(su).perform()
+    time.sleep(1)
+    one = browser.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
+    a1 = one.find_element_by_xpath(".//a[1]")
+    ActionChains(browser).click(a1).perform()
+    windows = browser.window_handles
+    browser.switch_to.window(windows[-1])
+    # wait = WebDriverWait(browser, 3, 0.5)
+    # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+    # wait.until(EC.presence_of_all_elements_located((By.ID, "website")))
+    # element = WebDriverWait(browser, 3, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html')))
+    # element = WebDriverWait(browser, 3, 0.1).until(EC.presence_of_element_located((By.ID, "div_company_mini")))
+    # browser.close()
+    # ActionChains(browser).send_keys(Keys.CONTROL + "t").perform()
+    # browser.find_element_by_xpath("").sendKeys(Keys.CONTROL + "t")
+    # browser.execute_script("window.open();")
+    # windows = browser.window_handles
+    # browser.switch_to.window(windows[-1])
+    # browser.switch_to.window(windows[1])
+    # browser.close()
+    # for m in range(20):
+    #     time.sleep(0.1)
+    #     title=browser.title
+    #     print( str(m)+ title)
+    #     browser.quit()
+
+finally:
+    print(11)
+    browser.quit()
