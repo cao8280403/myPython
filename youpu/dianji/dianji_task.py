@@ -65,8 +65,9 @@ class oneThread(threading.Thread):
             options = webdriver.ChromeOptions()  # 设置代理
             options.add_argument(self.arg1)
             options.add_argument('lang=zh_CN.UTF-8')
-            prefs = {"profile.managed_default_content_settings.images": 2}
-            options.add_experimental_option("prefs", prefs)
+            # prefs = {"profile.managed_default_content_settings.images": 2}
+            # options.add_experimental_option("prefs", prefs)
+            # options.add_argument('--host-resolver-rules=MAP ' + self.site + ' 127.0.0.1')
             options.add_argument("--disable-gpu")  # 禁用gpu
             # options.add_argument("--disable-cache")  # 禁用缓存
             # options.add_argument('--incognito')  # 隐身模式（无痕模式）
@@ -710,8 +711,8 @@ class Aclass(object):
         self.citycookies = []
 
     def fetch_fabao(self):
-        # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
-        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+        # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
         cursor = session.execute(
@@ -723,8 +724,8 @@ class Aclass(object):
         self.fabaos = result
 
     def fetch_cookies(self):
-        # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
-        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+        # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
         citycookies = session.query(City_cookies).all()
@@ -805,8 +806,8 @@ if __name__ == '__main__':
             if len(gids) >= 100:
                 aaa = gids
                 try:
-                    # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
-                    engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+                    engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+                    # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
                     DBSession = sessionmaker(bind=engine)
                     session = DBSession()  # 创建session
                     save_objs = [{'id': obj.id, 'site': obj.site, 'keyword': obj.keyword, 'state': obj.state + 1} for
@@ -888,13 +889,13 @@ if __name__ == '__main__':
                 except Exception as err:
                     print("error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                # time.sleep(120)
+                time.sleep(120)
             else:
                 print("fetchdb")
                 aclass.fetch_fabao()
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            time.sleep(int(sleep_time))
+                # change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+            # time.sleep(int(sleep_time))
     except Exception as err:
         print("error 4: " + str(err))
 print("end process")
