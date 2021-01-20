@@ -27,11 +27,11 @@ class ReadConfig:
         return value
 
     def get_pram(self):
-        time_sleep = self.cf.get("Pram", "time_sleep")
+        ip_min = self.cf.get("Pram", "ip_min")
         show_window = self.cf.get("Pram", "show_window")
         open_chrome_sec = self.cf.get("Pram", "open_chrome_sec")
         pool_num = self.cf.get("Pram", "pool_num")
-        return [time_sleep,show_window,open_chrome_sec,pool_num]
+        return [ip_min,show_window,open_chrome_sec,pool_num]
 
 
 if __name__ == '__main__':

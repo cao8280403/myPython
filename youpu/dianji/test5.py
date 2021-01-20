@@ -10,6 +10,11 @@ import time, requests
 from selenium.webdriver.common.keys import Keys
 
 from selenium.webdriver.common.action_chains import ActionChains
+print(time.strftime("%Y-%m-%d %H:%M:%S"))
+time1 = time.time()
+time.sleep(3.12)
+time2 = time.time()
+print(round(time2-time1))
 
 options = webdriver.ChromeOptions()  # 设置代理
 # options.add_argument("--user-data-dir="+r"C:/Users/Caoyang/AppData/Local/Google/Chrome/User Data/")

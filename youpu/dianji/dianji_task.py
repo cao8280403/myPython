@@ -36,10 +36,11 @@ success_count = 0
 httpIP = 0
 not_exist_zone = []
 submit_time = time.time() - 1
-submit_jiange_time = 1
+submit_jiange_time = 36
+
 
 class oneThread(threading.Thread):
-    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x):
+    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
         threading.Thread.__init__(self)
         self.word_one = word_one
         if word_two != "":
@@ -54,6 +55,7 @@ class oneThread(threading.Thread):
         self.proxies = proxies
         self.sleep_time = n
         self.arg_x = arg_x
+        self.ip_min = ip_min
 
     def run(self):
         global delete_cookies
@@ -298,7 +300,8 @@ class oneThread(threading.Thread):
             driver.execute_script("window.open();")
             driver.close()
             gids.append(word)
-            time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+            time.sleep(
+                random.randint(60 * (self.ip_min - 1) - 10, 60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
             driver.quit()
         else:
             # 点下一页
@@ -396,7 +399,7 @@ class oneThread(threading.Thread):
             #     driver.execute_script("window.open();")
             #     driver.close()
             #     gids.append(word)
-            #     time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+            #     time.sleep(random.randint(60*(self.ip_min-1)-10, 60*(self.ip_min-1)) - self.sleep_time * self.arg_x)
             #     driver.quit()
 
             if count == "1":
@@ -572,7 +575,8 @@ class oneThread(threading.Thread):
                     driver.execute_script("window.open();")
                     driver.close()
                     gids.append(word)
-                    time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                    time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                              60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                     driver.quit()
 
                 # 网址
@@ -591,7 +595,8 @@ class oneThread(threading.Thread):
                         driver.execute_script("window.open();")
                         driver.close()
                         gids.append(word)
-                        time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                         driver.quit()
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
@@ -605,7 +610,8 @@ class oneThread(threading.Thread):
                         driver.execute_script("window.open();")
                         driver.close()
                         gids.append(word)
-                        time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                         driver.quit()
                 # 图片
                 else:
@@ -624,7 +630,8 @@ class oneThread(threading.Thread):
                         driver.execute_script("window.open();")
                         driver.close()
                         gids.append(word)
-                        time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                         driver.quit()
             elif dict2.__len__() > 0:
                 index = sorted(dict2.items())[0][0]
@@ -648,7 +655,8 @@ class oneThread(threading.Thread):
                     driver.execute_script("window.open();")
                     driver.close()
                     gids.append(word)
-                    time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                    time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                              60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                     driver.quit()
                 # 网址
                 elif random_num < 6:
@@ -666,7 +674,8 @@ class oneThread(threading.Thread):
                         driver.execute_script("window.open();")
                         driver.close()
                         gids.append(word)
-                        time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                         driver.quit()
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
@@ -678,7 +687,8 @@ class oneThread(threading.Thread):
                         driver.execute_script("window.open();")
                         driver.close()
                         gids.append(word)
-                        time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                         driver.quit()
                 # 图片
                 else:
@@ -697,7 +707,8 @@ class oneThread(threading.Thread):
                         driver.execute_script("window.open();")
                         driver.close()
                         gids.append(word)
-                        time.sleep(random.randint(110, 120) - self.sleep_time * self.arg_x)
+                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
                         driver.quit()
 
         except Exception as error:
@@ -784,11 +795,12 @@ def close_chrome():
 if __name__ == '__main__':
     print("begin process")
     try:
+        this_time = 0
         readConfig = ReadConfig()
         num = readConfig.get_url()
         prams = readConfig.get_pram()
         get_window_size = readConfig.get_window_size()
-        sleep_time = prams[0]
+        ip_min = prams[0]
         show_window = prams[1]
         open_chrome_sec = prams[2]
         pool_num = prams[3]
@@ -820,8 +832,6 @@ if __name__ == '__main__':
                                  obj in gids]
                     session.bulk_update_mappings(Mipcms_fabao_list, save_objs)
                     session.commit()
-                    submit_jiange_time = round(time.time() - submit_time)
-                    submit_time = time.time()
                     if len(update_cookies) > 0:
                         eee = []
                         for tmp in update_cookies:
@@ -857,7 +867,7 @@ if __name__ == '__main__':
             if len(aclass.fabaos) > 0 and len(aclass.fabaos[0]) > 0:
                 try:
                     # aclass.fabaos.pop(0)
-                    obj_fetchip = Fetchip(num)
+                    obj_fetchip = Fetchip(num, ip_min)
                     ips = obj_fetchip.requesturl()
                     loop_count = loop_count + 1
                     # 这批ip使用10次
@@ -877,12 +887,13 @@ if __name__ == '__main__':
                                                 "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
                                                 aclass.citycookies, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
-                                                int(open_chrome_sec) * int(num) / 1000)
+                                                int(open_chrome_sec) * int(num), int(ip_min))
                                 threads.append(one)
                         for thread in threads:
-                            time.sleep(int(open_chrome_sec) / 1000)
+                            time.sleep(int(open_chrome_sec))
                             thread.start()
-
+                    submit_jiange_time = round(time.time() - submit_time)
+                    submit_time = time.time()
                     print("threads")
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " loop :  " + str(
                         loop_count) + " ; update_cookies :  " + str(len(update_cookies)))
@@ -891,14 +902,14 @@ if __name__ == '__main__':
                               " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
                             success_count) + " ; rate --- : 0 ;")
                         print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
-                            len(gids) / submit_jiange_time / 60))
+                            round(len(gids) / submit_jiange_time / 60)) + "; time --- " + str(this_time))
                     else:
                         print(time.strftime("%Y-%m-%d %H:%M:%S") +
                               " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
                             success_count) + " ; rate --- : " + str(
                             round(100 * success_count / httpIP, 2)) + "% ;")
                         print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
-                            len(gids) / submit_jiange_time / 60))
+                            round(len(gids) / submit_jiange_time / 60)) + "; time --- " + str(this_time))
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
@@ -912,7 +923,8 @@ if __name__ == '__main__':
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
                 change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            time.sleep(int(sleep_time))
+            this_time = abs(submit_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num))
+            time.sleep(int(this_time))
     except Exception as err:
         print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 4: " + str(err))
 print("end process")
