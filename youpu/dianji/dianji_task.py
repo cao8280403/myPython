@@ -36,7 +36,7 @@ success_count = 0
 httpIP = 0
 not_exist_zone = []
 submit_time = time.time() - 1
-
+submit_jiange_time = 1
 
 class oneThread(threading.Thread):
     def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x):
@@ -794,7 +794,11 @@ if __name__ == '__main__':
         pool_num = prams[3]
         sizelist = get_window_size.split(",")
         aclass = Aclass()
-        aclass.fetch_cookies()
+        try:
+            aclass.fetch_cookies()
+        except Exception as err:
+            print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
+            time.sleep(60)
         loop_count = 0
         while True:
             # close_chrome()
@@ -816,8 +820,7 @@ if __name__ == '__main__':
                                  obj in gids]
                     session.bulk_update_mappings(Mipcms_fabao_list, save_objs)
                     session.commit()
-                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
-                        len(gids) / (round(time.time() - submit_time)) / 60))
+                    submit_jiange_time = round(time.time() - submit_time)
                     submit_time = time.time()
                     if len(update_cookies) > 0:
                         eee = []
@@ -887,18 +890,26 @@ if __name__ == '__main__':
                         print(time.strftime("%Y-%m-%d %H:%M:%S") +
                               " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
                             success_count) + " ; rate --- : 0 ;")
+                        print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
+                            len(gids) / submit_jiange_time / 60))
                     else:
                         print(time.strftime("%Y-%m-%d %H:%M:%S") +
                               " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
                             success_count) + " ; rate --- : " + str(
                             round(100 * success_count / httpIP, 2)) + "% ;")
+                        print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
+                            len(gids) / submit_jiange_time / 60))
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
                 # time.sleep(120)
             else:
                 print("fetchdb")
-                aclass.fetch_fabao()
+                try:
+                    aclass.fetch_fabao()
+                except Exception as err:
+                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
+                    time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
                 change_fbl(tmp.split("*")[0], tmp.split("*")[1])
             time.sleep(int(sleep_time))
