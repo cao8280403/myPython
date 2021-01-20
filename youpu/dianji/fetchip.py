@@ -23,7 +23,7 @@ class Fetchip:
             data = json_obj.get('data')
             return data
         except Exception as err:
-            print("error fetchip: " + str(err))
+            print(time.strftime("%Y-%m-%d %H:%M:%S")+" error fetchip: " + str(err))
 
 
 if __name__ == '__main__':

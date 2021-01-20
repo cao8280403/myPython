@@ -35,6 +35,7 @@ update_cookies = []
 success_count = 0
 httpIP = 0
 not_exist_zone = []
+submit_time = time.time() - 1
 
 
 class oneThread(threading.Thread):
@@ -71,6 +72,7 @@ class oneThread(threading.Thread):
             # options.add_argument("--disable-gpu")  # 禁用gpu
             # options.add_argument("--disable-cache")  # 禁用缓存
             # options.add_argument('--incognito')  # 隐身模式（无痕模式）
+            options.add_experimental_option('excludeSwitches', ['enable-logging'])
             options.add_argument("disable-blink-features=AutomationControlled")  # 就是这一行告诉chrome去掉了webdriver痕迹
             # options.add_argument('--ignore-certificate-errors')
             # options.add_argument('--disable-infobars')  # 不显示正在受自动化软件控制  失效
@@ -184,7 +186,7 @@ class oneThread(threading.Thread):
 
             except Exception as error:
                 a = 1
-                print("error 1: " + str(error))
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 1: " + str(error))
                 # print('traceback.print_exc():' + str(traceback.print_exc()))
                 # print("ua ===>"+ua)
                 # print("cookie ===>"+cookie_list_str)
@@ -202,7 +204,7 @@ class oneThread(threading.Thread):
             driver.quit()
         except Exception as error:
             a = 1
-            print("error 2: " + str(error))
+            print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 2: " + str(error))
             # print('traceback.print_exc():' + str(traceback.print_exc()))
 
     def one_circle(self, word, count, driver):
@@ -701,7 +703,7 @@ class oneThread(threading.Thread):
         except Exception as error:
             a = 1
             if 'HTTPConnectionPool' not in str(error):
-                print("error 3: " + str(error))
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 3: " + str(error))
             driver.quit()
 
 
@@ -760,7 +762,7 @@ def close_chrome():
             try:
                 os.system('taskkill /pid ' + str(pid) + ' /f')
             except Exception as error:
-                print("error 5: " + str(error))
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 5: " + str(error))
         cmd_pids.sort(key=lambda x: x.create_time())
         conhost_pids.sort(key=lambda x: x.create_time())
         cmd_pids2 = cmd_pids[6:]
@@ -769,14 +771,14 @@ def close_chrome():
             try:
                 os.system('taskkill /pid ' + str(pid.pid) + ' /f')
             except Exception as error:
-                print("error 6: " + str(error))
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 6: " + str(error))
         for pid in conhost_pids3:
             try:
                 os.system('taskkill /pid ' + str(pid.pid) + ' /f')
             except Exception as error:
-                print("error 7: " + str(error))
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 7: " + str(error))
     except Exception as error:
-        print("error 9: " + str(error))
+        print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 9: " + str(error))
 
 
 if __name__ == '__main__':
@@ -814,7 +816,9 @@ if __name__ == '__main__':
                                  obj in gids]
                     session.bulk_update_mappings(Mipcms_fabao_list, save_objs)
                     session.commit()
-
+                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
+                        len(gids) / (round(time.time() - submit_time)) / 60))
+                    submit_time = time.time()
                     if len(update_cookies) > 0:
                         eee = []
                         for tmp in update_cookies:
@@ -841,10 +845,11 @@ if __name__ == '__main__':
                         session.commit()
                         delete_cookies = []
                 except Exception as err:
-                    print(err)
+                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                 for i in aaa:
                     print(i)
                 success_count = success_count + len(gids)
+
                 gids = []
             if len(aclass.fabaos) > 0 and len(aclass.fabaos[0]) > 0:
                 try:
@@ -876,18 +881,19 @@ if __name__ == '__main__':
                             thread.start()
 
                     print("threads")
-                    print("loop :  " + str(loop_count) + " ; update_cookies :  " + str(len(update_cookies)))
+                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " loop :  " + str(
+                        loop_count) + " ; update_cookies :  " + str(len(update_cookies)))
                     if httpIP == 0:
-                        print(
-                            "httpIP --- : " + str(httpIP) + " ; success --- : " + str(
-                                success_count) + " ; rate --- : 0 ;")
+                        print(time.strftime("%Y-%m-%d %H:%M:%S") +
+                              " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
+                            success_count) + " ; rate --- : 0 ;")
                     else:
-                        print(
-                            "httpIP --- : " + str(httpIP) + " ; success --- : " + str(
-                                success_count) + " ; rate --- : " + str(
-                                round(100 * success_count / httpIP, 2)) + "% ;")
+                        print(time.strftime("%Y-%m-%d %H:%M:%S") +
+                              " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
+                            success_count) + " ; rate --- : " + str(
+                            round(100 * success_count / httpIP, 2)) + "% ;")
                 except Exception as err:
-                    print("error 8: " + str(err))
+                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
                 # time.sleep(120)
             else:
@@ -897,5 +903,5 @@ if __name__ == '__main__':
                 change_fbl(tmp.split("*")[0], tmp.split("*")[1])
             time.sleep(int(sleep_time))
     except Exception as err:
-        print("error 4: " + str(err))
+        print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 4: " + str(err))
 print("end process")
