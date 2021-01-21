@@ -874,8 +874,7 @@ if __name__ == '__main__':
                                                      rate=str(round(100 * success_count / httpIP, 2)),
                                                      server_id=str(server_id),
                                                      rate2=str(round(3600 * tmp_uodate_count / submit_jiange_time)),
-                                                     dest_speed=str(
-                                                         3600 / (int(num) * int(open_chrome_sec) * int(pool_num))),
+                                                     dest_speed=str(3600 / int(open_chrome_sec)),
                                                      time=time.time())
                 session.add(new_obj)
                 session.commit()
