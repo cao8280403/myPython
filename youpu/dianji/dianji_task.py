@@ -4,7 +4,7 @@ from sqlalchemy import Column, String, create_engine, ForeignKey, func
 from fetchip import Fetchip
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list
+from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list, Mipcms_fabao_server_record
 from aliip import Aliip
 from dianji_thread import Dianji_thread
 import time
@@ -35,8 +35,10 @@ update_cookies = []
 success_count = 0
 httpIP = 0
 not_exist_zone = []
+loop_now_time = time.time() - 1
 submit_time = time.time() - 1
-submit_jiange_time = 36
+loop_jiange_time = 38
+submit_jiange_time = 0
 
 
 class oneThread(threading.Thread):
@@ -285,24 +287,25 @@ class oneThread(threading.Thread):
                     tmp = divs.index(div)
                     dict[tmp] = diva.text
         if dict.__len__() > 0:
-            index = sorted(dict.items())[0][0]
-            dest = divs[index]
-            driver.execute_script("arguments[0].scrollIntoView();", dest)
-            # 再向上移动200
-            js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-            driver.execute_script(js)
-            a = dest.find_element_by_xpath(".//a[1]")
-            ActionChains(driver).click(a).perform()
-            windows = driver.window_handles
-            driver.switch_to.window(windows[-1])
-            element = WebDriverWait(driver, 10, 0.5).until(
-                EC.presence_of_element_located((By.XPATH, '/html')))
-            driver.execute_script("window.open();")
-            driver.close()
-            gids.append(word)
-            time.sleep(
-                random.randint(60 * (self.ip_min - 1) - 10, 60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-            driver.quit()
+            if random.randint(1, 2) == 1:
+                index = sorted(dict.items())[0][0]
+                dest = divs[index]
+                driver.execute_script("arguments[0].scrollIntoView();", dest)
+                # 再向上移动200
+                js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                driver.execute_script(js)
+                a = dest.find_element_by_xpath(".//a[1]")
+                ActionChains(driver).click(a).perform()
+                windows = driver.window_handles
+                driver.switch_to.window(windows[-1])
+                element = WebDriverWait(driver, 10, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH, '/html')))
+                driver.execute_script("window.open();")
+                driver.close()
+                gids.append(word)
+                time.sleep(
+                    random.randint(60 * (self.ip_min - 1) - 10, 60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
+                driver.quit()
         else:
             # 点下一页
             return 1
@@ -328,7 +331,7 @@ class oneThread(threading.Thread):
             wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
 
             # 先判断1-5页是否有此站点，每页都一半概率打开一个网页，再点击目标站点，然后关闭
-            for x in range(5):
+            for x in range(2):
                 have_next = self.judge(driver)
                 if x == 0 and have_next == 1:
                     next_pages = driver.find_elements_by_xpath("//a[@class='n']")
@@ -337,13 +340,6 @@ class oneThread(threading.Thread):
                         driver.execute_script(js)
                         time.sleep(1)
                         ActionChains(driver).click(next_pages[0]).perform()
-                elif x < 4 and have_next == 1:
-                    next_pages = driver.find_elements_by_xpath("//a[@class='n']")
-                    if next_pages.__len__() > 1:
-                        js = "document.documentElement.scrollTop=document.documentElement.scrollHeight"
-                        driver.execute_script(js)
-                        time.sleep(1)
-                        ActionChains(driver).click(next_pages[1]).perform()
 
             # # 随机点击一个
             # all_divs = driver.find_elements_by_xpath("//div/h3")
@@ -796,6 +792,7 @@ if __name__ == '__main__':
     print("begin process")
     try:
         this_time = 0
+        tmp_uodate_count = 0
         readConfig = ReadConfig()
         num = readConfig.get_url()
         prams = readConfig.get_pram()
@@ -804,8 +801,13 @@ if __name__ == '__main__':
         show_window = prams[1]
         open_chrome_sec = prams[2]
         pool_num = prams[3]
+        server_id = prams[4]
         sizelist = get_window_size.split(",")
         aclass = Aclass()
+        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+        # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()  # 创建session
         try:
             aclass.fetch_cookies()
         except Exception as err:
@@ -832,6 +834,7 @@ if __name__ == '__main__':
                                  obj in gids]
                     session.bulk_update_mappings(Mipcms_fabao_list, save_objs)
                     session.commit()
+
                     if len(update_cookies) > 0:
                         eee = []
                         for tmp in update_cookies:
@@ -857,11 +860,25 @@ if __name__ == '__main__':
                             synchronize_session=False)
                         session.commit()
                         delete_cookies = []
+                    session.close()
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                 for i in aaa:
                     print(i)
                 success_count = success_count + len(gids)
+                tmp_uodate_count = len(gids)
+                submit_jiange_time = round(time.time() - submit_time)
+                submit_time = time.time()
+                # 新增mipcms_fabao_server_record记录
+                new_obj = Mipcms_fabao_server_record(ip_count=str(httpIP), success_count=str(success_count),
+                                                     rate=str(round(100 * success_count / httpIP, 2)),
+                                                     server_id=str(server_id),
+                                                     rate2=str(round(3600 * tmp_uodate_count / submit_jiange_time)),
+                                                     dest_speed=str(
+                                                         3600 / (int(num) * int(open_chrome_sec) * int(pool_num))),
+                                                     time=time.time())
+                session.add(new_obj)
+                session.commit()
 
                 gids = []
             if len(aclass.fabaos) > 0 and len(aclass.fabaos[0]) > 0:
@@ -892,24 +909,23 @@ if __name__ == '__main__':
                         for thread in threads:
                             time.sleep(int(open_chrome_sec))
                             thread.start()
-                    submit_jiange_time = round(time.time() - submit_time)
-                    submit_time = time.time()
+                    loop_jiange_time = abs(round(time.time() - loop_now_time) - int(this_time))
+                    loop_now_time = time.time()
                     print("threads")
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " loop :  " + str(
                         loop_count) + " ; update_cookies :  " + str(len(update_cookies)))
-                    if httpIP == 0:
+                    if httpIP == 0 or submit_jiange_time == 0:
                         print(time.strftime("%Y-%m-%d %H:%M:%S") +
                               " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
                             success_count) + " ; rate --- : 0 ;")
-                        print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
-                            round(len(gids) / submit_jiange_time / 60)) + "; time --- " + str(this_time))
+                        print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- :0 ;" + " time --- " + str(this_time))
                     else:
                         print(time.strftime("%Y-%m-%d %H:%M:%S") +
                               " httpIP --- : " + str(httpIP) + " ; success --- : " + str(
                             success_count) + " ; rate --- : " + str(
                             round(100 * success_count / httpIP, 2)) + "% ;")
                         print(time.strftime("%Y-%m-%d %H:%M:%S") + " rate2 --- " + str(
-                            round(len(gids) / submit_jiange_time / 60)) + "; time --- " + str(this_time))
+                            round(3600 * tmp_uodate_count / submit_jiange_time)) + "; time --- " + str(this_time))
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
@@ -923,8 +939,8 @@ if __name__ == '__main__':
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
                 change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            this_time = abs(submit_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num))
-            time.sleep(int(this_time))
+            this_time = 3 * abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num))
+            time.sleep(abs(int(this_time) - 2))
     except Exception as err:
         print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 4: " + str(err))
 print("end process")

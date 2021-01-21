@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, create_engine, ForeignKey
+from sqlalchemy import Column, String, create_engine, ForeignKey, Integer
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 import time
@@ -39,6 +39,17 @@ class City_cookies(Base):
     zone = Column(String(255))
     ua = Column(String(255))
     error_count = Column(String(255))
+
+class Mipcms_fabao_server_record(Base):
+    __tablename__ = 'mipcms_fabao_server_record'
+    id = Column(Integer, primary_key=True,autoincrement=True)
+    server_id = Column(String(255))
+    ip_count = Column(String(255))
+    success_count = Column(String(255))
+    rate = Column(String(255))
+    rate2 = Column(String(255))
+    dest_speed = Column(String(255))
+    time = Column(String(255))
 
 
 class Updatedb():

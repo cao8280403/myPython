@@ -31,7 +31,8 @@ class ReadConfig:
         show_window = self.cf.get("Pram", "show_window")
         open_chrome_sec = self.cf.get("Pram", "open_chrome_sec")
         pool_num = self.cf.get("Pram", "pool_num")
-        return [ip_min,show_window,open_chrome_sec,pool_num]
+        server_id = self.cf.get("Pram", "server_id")
+        return [ip_min,show_window,open_chrome_sec,pool_num,server_id]
 
 
 if __name__ == '__main__':
