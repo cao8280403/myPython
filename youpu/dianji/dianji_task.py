@@ -4,7 +4,8 @@ from sqlalchemy import Column, String, create_engine, ForeignKey, func
 from fetchip import Fetchip
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list, Mipcms_fabao_server_record
+from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list, Mipcms_fabao_server_record, \
+    Mipcms_fabao_server_switch
 from aliip import Aliip
 from dianji_thread import Dianji_thread
 import time
@@ -93,6 +94,7 @@ class oneThread(threading.Thread):
             cookie_list_str = ''
             tmp_city_cookie = ''
             ua = ""
+            cookie_flag = True
             if json_result["City"] != '' and json_result["County"] != '':
                 tmp_cookies = []
                 for tmp in self.citycookies:
@@ -105,6 +107,7 @@ class oneThread(threading.Thread):
                     cookie_list_str = city_cookie.cookie
                 elif tmp_cookies.__len__() == 0:
                     ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
+                    cookie_flag = False
                     not_exist_zone.append(json_result["City"] + "--" + json_result["County"])
                 else:
                     city_cookie = tmp_cookies[random.randint(0, tmp_cookies.__len__() - 1)]
@@ -112,8 +115,9 @@ class oneThread(threading.Thread):
                     tmp_city_cookie = city_cookie
                     cookie_list_str = city_cookie.cookie
             else:
-                return
-                # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
+                # return
+                cookie_flag = False
+                ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
             # 'user-agent="' + ua[random.randint(0, ua.__len__() - 1)][0] + '"',
             options.add_argument('user-agent="' + ua + '"')
             options.add_argument('Connection="close"')
@@ -144,10 +148,11 @@ class oneThread(threading.Thread):
                 driver.refresh()
                 time.sleep(2)
                 # 判断是否登录，右上角是否存在那个登录按钮
-                usernames = driver.find_elements_by_class_name("user-name")
-                if len(usernames) == 0:
-                    delete_cookies.append(tmp_city_cookie)
-                    # driver.quit()
+                if cookie_flag:
+                    usernames = driver.find_elements_by_class_name("user-name")
+                    if len(usernames) == 0:
+                        delete_cookies.append(tmp_city_cookie)
+                        # driver.quit()
 
                 # print_time(self.name, self.counter, 5)
                 random_count = self.one_circle(self.word_one, "1", driver)
@@ -725,7 +730,7 @@ class Aclass(object):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
         cursor = session.execute(
-            "select * from mipcms_fabao_list where state = 0 order by rand() limit 1000")
+            "select * from mipcms_fabao_list where state = 0 and site = 'www.kf400.cn' order by rand() limit 1000")
         # cursor = session.execute(
         #     "select c.* from ( select a.*,b.mubiao from (select * from mipcms_fabao_history where time >= UNIX_TIMESTAMP(date_format(now(),'%Y-%m-%d'))) a  left join mipcms_fabao b on a.site = b.site and a.keyword=b.keyword where a.count<b.mubiao) c order by (mubiao * rand() ) desc limit 1000")
         result = cursor.fetchall()
@@ -740,6 +745,14 @@ class Aclass(object):
         citycookies = session.query(City_cookies).all()
         print(len(citycookies))
         self.citycookies = citycookies
+
+    def fetch_mipcms_fabao_server_switch(self):
+        engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+        # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()  # 创建session
+        mipcms_fabao_server_switchs = session.query(Mipcms_fabao_server_switch).all()
+        return mipcms_fabao_server_switchs[0].flag
 
 
 def change_fbl(x, y):
@@ -802,6 +815,7 @@ if __name__ == '__main__':
         open_chrome_sec = prams[2]
         pool_num = prams[3]
         server_id = prams[4]
+        ip_address = prams[5]
         sizelist = get_window_size.split(",")
         aclass = Aclass()
         engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
@@ -816,7 +830,14 @@ if __name__ == '__main__':
         loop_count = 0
         while True:
             # close_chrome()
+            try:
+                flag = aclass.fetch_mipcms_fabao_server_switch()
+                if flag == 1:
+                    break
 
+            except Exception as err:
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
+                time.sleep(60)
             if len(not_exist_zone) > 0:
                 filename = 'not_exist_zone.txt'
                 with open(filename, 'a', encoding='utf8') as file_object:
@@ -875,7 +896,7 @@ if __name__ == '__main__':
                                                      server_id=str(server_id),
                                                      rate2=str(round(3600 * tmp_uodate_count / submit_jiange_time)),
                                                      dest_speed=str(3600 / int(open_chrome_sec)),
-                                                     time=time.time())
+                                                     time=time.time(), ip_address=str(ip_address))
                 session.add(new_obj)
                 session.commit()
 
@@ -928,7 +949,7 @@ if __name__ == '__main__':
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                # time.sleep(120)
+                # time.sleep(320)
             else:
                 print("fetchdb")
                 try:
@@ -937,9 +958,9 @@ if __name__ == '__main__':
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            this_time = 3 * abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num))
-            time.sleep(abs(int(this_time) - 2))
+                # change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+            # this_time = min(3 * abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 30)
+            # time.sleep(abs(int(this_time) - 2))
     except Exception as err:
         print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 4: " + str(err))
 print("end process")

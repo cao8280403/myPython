@@ -50,6 +50,13 @@ class Mipcms_fabao_server_record(Base):
     rate2 = Column(String(255))
     dest_speed = Column(String(255))
     time = Column(String(255))
+    ip_address = Column(String(255))
+
+class Mipcms_fabao_server_switch(Base):
+    __tablename__ = 'mipcms_fabao_server_switch'
+    id = Column(Integer, primary_key=True,autoincrement=True)
+    flag = Column(String(255))
+
 
 
 class Updatedb():
