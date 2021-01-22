@@ -822,6 +822,8 @@ if __name__ == '__main__':
         # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
+        cursor = session.execute("update mipcms_fabao_server_switch set flag = 0")
+        session.commit()
         try:
             aclass.fetch_cookies()
         except Exception as err:
@@ -958,9 +960,9 @@ if __name__ == '__main__':
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-                # change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            # this_time = min(3 * abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 30)
-            # time.sleep(abs(int(this_time) - 2))
+                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+            this_time = min(3 * abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 30)
+            time.sleep(abs(int(this_time) - 2))
     except Exception as err:
         print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 4: " + str(err))
 print("end process")
