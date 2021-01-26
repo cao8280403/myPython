@@ -17,7 +17,7 @@ from selenium.webdriver.common.keys import Keys  # 键盘对象
 from selenium.webdriver.support import expected_conditions as EC  # 判断器
 from selenium.webdriver.support.wait import WebDriverWait  # 浏览器等待对像
 from selenium.webdriver.chrome.service import Service
-import time
+import time,pyautogui
 import json
 import os
 import random
@@ -71,11 +71,13 @@ class oneThread(threading.Thread):
             options = webdriver.ChromeOptions()  # 设置代理
             options.add_argument(self.arg1)
             options.add_argument('lang=zh_CN.UTF-8')
+            options.add_argument('--disk-cache-dir=d:\chromecahce')
             # prefs = {"profile.managed_default_content_settings.images": 2}
             # options.add_experimental_option("prefs", prefs)
             # options.add_argument('--host-resolver-rules=MAP ' + self.site + ' 127.0.0.1')
             # options.add_argument("--disable-gpu")  # 禁用gpu
-            # options.add_argument("--disable-cache")  # 禁用缓存
+            # options.add_argument("disable-cache")  # 禁用缓存
+            options.add_argument('--disable-application-cache')
             # options.add_argument('--incognito')  # 隐身模式（无痕模式）
             options.add_experimental_option('excludeSwitches', ['enable-logging'])
             options.add_argument("disable-blink-features=AutomationControlled")  # 就是这一行告诉chrome去掉了webdriver痕迹
@@ -126,13 +128,12 @@ class oneThread(threading.Thread):
             try:
                 # driver.set_window_size(self.arg3, self.arg4)  # 分辨率 1024*768
                 driver.maximize_window()
-
-                driver.get("https://www.baidu.com")
-                element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
-                )
-                driver.delete_all_cookies()
                 if cookie_list_str != '':
+                    driver.get("https://www.baidu.com")
+                    element = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
+                    )
+                    driver.delete_all_cookies()
                     cookie_list_array = cookie_list_str.split(";")
                     for tmp_cookie in cookie_list_array:
                         cookie_dict = {
@@ -145,7 +146,13 @@ class oneThread(threading.Thread):
                             'HostOnly': False,
                             'Secure': False}
                         driver.add_cookie(cookie_dict)
-                driver.refresh()
+                    driver.refresh()
+                else:
+                    driver.get("https://www.baidu.com/s?ie=UTF-8&wd="+word["keyword"])
+                    element = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
+                    )
+
                 time.sleep(2)
                 # 判断是否登录，右上角是否存在那个登录按钮
                 if cookie_flag:
@@ -571,15 +578,7 @@ class oneThread(threading.Thread):
                     ActionChains(driver).click(a).perform()
                     windows = driver.window_handles
                     driver.switch_to.window(windows[-1])
-                    element = WebDriverWait(driver, 10, 0.5).until(
-                        EC.presence_of_element_located((By.XPATH, '/html')))
-                    driver.execute_script("window.open();")
-                    driver.close()
-                    gids.append(word)
-                    time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                              60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                    driver.quit()
-
+                    self.last_step(driver)
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict1.items())[0][0]
@@ -591,14 +590,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        element = WebDriverWait(driver, 10, 0.5).until(
-                            EC.presence_of_element_located((By.XPATH, '/html')))
-                        driver.execute_script("window.open();")
-                        driver.close()
-                        gids.append(word)
-                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                        driver.quit()
+                        self.last_step(driver)
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         # ActionChains(driver).move_to_element(a).perform()
@@ -606,14 +598,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        element = WebDriverWait(driver, 10, 0.5).until(
-                            EC.presence_of_element_located((By.XPATH, '/html')))
-                        driver.execute_script("window.open();")
-                        driver.close()
-                        gids.append(word)
-                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                        driver.quit()
+                        self.last_step(driver)
                 # 图片
                 else:
                     index = sorted(dict1.items())[0][0]
@@ -626,14 +611,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        element = WebDriverWait(driver, 10, 0.5).until(
-                            EC.presence_of_element_located((By.XPATH, '/html')))
-                        driver.execute_script("window.open();")
-                        driver.close()
-                        gids.append(word)
-                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                        driver.quit()
+                        self.last_step(driver)
             elif dict2.__len__() > 0:
                 index = sorted(dict2.items())[0][0]
                 dest = divs[index]
@@ -651,14 +629,7 @@ class oneThread(threading.Thread):
                     ActionChains(driver).click(a).perform()
                     windows = driver.window_handles
                     driver.switch_to.window(windows[-1])
-                    element = WebDriverWait(driver, 10, 0.5).until(
-                        EC.presence_of_element_located((By.XPATH, '/html')))
-                    driver.execute_script("window.open();")
-                    driver.close()
-                    gids.append(word)
-                    time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                              60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                    driver.quit()
+                    self.last_step(driver)
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict2.items())[0][0]
@@ -670,27 +641,13 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        element = WebDriverWait(driver, 10, 0.5).until(
-                            EC.presence_of_element_located((By.XPATH, '/html')))
-                        driver.execute_script("window.open();")
-                        driver.close()
-                        gids.append(word)
-                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                        driver.quit()
+                        self.last_step(driver)
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        element = WebDriverWait(driver, 10, 0.5).until(
-                            EC.presence_of_element_located((By.XPATH, '/html')))
-                        driver.execute_script("window.open();")
-                        driver.close()
-                        gids.append(word)
-                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                        driver.quit()
+                        self.last_step(driver)
                 # 图片
                 else:
                     index = sorted(dict2.items())[0][0]
@@ -703,19 +660,39 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        element = WebDriverWait(driver, 10, 0.5).until(
-                            EC.presence_of_element_located((By.XPATH, '/html')))
-                        driver.execute_script("window.open();")
-                        driver.close()
-                        gids.append(word)
-                        time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                                  60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-                        driver.quit()
+                        self.last_step(driver)
 
         except Exception as error:
             a = 1
             if 'HTTPConnectionPool' not in str(error):
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 3: " + str(error))
+            driver.quit()
+
+
+    def last_step(self, driver):
+        global gids
+        try:
+            time.sleep(1)
+            element = WebDriverWait(driver, 10, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '/html')))
+            driver.execute_script("window.open();")
+            driver.close()
+            gids.append(word)
+            time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                      60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
+            # 切回百度页面
+            driver.close()
+            js = "document.documentElement.scrollTop=document.documentElement.scrollTop+200"
+            driver.execute_script(js)
+            time.sleep(random.randint(2, 5))
+            driver.get('chrome://settings/clearBrowserData')
+            for m in range(7):
+                pyautogui.press('tab')
+            pyautogui.press('enter')
+            driver.quit()
+        except Exception as error:
+            if 'HTTPConnectionPool' not in str(error):
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error last_step: " + str(error))
             driver.quit()
 
 
@@ -730,7 +707,7 @@ class Aclass(object):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
         cursor = session.execute(
-            "select * from mipcms_fabao_list where state = 0 and site = 'www.kf400.cn' order by rand() limit 1000")
+            "select * from mipcms_fabao_list where state = 0  order by rand() limit 1000")
         # cursor = session.execute(
         #     "select c.* from ( select a.*,b.mubiao from (select * from mipcms_fabao_history where time >= UNIX_TIMESTAMP(date_format(now(),'%Y-%m-%d'))) a  left join mipcms_fabao b on a.site = b.site and a.keyword=b.keyword where a.count<b.mubiao) c order by (mubiao * rand() ) desc limit 1000")
         result = cursor.fetchall()
@@ -846,7 +823,7 @@ if __name__ == '__main__':
                     for x in not_exist_zone:
                         file_object.write(x + "\n")
                     file_object.close()
-            if len(gids) >= 100:
+            if len(gids) >= 200:
                 aaa = gids
                 try:
                     engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
@@ -885,7 +862,8 @@ if __name__ == '__main__':
                         delete_cookies = []
                     session.close()
                 except Exception as err:
-                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
+                    time.sleep(60*10)
+                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " update db error " + str(err))
                 for i in aaa:
                     print(i)
                 success_count = success_count + len(gids)
@@ -956,12 +934,15 @@ if __name__ == '__main__':
                 print("fetchdb")
                 try:
                     aclass.fetch_fabao()
+                    if len(aclass.fabaos) > 0 and len(aclass.fabaos[0]) == 0:
+                        gids = []
+                        time.sleep(60 * 10)
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
                 change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            this_time = min(3 * abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 30)
+            this_time = min(abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 10)
             time.sleep(abs(int(this_time) - 2))
     except Exception as err:
         print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 4: " + str(err))

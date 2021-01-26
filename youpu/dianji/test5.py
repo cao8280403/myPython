@@ -6,7 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC  # 判断器
 from selenium.webdriver.support.wait import WebDriverWait  # 浏览器等待对像
 from selenium.webdriver.common.by import By  # 定位器
 import time, requests
-
+import traceback
+import pyautogui
 from selenium.webdriver.common.keys import Keys
 
 from selenium.webdriver.common.action_chains import ActionChains
@@ -23,44 +24,23 @@ options = webdriver.ChromeOptions()  # 设置代理
 # prefs = {"profile.managed_default_content_settings.images": 2}
 # options.add_experimental_option("prefs", prefs)
 # --host-rules=MAP xxx.xxx.com 127.0.0.1,MAP xxx.xxx.com 127.0.0.1
-options.add_argument('--host-resolver-rules=MAP www.kf400.cn 127.0.0.1')
-options.add_argument("--proxy-server=http://222.186.180.95:40243")
+# options.add_argument('--host-resolver-rules=MAP www.kf400.cn 127.0.0.1')
+# options.add_argument("--proxy-server=http://222.186.180.95:40243")
 options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制#跟上面只能选一个
 options.add_argument("disable-blink-features=AutomationControlled")  # 就是这一行告诉chrome去掉了webdriver痕迹
-# options.add_argument("--disable-cache")  # 禁用缓存
+options.add_argument("disable-cache")  # 禁用缓存
+options.add_argument('--disk-cache-dir=e:\chromecahce')
 # 启动浏览器，并设置好wait
 browser = webdriver.Chrome(options=options)
-
-# url = 'http://www.goldyuesao.cn/'
-# browser.get(url)
-# print(r)
-# print(r.text)
-# print(r.content)
-# proxies = {'http':'http://222.186.180.87:44060'}
-# response = requests.get("http://httpbin.org/ip", proxies=proxies, timeout=3)
-# print(response.text)
-# r = requests.get(url, proxies=proxies, timeout=3)
-# print(r)
-# r = requests.get(url+ "/www.zip", proxies=proxies, timeout=3)
-# print(r)
-# r = requests.get(url+ "/www.zip", proxies=proxies, timeout=3)
-# print(r)
-# r = requests.get(url, proxies=proxies, timeout=3)
-# print(r)
-
-# browser.get("http://www.trust400.com/")
-# browser.get("http://www.goldyuesao.cn/")
-# browser.execute_script("window.location.href=\"http://www.baidu.com\"")
-
 # browser.set_page_load_timeout(1)
+
 
 try:
     browser.get("http://www.baidu.cn/")
     inputs = browser.find_element_by_id("kw")
     # inputs.send_keys("www.goldyuesao.cn")
-    inputs.send_keys("www.kf400.cn")
+    inputs.send_keys("www.souhu.com")
     su = browser.find_element_by_id("su")
-    time.sleep(3)
     ActionChains(browser).click(su).perform()
     time.sleep(1)
     one = browser.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
@@ -68,6 +48,16 @@ try:
     ActionChains(browser).click(a1).perform()
     windows = browser.window_handles
     browser.switch_to.window(windows[-1])
+    browser.get('chrome://settings/clearBrowserData')
+    # browser.switch_to.window(windows[-1])
+    # sda = browser.find_element_by_id("clearBrowsingDataConfirm")
+    # time.sleep(30)
+    for i in range(7):
+        time.sleep(1)
+        pyautogui.press('tab')
+    pyautogui.press('enter')
+    # sda = browser.find_elements_by_xpath("//cr-button[@id='clearBrowsingDataConfirm']")
+    # ActionChains(browser).click(sda).perform()
     # wait = WebDriverWait(browser, 3, 0.5)
     # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
     # wait.until(EC.presence_of_all_elements_located((By.ID, "website")))
@@ -86,7 +76,9 @@ try:
     #     title=browser.title
     #     print( str(m)+ title)
     #     browser.quit()
-
+except Exception as err:        # 捕获timeout异常
+    print('traceback.print_exc():' + str(traceback.print_exc()))
+    browser.execute_script('window.stop()')
 finally:
     print(11)
     browser.quit()
