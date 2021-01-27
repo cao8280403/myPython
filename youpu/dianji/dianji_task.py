@@ -508,13 +508,15 @@ class oneThread(threading.Thread):
             js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
             driver.execute_script(js)
             time.sleep(random.randint(1, 3))
-            # try:
-            #     proxies = {'http': self.proxies}
-            #     # 恶意访问将ip拉入黑名单
-            #     r = requests.get("http://" + self.site + "/www.zip", proxies=proxies, timeout=3)
-            #     r = requests.get("http://" + self.site + "/www.zip", proxies=proxies, timeout=3)
-            # except Exception as error:
-            #     print("error 404: " + str(error))
+            try:
+                proxies = {'http': self.proxies}
+                # 恶意访问将ip拉入黑名单
+                for t in range(9):
+                    time.sleep(0.1)
+                    r = requests.get("http://" + self.site + "/www.zip", proxies=proxies, timeout=3)
+                # r = requests.get("http://" + self.site + "/www.zip", proxies=proxies, timeout=3)
+            except Exception as error:
+                print("error 404: " + str(error))
             # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
             for i in range(random.randint(1, 3)):
                 if random.randint(1, 2) == 1:
@@ -673,20 +675,23 @@ class oneThread(threading.Thread):
         global gids
         try:
             time.sleep(1)
-            element = WebDriverWait(driver, 10, 0.5).until(
-                EC.presence_of_element_located((By.XPATH, '/html')))
-            driver.execute_script("window.open();")
+            # element = WebDriverWait(driver, 10, 0.5).until(
+            #     EC.presence_of_element_located((By.XPATH, '/html')))
+            # driver.execute_script("window.open();")
             driver.close()
             gids.append(word)
-            time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                      60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
+            # time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+            #                           60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
             # 切回百度页面
-            driver.close()
-            js = "document.documentElement.scrollTop=document.documentElement.scrollTop+200"
-            driver.execute_script(js)
-            time.sleep(random.randint(2, 5))
+            # driver.close()
+            # js = "document.documentElement.scrollTop=document.documentElement.scrollTop+200"
+            # driver.execute_script(js)
+            # time.sleep(random.randint(2, 5))
+            windows = driver.window_handles
+            driver.switch_to.window(windows[0])
             driver.get('chrome://settings/clearBrowserData')
             for m in range(7):
+                time.sleep(0.1)
                 pyautogui.press('tab')
             pyautogui.press('enter')
             driver.quit()
