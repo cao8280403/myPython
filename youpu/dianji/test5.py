@@ -13,7 +13,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 print(time.strftime("%Y-%m-%d %H:%M:%S"))
 time1 = time.time()
-time.sleep(3.12)
+# time.sleep(3.12)
 time2 = time.time()
 print(round(time2-time1))
 
@@ -37,29 +37,42 @@ browser = webdriver.Chrome(options=options)
 
 try:
     browser.get("http://www.baidu.cn/")
-    inputs = browser.find_element_by_id("kw")
-    # inputs.send_keys("www.goldyuesao.cn")
-    inputs.send_keys("www.kf400.cn")
-    su = browser.find_element_by_id("su")
-    ActionChains(browser).click(su).perform()
-    time.sleep(1)
-    one = browser.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
-    a1 = one.find_element_by_xpath(".//a[1]")
-
-    ActionChains(browser).click(a1).perform()
-    # time.sleep(3)
-    windows = browser.window_handles
-    # t1 = time.time()
-    browser.switch_to.window(windows[-1])
-    t2 = time.time()
-    # print(t2-t1)
-    time.sleep(2)
-    browser.execute_script("window.open();")
-    # browser.close()
-    t3 = time.time()
-    print(t3-t2)
-    # browser.get('chrome://settings/clearBrowserData')
+    # inputs = browser.find_element_by_id("kw")
+    # # inputs.send_keys("www.goldyuesao.cn")
+    # inputs.send_keys("www.kf400.cn")
+    # su = browser.find_element_by_id("su")
+    # ActionChains(browser).click(su).perform()
+    # time.sleep(1)
+    # one = browser.find_element_by_xpath("//div[@id='content_left']/div[@data-click][1]")
+    # a1 = one.find_element_by_xpath(".//a[1]")
+    #
+    # ActionChains(browser).click(a1).perform()
+    # # time.sleep(3)
+    # windows = browser.window_handles
+    # # t1 = time.time()
     # browser.switch_to.window(windows[-1])
+    # t2 = time.time()
+    # # print(t2-t1)
+    # time.sleep(2)
+    # browser.execute_script("window.open();")
+    # # browser.close()
+    # t3 = time.time()
+    # print(t3-t2)
+    browser.get('chrome://settings/clearBrowserData')
+    time.sleep(2)
+    # browser.switch_to.window(windows[-1])
+    # new
+    # WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable((WebElement)((JavascriptExecutor)
+    # driver).executeScript(
+    #     "return document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')"))).click()
+    clearData = browser.execute_script(
+        "return document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page ').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')")
+    # clearData = browser.execute_script(
+    #     "document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')")
+
+    clearData.click()
+    # browser.execute_script("return arguments[0].shadow-root")
+    # dscf = browser.find_element_by_tag_name("settings-ui")
     # sda = browser.find_element_by_id("clearBrowsingDataConfirm")
     # time.sleep(30)
     # for i in range(7):

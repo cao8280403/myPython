@@ -17,7 +17,7 @@ from selenium.webdriver.common.keys import Keys  # 键盘对象
 from selenium.webdriver.support import expected_conditions as EC  # 判断器
 from selenium.webdriver.support.wait import WebDriverWait  # 浏览器等待对像
 from selenium.webdriver.chrome.service import Service
-import time,pyautogui
+import time, pyautogui
 import json
 import os
 import random
@@ -43,13 +43,14 @@ submit_jiange_time = 0
 
 
 class oneThread(threading.Thread):
-    def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
+    # def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
+    def __init__(self, word_one, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
         threading.Thread.__init__(self)
         self.word_one = word_one
-        if word_two != "":
-            self.word_two = word_two
-        else:
-            self.word_two = ""
+        # if word_two != "":
+        #     self.word_two = word_two
+        # else:
+        #     self.word_two = ""
         self.site = site
         self.arg1 = arg1
         self.ip = ip
@@ -65,6 +66,7 @@ class oneThread(threading.Thread):
         global update_cookies
         global httpIP
         global not_exist_zone
+        word = self.word_one
         try:
             # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
             # print("begin thread：")
@@ -148,7 +150,7 @@ class oneThread(threading.Thread):
                         driver.add_cookie(cookie_dict)
                     driver.refresh()
                 else:
-                    driver.get("https://www.baidu.com/s?ie=UTF-8&wd="+word["keyword"])
+                    driver.get("https://www.baidu.com/s?ie=UTF-8&wd=" + word["keyword"])
                     element = WebDriverWait(driver, 10).until(
                         EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
                     )
@@ -246,7 +248,7 @@ class oneThread(threading.Thread):
             # print(err)
 
     # 判断1-5页是否有此站点
-    def judge(self, driver):
+    def judge(self, word, driver):
         global gids
         # 上下滚几次
         now_height = random.randint(2, 6)
@@ -344,7 +346,7 @@ class oneThread(threading.Thread):
 
             # 先判断1-5页是否有此站点，每页都一半概率打开一个网页，再点击目标站点，然后关闭
             for x in range(2):
-                have_next = self.judge(driver)
+                have_next = self.judge(word, driver)
                 if x == 0 and have_next == 1:
                     next_pages = driver.find_elements_by_xpath("//a[@class='n']")
                     if next_pages.__len__() > 0:
@@ -580,7 +582,7 @@ class oneThread(threading.Thread):
                     ActionChains(driver).click(a).perform()
                     windows = driver.window_handles
                     driver.switch_to.window(windows[-1])
-                    self.last_step(driver)
+                    self.last_step(word, driver)
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict1.items())[0][0]
@@ -592,7 +594,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        self.last_step(driver)
+                        self.last_step(word, driver)
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         # ActionChains(driver).move_to_element(a).perform()
@@ -600,7 +602,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        self.last_step(driver)
+                        self.last_step(word, driver)
                 # 图片
                 else:
                     index = sorted(dict1.items())[0][0]
@@ -613,7 +615,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        self.last_step(driver)
+                        self.last_step(word, driver)
             elif dict2.__len__() > 0:
                 index = sorted(dict2.items())[0][0]
                 dest = divs[index]
@@ -631,7 +633,7 @@ class oneThread(threading.Thread):
                     ActionChains(driver).click(a).perform()
                     windows = driver.window_handles
                     driver.switch_to.window(windows[-1])
-                    self.last_step(driver)
+                    self.last_step(word, driver)
                 # 网址
                 elif random_num < 6:
                     index = sorted(dict2.items())[0][0]
@@ -643,13 +645,13 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        self.last_step(driver)
+                        self.last_step(word, driver)
                     else:
                         a = dest.find_element_by_xpath("./div[2]/a[1]")
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        self.last_step(driver)
+                        self.last_step(word, driver)
                 # 图片
                 else:
                     index = sorted(dict2.items())[0][0]
@@ -662,7 +664,7 @@ class oneThread(threading.Thread):
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
-                        self.last_step(driver)
+                        self.last_step(word, driver)
 
         except Exception as error:
             a = 1
@@ -670,8 +672,7 @@ class oneThread(threading.Thread):
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 3: " + str(error))
             driver.quit()
 
-
-    def last_step(self, driver):
+    def last_step(self, word, driver):
         global gids
         try:
             time.sleep(1)
@@ -690,10 +691,16 @@ class oneThread(threading.Thread):
             windows = driver.window_handles
             driver.switch_to.window(windows[0])
             driver.get('chrome://settings/clearBrowserData')
-            for m in range(7):
-                time.sleep(0.1)
-                pyautogui.press('tab')
-            pyautogui.press('enter')
+            time.sleep(1)
+            clearData = driver.execute_script(
+                "return document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page ').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')")
+            time.sleep(1)
+            clearData.click()
+            time.sleep(1)
+            # for m in range(7):
+            #     time.sleep(0.1)
+            #     pyautogui.press('tab')
+            # pyautogui.press('enter')
             driver.quit()
         except Exception as error:
             if 'HTTPConnectionPool' not in str(error):
@@ -867,7 +874,7 @@ if __name__ == '__main__':
                         delete_cookies = []
                     session.close()
                 except Exception as err:
-                    time.sleep(60*10)
+                    time.sleep(60 * 10)
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " update db error " + str(err))
                 for i in aaa:
                     print(i)
@@ -898,14 +905,36 @@ if __name__ == '__main__':
                         threads = []
                         for ip in ips:
                             if len(aclass.fabaos) > 0:
-                                fabaos_one = aclass.fabaos.pop(0)
-                                fabaos_two = ""
-                                site = fabaos_one["site"]
-                                for word in aclass.fabaos:
-                                    if word["site"] == site:
-                                        fabaos_two = aclass.fabaos.pop(aclass.fabaos.index(word))
+                                # fabaos_one = aclass.fabaos.pop(0)
+                                # fabaos_two = ""
+                                # site = fabaos_one["site"]
+                                # for word in aclass.fabaos:
+                                #     if word["site"] == site:
+                                #         fabaos_two = aclass.fabaos.pop(aclass.fabaos.index(word))
+                                #         break
+                                # one = oneThread(fabaos_one, fabaos_two, site,
+                                #                 "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
+                                #                 aclass.citycookies, show_window,
+                                #                 "http://" + ip["ip"] + ":" + ip["port"], n,
+                                #                 int(open_chrome_sec) * int(num), int(ip_min))
+
+                                # 找出一个有此城市的关键词，再看province是否有
+                                province = ip["province"]
+                                city = ip["city"]
+                                fabaos_tmp = ""
+                                for fabao in aclass.fabaos:
+                                    if city in fabao["keyword"]:
+                                        fabaos_tmp = aclass.fabaos.pop(aclass.fabaos.index(fabao))
                                         break
-                                one = oneThread(fabaos_one, fabaos_two, site,
+                                if fabaos_tmp == "":
+                                    for fabao in aclass.fabaos:
+                                        if province in fabao["keyword"]:
+                                            fabaos_tmp = aclass.fabaos.pop(aclass.fabaos.index(fabao))
+                                            break
+                                if fabaos_tmp == "":
+                                    fabaos_tmp = aclass.fabaos.pop(0)
+                                site = fabaos_tmp["site"]
+                                one = oneThread(fabaos_tmp, site,
                                                 "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
                                                 aclass.citycookies, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
@@ -934,7 +963,7 @@ if __name__ == '__main__':
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                # time.sleep(320)
+                time.sleep(120)
             else:
                 print("fetchdb")
                 try:
@@ -946,7 +975,7 @@ if __name__ == '__main__':
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+                # change_fbl(tmp.split("*")[0], tmp.split("*")[1])
             this_time = min(abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 10)
             time.sleep(abs(int(this_time) - 2))
     except Exception as err:
