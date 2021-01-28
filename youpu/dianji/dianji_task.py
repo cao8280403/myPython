@@ -963,7 +963,7 @@ if __name__ == '__main__':
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                time.sleep(120)
+                # time.sleep(120)
             else:
                 print("fetchdb")
                 try:
@@ -975,7 +975,7 @@ if __name__ == '__main__':
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-                # change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
             this_time = min(abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 10)
             time.sleep(abs(int(this_time) - 2))
     except Exception as err:
