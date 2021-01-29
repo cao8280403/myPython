@@ -51,6 +51,7 @@ class Mipcms_fabao_server_record(Base):
     dest_speed = Column(String(255))
     time = Column(String(255))
     ip_address = Column(String(255))
+    cpu = Column(String(255))
 
 class Mipcms_fabao_server_switch(Base):
     __tablename__ = 'mipcms_fabao_server_switch'
