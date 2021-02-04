@@ -40,6 +40,18 @@ class City_cookies(Base):
     ua = Column(String(255))
     error_count = Column(String(255))
 
+class Backup_cookies(Base):
+    __tablename__ = 'backup_cookies'
+    id = Column(Integer, primary_key=True,autoincrement=True)
+    cookie = Column(String(255))
+
+class Mipcms_ip(Base):
+    __tablename__ = 'mipcms_ip'
+    id = Column(Integer, primary_key=True,autoincrement=True)
+    city = Column(String(255))
+    county = Column(String(255))
+    ip = Column(String(255))
+
 class Mipcms_fabao_server_record(Base):
     __tablename__ = 'mipcms_fabao_server_record'
     id = Column(Integer, primary_key=True,autoincrement=True)

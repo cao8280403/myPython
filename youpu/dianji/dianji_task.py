@@ -5,7 +5,7 @@ from fetchip import Fetchip
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list, Mipcms_fabao_server_record, \
-    Mipcms_fabao_server_switch
+    Mipcms_fabao_server_switch, Mipcms_ip
 from aliip import Aliip
 from dianji_thread import Dianji_thread
 import os
@@ -42,11 +42,12 @@ loop_now_time = time.time() - 1
 submit_time = time.time() - 1
 loop_jiange_time = 38
 submit_jiange_time = 0
+all_ips = []
 
 
 class oneThread(threading.Thread):
     # def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
-    def __init__(self, word_one, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
+    def __init__(self, word_one, site, arg1, ip, city, county, citycookies, show_window, proxies, n, arg_x, ip_min):
         threading.Thread.__init__(self)
         self.word_one = word_one
         # if word_two != "":
@@ -56,6 +57,8 @@ class oneThread(threading.Thread):
         self.site = site
         self.arg1 = arg1
         self.ip = ip
+        self.city = city
+        self.county = county
         self.citycookies = citycookies
         self.show_window = show_window
         self.proxies = proxies
@@ -92,38 +95,58 @@ class oneThread(threading.Thread):
             options.add_argument('log-level=3')
             # options.add_experimental_option('excludeSwitches', ['enable-logging'])#禁止打印日志
             options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 不显示正在受自动化软件控制#跟上面只能选一个
-            # 根据ip获取阿里ip的地域
-            aliip = Aliip()
-            ali_result = aliip.requesturl(self.ip)
-            json_result = json.loads(ali_result)
-            # 如果地域不全，就随机拿个ua，否则根据城市和地区选一个随机的cookie
-            cookie_list_str = ''
+            # # 根据ip获取阿里ip的地域
+            # aliip = Aliip()
+            # ali_result = aliip.requesturl(self.ip)
+            # json_result = json.loads(ali_result)
+            # # 如果地域不全，就随机拿个ua，否则根据城市和地区选一个随机的cookie
+            # cookie_list_str = ''
             tmp_city_cookie = ''
-            ua = ""
-            cookie_flag = True
-            if json_result["City"] != '' and json_result["County"] != '':
-                tmp_cookies = []
-                for tmp in self.citycookies:
-                    if tmp.city == json_result["City"] and tmp.zone == json_result["County"]:
-                        tmp_cookies.append(tmp)
-                if tmp_cookies.__len__() == 1:
-                    city_cookie = tmp_cookies[0]
-                    ua = city_cookie.ua
-                    tmp_city_cookie = city_cookie
-                    cookie_list_str = city_cookie.cookie
-                elif tmp_cookies.__len__() == 0:
-                    ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
-                    cookie_flag = False
-                    not_exist_zone.append(json_result["City"] + "--" + json_result["County"])
-                else:
-                    city_cookie = tmp_cookies[random.randint(0, tmp_cookies.__len__() - 1)]
-                    ua = city_cookie.ua
-                    tmp_city_cookie = city_cookie
-                    cookie_list_str = city_cookie.cookie
+            # ua = ""
+            # cookie_flag = True
+            tmp_cookies = []
+            for tmp in self.citycookies:
+                if tmp.city == self.city and tmp.zone == self.county:
+                    tmp_cookies.append(tmp)
+            if tmp_cookies.__len__() == 1:
+                city_cookie = tmp_cookies[0]
+                ua = city_cookie.ua
+                tmp_city_cookie = city_cookie
+                cookie_list_str = city_cookie.cookie
+            elif tmp_cookies.__len__() == 0:
+                return
+                # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
+                # cookie_flag = False
+                # not_exist_zone.append(json_result["City"] + "--" + json_result["County"])
             else:
-                # return
-                cookie_flag = False
-                ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
+                city_cookie = tmp_cookies[random.randint(0, tmp_cookies.__len__() - 1)]
+                ua = city_cookie.ua
+                tmp_city_cookie = city_cookie
+                cookie_list_str = city_cookie.cookie
+            # if json_result["City"] != '' and json_result["County"] != '':
+            #     tmp_cookies = []
+            #     for tmp in self.citycookies:
+            #         if tmp.city == json_result["City"] and tmp.zone == json_result["County"]:
+            #             tmp_cookies.append(tmp)
+            #     if tmp_cookies.__len__() == 1:
+            #         city_cookie = tmp_cookies[0]
+            #         ua = city_cookie.ua
+            #         tmp_city_cookie = city_cookie
+            #         cookie_list_str = city_cookie.cookie
+            #     elif tmp_cookies.__len__() == 0:
+            #         return
+            #         # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
+            #         # cookie_flag = False
+            #         # not_exist_zone.append(json_result["City"] + "--" + json_result["County"])
+            #     else:
+            #         city_cookie = tmp_cookies[random.randint(0, tmp_cookies.__len__() - 1)]
+            #         ua = city_cookie.ua
+            #         tmp_city_cookie = city_cookie
+            #         cookie_list_str = city_cookie.cookie
+            # else:
+            #     return
+            #     # cookie_flag = False
+            #     # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
             # 'user-agent="' + ua[random.randint(0, ua.__len__() - 1)][0] + '"',
             options.add_argument('user-agent="' + ua + '"')
             options.add_argument('Connection="close"')
@@ -149,7 +172,12 @@ class oneThread(threading.Thread):
                             'Secure': False}
                         driver.add_cookie(cookie_dict)
                     driver.refresh()
-                time.sleep(random.randint(1, 3))
+                time.sleep(random.randint(2, 3))
+
+                # 判断是否登录，右上角是否存在那个登录按钮
+                usernames = driver.find_elements_by_class_name("user-name")
+                if len(usernames) == 0:
+                    delete_cookies.append(tmp_city_cookie)
                 driver.get(
                     "https://www.baidu.com/s?ie=UTF-8&wd=" + word["keyword"] + "&si=" + self.site + "&ct=2097152")
                 element = WebDriverWait(driver, 10).until(
@@ -302,6 +330,8 @@ class oneThread(threading.Thread):
                             driver.switch_to.window(windows[-1])
                             self.last_step(word, driver)
             except Exception as error:
+                if 'Connection aborted' in str(error):
+                    delete_cookies.append(tmp_city_cookie)
                 driver.quit()
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + " error main process: " + str(error))
                 # print('traceback.print_exc():' + str(traceback.print_exc()))
@@ -312,8 +342,7 @@ class oneThread(threading.Thread):
     def last_step(self, word, driver):
         global gids
         try:
-            time.sleep(1)
-            driver.close()
+            # driver.close()
             gids.append(word)
             # windows = driver.window_handles
             # driver.switch_to.window(windows[0])
@@ -323,7 +352,14 @@ class oneThread(threading.Thread):
             #     "return document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page ').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')")
             # time.sleep(1)
             # clearData.click()
+            time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                      60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
+            windows = driver.window_handles
+            driver.switch_to.window(windows[0])
             time.sleep(1)
+            su = driver.find_element_by_id("su")
+            ActionChains(driver).click(su).perform()
+            time.sleep(2)
             driver.quit()
         except Exception as error:
             if 'HTTPConnectionPool' not in str(error):
@@ -362,7 +398,12 @@ class Aclass(object):
         # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
-        citycookies = session.query(City_cookies).all()
+        all_count = session.query(func.count(City_cookies.id)).scalar()
+        if all_count > 50000:
+            x = random.randint(0, all_count - 50000)
+        else:
+            x = 0
+        citycookies = session.query(City_cookies).limit(50000).offset(x).all()
         print(len(citycookies))
         self.citycookies = citycookies
 
@@ -391,7 +432,7 @@ def close_chrome():
         cmd_pids = []
         conhost_pids = []
         for p in process_list:
-            if p.name() == "chrome.exe" and p.create_time() + 5 * 60 < time.time():
+            if p.name() == "chrome.exe" and p.create_time() + 6 * 60 < time.time():
                 pids.append(p.pid)
             if p.name() == "cmd.exe":
                 cmd_pids.append(p)
@@ -425,9 +466,11 @@ def getMemCpu():
     data = psutil.virtual_memory()
     total = data.total  # 总内存,单位为byte
     free = data.available  # 可以内存
-    memory = "Memory usage:%d" % (int(round(data.percent))) + "%" + "  "
-    cpu = "CPU:%0.2f" % psutil.cpu_percent(interval=1) + "%"
-    return memory + cpu
+    # memory = "Memory usage:%d" % (int(round(data.percent))) + "%" + "  "
+    memory = int(round(data.percent))
+    # cpu = "CPU:%0.2f" % psutil.cpu_percent(interval=1) + "%"
+    cpu = int(round(psutil.cpu_percent(interval=1)))
+    return str(memory) + "," + str(cpu)
 
 
 def getLocalSpace(folder):
@@ -442,15 +485,18 @@ def getLocalSpace(folder):
     if platform.system() == 'Windows':
         free_bytes = ctypes.c_ulonglong(0)
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folderTemp), None, None, ctypes.pointer(free_bytes))
-        return str(round(free_bytes.value / 1024 / 1024 / 1024)) + "G"
+        return str(100 - int(round(free_bytes.value * 100 / 1024 / 1024 / 1024 / 8)))
     else:
         st = os.statvfs(folderTemp)
-        return str(round(st.f_bavail * st.f_frsize / 1024 / 1024)) + "G"
+        return str(100 - int(round(st.f_bavail * st.f_frsize * 100 / 1024 / 1024 / 8)))
 
 
 if __name__ == '__main__':
     print("begin process")
     try:
+        all_ips = []
+        aliip = Aliip()
+
         this_time = 0
         tmp_uodate_count = 0
         readConfig = ReadConfig()
@@ -478,7 +524,7 @@ if __name__ == '__main__':
             time.sleep(60)
         loop_count = 0
         while True:
-            # close_chrome()
+            close_chrome()
             try:
                 flag = aclass.fetch_mipcms_fabao_server_switch()
                 if flag == 1:
@@ -519,17 +565,17 @@ if __name__ == '__main__':
                     #     session.bulk_update_mappings(City_cookies, save_objs)
                     #     session.commit()
                     #     update_cookies = []
-                    # # 顺便删除cookies
-                    # if len(delete_cookies) > 0:
-                    #     bbb = []
-                    #     for tmp in delete_cookies:
-                    #         if tmp != '':
-                    #             bbb.append(tmp.id)
-                    #     ccc = tuple(bbb)
-                    #     delete_count = session.query(City_cookies).filter(City_cookies.id.in_(ccc)).delete(
-                    #         synchronize_session=False)
-                    #     session.commit()
-                    #     delete_cookies = []
+                    # 顺便删除cookies
+                    if len(delete_cookies) > 0:
+                        bbb = []
+                        for tmp in delete_cookies:
+                            if tmp != '':
+                                bbb.append(tmp.id)
+                        ccc = tuple(bbb)
+                        delete_count = session.query(City_cookies).filter(City_cookies.id.in_(ccc)).delete(
+                            synchronize_session=False)
+                        session.commit()
+                        delete_cookies = []
                     session.close()
                 except Exception as err:
                     time.sleep(60 * 10)
@@ -545,13 +591,19 @@ if __name__ == '__main__':
                 # 新增mipcms_fabao_server_record记录
                 new_obj = Mipcms_fabao_server_record(ip_count=str(httpIP), success_count=str(success_count),
                                                      rate=str(round(100 * success_count / httpIP, 2)),
-                                                     server_id=str(server_id), cpu=str(memCpu) + " " + str(dpan),
+                                                     server_id=str(server_id), cpu=str(memCpu) + "," + str(dpan),
                                                      rate2=str(round(3600 * tmp_uodate_count / submit_jiange_time)),
                                                      dest_speed=str(3600 / int(open_chrome_sec)),
                                                      time=time.time(), ip_address=str(ip_address))
                 session.add(new_obj)
                 session.commit()
-
+                # 新增mipcms_ip记录
+                objects = []
+                for ip in all_ips:
+                    objects.append(Mipcms_ip(ip=ip['origin_ip'], city=ip['City'], county=ip['County']))
+                session.bulk_save_objects(objects)
+                session.commit()
+                all_ips = []
                 gids = []
             if len(aclass.fabaos) > 0 and len(aclass.fabaos[0]) > 0:
                 try:
@@ -559,11 +611,22 @@ if __name__ == '__main__':
                     obj_fetchip = Fetchip(num, ip_min)
                     ips = obj_fetchip.requesturl()
                     loop_count = loop_count + 1
+                    tmp_ips = []
+                    for ip in ips:
+                        # 根据ip获取阿里ip的地域
+                        ali_result = aliip.requesturl(ip["origin_ip"])
+                        json_result = json.loads(ali_result)
+                        ip["City"] = json_result["City"]
+                        ip["County"] = json_result["County"]
+                        all_ips.append(ip)
+
+                        if json_result["City"] != '' and json_result["County"] != '':
+                            tmp_ips.append(ip)
                     # 这批ip使用10次
                     for n in range(int(pool_num)):
 
                         threads = []
-                        for ip in ips:
+                        for ip in tmp_ips:
                             if len(aclass.fabaos) > 0:
                                 # fabaos_one = aclass.fabaos.pop(0)
                                 # fabaos_two = ""
@@ -596,6 +659,7 @@ if __name__ == '__main__':
                                 site = fabaos_tmp["site"]
                                 one = oneThread(fabaos_tmp, site,
                                                 "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
+                                                ip["City"], ip["County"],
                                                 aclass.citycookies, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
                                                 int(open_chrome_sec) * int(num), int(ip_min))
