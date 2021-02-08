@@ -10,7 +10,7 @@ def close_chrome():
         cmd_pids = []
         conhost_pids = []
         for p in process_list:
-            if p.name() == "chrome.exe" and p.create_time() + 5 * 60 < time.time():
+            if p.name() == "chrome.exe" and p.create_time() + 1 * 60 < time.time():
                 pids.append(p.pid)
             if p.name() == "cmd.exe":
                 cmd_pids.append(p)

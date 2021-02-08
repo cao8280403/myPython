@@ -35,6 +35,7 @@ from readconfig import ReadConfig
 gids = []
 delete_cookies = []
 update_cookies = []
+succsee_cookies = []
 success_count = 0
 httpIP = 0
 not_exist_zone = []
@@ -57,12 +58,13 @@ class oneThread(threading.Thread):
 
     def run(self):
         global delete_cookies
+        global update_cookies
+        global succsee_cookies
         try:
             # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
             options = webdriver.ChromeOptions()  # 设置代理
             options.add_argument(self.arg1)
             options.add_argument('lang=zh_CN.UTF-8')
-            options.add_argument('--disk-cache-dir=d:\chromecahce')
             options.add_experimental_option('excludeSwitches', ['enable-logging'])
             options.add_argument("disable-blink-features=AutomationControlled")  # 就是这一行告诉chrome去掉了webdriver痕迹
             if self.show_window == 'no':
@@ -82,8 +84,8 @@ class oneThread(threading.Thread):
                 for tmp_cookie in cookie_list_array:
                     cookie_dict = {
                         "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
-                        'name': tmp_cookie.split("=")[0],
-                        'value': tmp_cookie.split("=")[1],
+                        'name': tmp_cookie.split("=")[0].strip(),
+                        'value': tmp_cookie.split("=")[1].strip(),
                         "expires": "",
                         'path': '/',
                         'httpOnly': False,
@@ -98,14 +100,52 @@ class oneThread(threading.Thread):
                 usernames = driver.find_elements_by_class_name("user-name")
                 if len(usernames) == 0:
                     delete_cookies.append(self.cookie)
+                else:
+                    succsee_cookies.append(self.cookie)
                 driver.quit()
             except Exception as error:
                 if 'Connection aborted' in str(error):
-                    delete_cookies.append(self.cookie)
+                    update_cookies.append(self.cookie)
                 driver.quit()
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + " error main process: " + str(error))
         except Exception as error:
             print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 2: " + str(error))
+
+def close_chrome():
+    try:
+        process_list = list(psutil.process_iter())
+        pids = []
+        cmd_pids = []
+        conhost_pids = []
+        for p in process_list:
+            if p.name() == "chrome.exe" and p.create_time() + 1 * 60 < time.time():
+                pids.append(p.pid)
+            if p.name() == "cmd.exe":
+                cmd_pids.append(p)
+            if p.name() == "conhost.exe":
+                conhost_pids.append(p)
+        # print("close pids count:" + str(len(pids)))
+        for pid in pids:
+            try:
+                os.system('taskkill /pid ' + str(pid) + ' /f')
+            except Exception as error:
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 5: " + str(error))
+        cmd_pids.sort(key=lambda x: x.create_time())
+        conhost_pids.sort(key=lambda x: x.create_time())
+        cmd_pids2 = cmd_pids[6:]
+        conhost_pids3 = conhost_pids[8:]
+        for pid in cmd_pids2:
+            try:
+                os.system('taskkill /pid ' + str(pid.pid) + ' /f')
+            except Exception as error:
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 6: " + str(error))
+        for pid in conhost_pids3:
+            try:
+                os.system('taskkill /pid ' + str(pid.pid) + ' /f')
+            except Exception as error:
+                print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 7: " + str(error))
+    except Exception as error:
+        print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 9: " + str(error))
 
 
 class Aclass(object):
@@ -119,7 +159,7 @@ class Aclass(object):
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
         # all_count = session.query(func.count(Backup_cookies.id)).scalar()
-        cookies = session.query(Backup_cookies).filter(Backup_cookies.id >= last_cookie_id).limit(1000).all()
+        cookies = session.query(Backup_cookies).filter(Backup_cookies.reject == 0).limit(1000).all()
         print(len(cookies))
         self.cookies = cookies
 
@@ -157,23 +197,65 @@ if __name__ == '__main__':
             time.sleep(60)
         loop_count = 0
         while True:
-
+            close_chrome()
             try:
-                # 判断是否有需要删除的
-                if len(delete_cookies) > 0:
-                    bbb = []
-                    for tmp in delete_cookies:
+                if len(update_cookies) > 0:
+                    eee = []
+                    for tmp in update_cookies:
                         if tmp != '':
-                            bbb.append(tmp.id)
-                    ccc = tuple(bbb)
+                            eee.append(tmp.id)
+                    fff = tuple(eee)
                     engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
                     # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
                     DBSession = sessionmaker(bind=engine)
                     session = DBSession()  # 创建session
-                    delete_count = session.query(Backup_cookies).filter(Backup_cookies.id.in_(ccc)).delete(
-                        synchronize_session=False)
+                    tmp_city_cookies = session.query(Backup_cookies).filter(Backup_cookies.id.in_(fff)).all()
+                    save_objs = [
+                        {'id': obj.id, 'cookie': obj.cookie, 'reject': 1} for obj in
+                        tmp_city_cookies]
+                    session.bulk_update_mappings(Backup_cookies, save_objs)
+                    session.commit()
+                    update_cookies = []
+                    session.close()
+
+                # 判断是否有需要删除的
+                if len(delete_cookies) > 0:
+                    eee = []
+                    for tmp in delete_cookies:
+                        if tmp != '':
+                            eee.append(tmp.id)
+                    fff = tuple(eee)
+                    engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+                    # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+                    DBSession = sessionmaker(bind=engine)
+                    session = DBSession()  # 创建session
+                    tmp_city_cookies = session.query(Backup_cookies).filter(Backup_cookies.id.in_(fff)).all()
+                    save_objs = [
+                        {'id': obj.id, 'cookie': obj.cookie, 'reject': 2} for obj in
+                        tmp_city_cookies]
+                    session.bulk_update_mappings(Backup_cookies, save_objs)
                     session.commit()
                     delete_cookies = []
+                    session.close()
+
+                # 成功的
+                if len(succsee_cookies) > 0:
+                    eee = []
+                    for tmp in succsee_cookies:
+                        if tmp != '':
+                            eee.append(tmp.id)
+                    fff = tuple(eee)
+                    engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
+                    # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+                    DBSession = sessionmaker(bind=engine)
+                    session = DBSession()  # 创建session
+                    tmp_city_cookies = session.query(Backup_cookies).filter(Backup_cookies.id.in_(fff)).all()
+                    save_objs = [
+                        {'id': obj.id, 'cookie': obj.cookie, 'reject': 3} for obj in
+                        tmp_city_cookies]
+                    session.bulk_update_mappings(Backup_cookies, save_objs)
+                    session.commit()
+                    succsee_cookies = []
                     session.close()
                 if len(aclass.cookies) > 0:
                     obj_fetchip = Fetchip(num, ip_min)
@@ -187,7 +269,7 @@ if __name__ == '__main__':
                                             cookie, show_window, aclass.uas[random.randint(0, len(aclass.uas) - 1)].ua)
                             threads.append(one)
                         for thread in threads:
-                            time.sleep(int(open_chrome_sec))
+                            time.sleep(int(open_chrome_sec)/1000)
                             thread.start()
                         print("threads")
                 else:
@@ -195,7 +277,7 @@ if __name__ == '__main__':
                     aclass.fetch_thousand_cookies()
                     if len((aclass.cookies)) == 0:
                         break
-                    last_cookie_id = aclass.cookies[len((aclass.cookies)) - 1].id+1
+                    # last_cookie_id = aclass.cookies[len((aclass.cookies)) - 1].id+1
 
             except Exception as err:
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + "error 9: " + str(err))

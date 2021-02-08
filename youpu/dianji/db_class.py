@@ -22,6 +22,7 @@ class Mipcms_fabao(Base):
     site = Column(String(255))
     mubiao = Column(String(255))
     keyword = Column(String(255))
+    short_title = Column(String(255))
 
 class Mipcms_fabao_list(Base):
     __tablename__ = 'mipcms_fabao_list'
@@ -29,6 +30,7 @@ class Mipcms_fabao_list(Base):
     site = Column(String(255))
     state = Column(String(255))
     keyword = Column(String(255))
+    short_title = Column(String(255))
 
 
 class City_cookies(Base):
@@ -41,9 +43,10 @@ class City_cookies(Base):
     error_count = Column(String(255))
 
 class Backup_cookies(Base):
-    __tablename__ = 'backup_cookies'
+    __tablename__ = 'city_cookies_check'
     id = Column(Integer, primary_key=True,autoincrement=True)
     cookie = Column(String(255))
+    reject = Column(String(255))
 
 class Mipcms_ip(Base):
     __tablename__ = 'mipcms_ip'
