@@ -6,8 +6,6 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list, Mipcms_fabao_server_record, \
     Mipcms_fabao_server_switch, Mipcms_ip
-from aliip import Aliip
-from dianji_thread import Dianji_thread
 import os
 import platform
 import ctypes
@@ -26,7 +24,6 @@ import random
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
 from aliip import Aliip
-from Bclass import Bclass
 import psutil
 import traceback
 import win32api, win32con
@@ -43,11 +40,13 @@ submit_time = time.time() - 1
 loop_jiange_time = 38
 submit_jiange_time = 0
 all_ips = []
+memCpu = ''
 
 
 class oneThread(threading.Thread):
     # def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
-    def __init__(self, word_one, site, arg1, ip, city, county, citycookies, show_window, proxies, n, arg_x, ip_min):
+    def __init__(self, word_one, site, arg1, ip, city, county, citycookies, show_window, proxies, n, arg_x, ip_min,
+                 total_loop_count):
         threading.Thread.__init__(self)
         self.word_one = word_one
         # if word_two != "":
@@ -65,13 +64,17 @@ class oneThread(threading.Thread):
         self.sleep_time = n
         self.arg_x = arg_x
         self.ip_min = ip_min
+        self.total_loop_count = total_loop_count
 
     def run(self):
         global delete_cookies
         global update_cookies
         global httpIP
         global not_exist_zone
+        global memCpu
         word = self.word_one
+        if self.sleep_time == self.total_loop_count - 1:
+            memCpu = getMemCpu()
         try:
             # 初始化的时候 需要获取ip and port 设置ua 使用传递过来的参数ua
             # print("begin thread：")
@@ -157,29 +160,29 @@ class oneThread(threading.Thread):
                 element = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
                 )
-                if cookie_list_str != '':
-                    driver.delete_all_cookies()
-                    cookie_list_array = cookie_list_str.split(";")
-                    for tmp_cookie in cookie_list_array:
-                        cookie_dict = {
-                            "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
-                            'name': tmp_cookie.split("=")[0].strip(),
-                            'value': tmp_cookie.split("=")[1].strip(),
-                            "expires": "",
-                            'path': '/',
-                            'httpOnly': False,
-                            'HostOnly': False,
-                            'Secure': False}
-                        driver.add_cookie(cookie_dict)
-                    driver.refresh()
+                # if cookie_list_str != '':
+                #     driver.delete_all_cookies()
+                #     cookie_list_array = cookie_list_str.split(";")
+                #     for tmp_cookie in cookie_list_array:
+                #         cookie_dict = {
+                #             "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
+                #             'name': tmp_cookie.split("=")[0].strip(),
+                #             'value': tmp_cookie.split("=")[1].strip(),
+                #             "expires": "",
+                #             'path': '/',
+                #             'httpOnly': False,
+                #             'HostOnly': False,
+                #             'Secure': False}
+                #         driver.add_cookie(cookie_dict)
+                #     driver.refresh()
                 time.sleep(random.randint(2, 3))
 
                 # 判断是否登录，右上角是否存在那个登录按钮
-                usernames = driver.find_elements_by_class_name("user-name")
-                if len(usernames) == 0:
-                    delete_cookies.append(tmp_city_cookie)
+                # usernames = driver.find_elements_by_class_name("user-name")
+                # if len(usernames) == 0:
+                #     delete_cookies.append(tmp_city_cookie)
                 driver.get(
-                    "https://www.baidu.com/s?ie=UTF-8&wd=" + word["keyword"] + "&rn=1&si=" + self.site + "&ct=2097152")
+                    "https://www.baidu.com/s?ie=UTF-8&wd=" + word["keyword"] + "&si=" + self.site + "&ct=2097152")
                 element = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
                 )
@@ -192,6 +195,7 @@ class oneThread(threading.Thread):
                 wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
 
                 time.sleep(random.randint(2, 3))
+
                 try:
                     proxies = {'http': self.proxies}
                     # 恶意访问将ip拉入黑名单
@@ -200,90 +204,141 @@ class oneThread(threading.Thread):
                         r = requests.get("http://" + self.site + "/shell.php", proxies=proxies, timeout=3)
                 except Exception as error:
                     print("error attack: " + str(error))
+
+                now_height = random.randint(2, 6)
+                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                driver.execute_script(js)
+                time.sleep(random.randint(1, 3))
+                # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
+                for i in range(random.randint(1, 3)):
+                    if random.randint(1, 2) == 1:
+                        now_height = min(now_height + random.randint(1, 5), 10)
+                        if now_height == 0:
+                            js = "document.documentElement.scrollTop=document.body.scrollTop"
+                        else:
+                            js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                        driver.execute_script(js)
+                        time.sleep(random.randint(1, 3))
+                    else:
+                        tmp = random.randint(1, 5)
+                        now_height = now_height - tmp if now_height > tmp else 0
+                        if now_height == 0:
+                            js = "document.documentElement.scrollTop=document.body.scrollTop"
+                        else:
+                            js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                        driver.execute_script(js)
+                        time.sleep(random.randint(1, 3))
                 if not (word["short_title"]) is None and len(word["short_title"]) > 0:
                     # 判断
                     # 如果标题不包括带的标题
                     # 获取所有标题
-                    div = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")[0]
-                    tmp_title = div.find_element_by_xpath(".//a[1]").text
-                    if str(word["short_title"]) in tmp_title:
-                        driver.execute_script("arguments[0].scrollIntoView();", div)
+                    divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                    tmp_index = 100
+                    for div in divs:
+                        tmp_title = div.find_element_by_xpath(".//a[1]").text
+                        if str(word["short_title"]) in tmp_title:
+                            tmp_index = divs.index(div)
+                            break
+                    if tmp_index < 100:
+                        dest = divs[tmp_index]
+                        driver.execute_script("arguments[0].scrollIntoView();", dest)
                         # 再向上移动200
                         js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
                         driver.execute_script(js)
                         time.sleep(random.randint(2, 3))
-                        a = div.find_element_by_xpath(".//a[1]")
+                        a = dest.find_element_by_xpath(".//a[1]")
                         ActionChains(driver).click(a).perform()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[-1])
                         self.last_step(word, driver)
                     else:
-                        driver.get(
-                            "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
-                                "keyword"] + "&rn=2&si=" + self.site + "&ct=2097152")
+                        dest = divs[0]
+                        driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        # 再向上移动200
+                        js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        driver.execute_script(js)
                         time.sleep(random.randint(2, 3))
-                        su = driver.find_element_by_id("su")
-                        ActionChains(driver).click(su).perform()
-                        wait = WebDriverWait(driver, 3, 1)
-                        # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
-                        wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                        time.sleep(random.randint(2, 3))
-                        divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                        tmp_index = 100
-                        for div in divs:
-                            tmp_title = div.find_element_by_xpath(".//a[1]").text
-                            if str(word["short_title"]) in tmp_title:
-                                tmp_index = divs.index(div)
-                                break
-                        if tmp_index < 100:
-                            dest = divs[tmp_index]
-                            driver.execute_script("arguments[0].scrollIntoView();", dest)
-                            # 再向上移动200
-                            js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                            driver.execute_script(js)
-                            time.sleep(random.randint(2, 3))
-                            a = dest.find_element_by_xpath(".//a[1]")
-                            ActionChains(driver).click(a).perform()
-                            windows = driver.window_handles
-                            driver.switch_to.window(windows[-1])
-                            self.last_step(word, driver)
-                        else:
-                            driver.get(
-                                "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
-                                    "keyword"] + "&rn=10&si=" + self.site + "&ct=2097152")
-                            time.sleep(random.randint(2, 3))
-                            su = driver.find_element_by_id("su")
-                            ActionChains(driver).click(su).perform()
-                            wait = WebDriverWait(driver, 3, 1)
-                            # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
-                            wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                            time.sleep(random.randint(2, 3))
-                            divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                            tmp_index = 100
-                            for div in divs:
-                                tmp_title = div.find_element_by_xpath(".//a[1]").text
-                                if str(word["short_title"]) in tmp_title:
-                                    tmp_index = divs.index(div)
-                                    break
-                            if tmp_index < 100:
-                                dest = divs[tmp_index]
-                                driver.execute_script("arguments[0].scrollIntoView();", dest)
-                                # 再向上移动200
-                                js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                                driver.execute_script(js)
-                                time.sleep(random.randint(2, 3))
-                                a = dest.find_element_by_xpath(".//a[1]")
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
-                            else:
-                                dest = divs[0]
-                                a = dest.find_element_by_xpath(".//a[1]")
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
+                        a = dest.find_element_by_xpath(".//a[1]")
+                        ActionChains(driver).click(a).perform()
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        self.last_step(word, driver)
+
+                        # driver.get(
+                        #     "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
+                        #         "keyword"] + "&rn=2&si=" + self.site + "&ct=2097152")
+                        # # time.sleep(random.randint(2, 3))
+                        # # su = driver.find_element_by_id("su")
+                        # # ActionChains(driver).click(su).perform()
+                        # # wait = WebDriverWait(driver, 3, 1)
+                        # # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+                        # # wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        # time.sleep(random.randint(2, 3))
+                        # divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                        # tmp_index = 100
+                        # for div in divs:
+                        #     tmp_title = div.find_element_by_xpath(".//a[1]").text
+                        #     if str(word["short_title"]) in tmp_title:
+                        #         tmp_index = divs.index(div)
+                        #         break
+                        # if tmp_index < 100:
+                        #     su = driver.find_element_by_id("su")
+                        #     ActionChains(driver).click(su).perform()
+                        #     wait = WebDriverWait(driver, 3, 1)
+                        #     wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        #     dest = divs[tmp_index]
+                        #     driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        #     # 再向上移动200
+                        #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        #     driver.execute_script(js)
+                        #     time.sleep(random.randint(2, 3))
+                        #     a = dest.find_element_by_xpath(".//a[1]")
+                        #     ActionChains(driver).click(a).perform()
+                        #     windows = driver.window_handles
+                        #     driver.switch_to.window(windows[-1])
+                        #     self.last_step(word, driver)
+                        # else:
+                        #     driver.get(
+                        #         "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
+                        #             "keyword"] + "&rn=3&si=" + self.site + "&ct=2097152")
+                        #     # time.sleep(random.randint(2, 3))
+                        #     # su = driver.find_element_by_id("su")
+                        #     # ActionChains(driver).click(su).perform()
+                        #     # wait = WebDriverWait(driver, 3, 1)
+                        #     # # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+                        #     # wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        #     time.sleep(random.randint(2, 3))
+                        #     divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                        #     tmp_index = 100
+                        #     for div in divs:
+                        #         tmp_title = div.find_element_by_xpath(".//a[1]").text
+                        #         if str(word["short_title"]) in tmp_title:
+                        #             tmp_index = divs.index(div)
+                        #             break
+                        #     if tmp_index < 100:
+                        #         su = driver.find_element_by_id("su")
+                        #         ActionChains(driver).click(su).perform()
+                        #         wait = WebDriverWait(driver, 3, 1)
+                        #         wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        #         dest = divs[tmp_index]
+                        #         driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        #         # 再向上移动200
+                        #         js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        #         driver.execute_script(js)
+                        #         time.sleep(random.randint(2, 3))
+                        #         a = dest.find_element_by_xpath(".//a[1]")
+                        #         ActionChains(driver).click(a).perform()
+                        #         windows = driver.window_handles
+                        #         driver.switch_to.window(windows[-1])
+                        #         self.last_step(word, driver)
+                        #     else:
+                        #         driver.quit()
+                        #         # dest = divs[0]
+                        #         # a = dest.find_element_by_xpath(".//a[1]")
+                        #         # ActionChains(driver).click(a).perform()
+                        #         # windows = driver.window_handles
+                        #         # driver.switch_to.window(windows[-1])
+                        #         # self.last_step(word, driver)
                 else:
                     divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
                     dest = divs[0]
@@ -485,8 +540,11 @@ class oneThread(threading.Thread):
             #     "return document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page ').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm')")
             # time.sleep(1)
             # clearData.click()
-            time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-                                      60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
+            if self.ip_min == 1:
+                time.sleep(30)
+            else:
+                time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                          60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
             windows = driver.window_handles
             driver.switch_to.window(windows[0])
             time.sleep(1)
@@ -629,8 +687,6 @@ if __name__ == '__main__':
     try:
         all_ips = []
         aliip = Aliip()
-        memCpu = ''
-
         this_time = 0
         tmp_uodate_count = 0
         readConfig = ReadConfig()
@@ -758,7 +814,7 @@ if __name__ == '__main__':
                             tmp_ips.append(ip)
                     # 这批ip使用10次
                     for n in range(int(pool_num)):
-                    # for n in range(1):
+                        # for n in range(1):
 
                         threads = []
                         for ip in tmp_ips:
@@ -797,7 +853,7 @@ if __name__ == '__main__':
                                                 ip["City"], ip["County"],
                                                 aclass.citycookies, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
-                                                int(open_chrome_sec) * int(num), int(ip_min))
+                                                int(open_chrome_sec) * int(num), int(ip_min), int(pool_num))
                                 threads.append(one)
                         for thread in threads:
                             time.sleep(int(open_chrome_sec))
@@ -835,7 +891,7 @@ if __name__ == '__main__':
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
                 change_fbl(tmp.split("*")[0], tmp.split("*")[1])
-            memCpu = getMemCpu()
+            # memCpu = getMemCpu()
             this_time = min(abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 10)
             time.sleep(abs(int(this_time) - 2))
     except Exception as err:
