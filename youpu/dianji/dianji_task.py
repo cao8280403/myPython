@@ -46,7 +46,7 @@ memCpu = ''
 class oneThread(threading.Thread):
     # def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
     def __init__(self, word_one, site, arg1, ip, city, county, citycookies, show_window, proxies, n, arg_x, ip_min,
-                 total_loop_count):
+                 total_loop_count, use_cookie):
         threading.Thread.__init__(self)
         self.word_one = word_one
         # if word_two != "":
@@ -65,6 +65,7 @@ class oneThread(threading.Thread):
         self.arg_x = arg_x
         self.ip_min = ip_min
         self.total_loop_count = total_loop_count
+        self.use_cookie = use_cookie
 
     def run(self):
         global delete_cookies
@@ -156,31 +157,34 @@ class oneThread(threading.Thread):
             driver = webdriver.Chrome(options=options)
             try:
                 httpIP = httpIP + 1
+                driver.maximize_window()
                 driver.get("https://www.baidu.com")
                 element = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
                 )
-                # if cookie_list_str != '':
-                #     driver.delete_all_cookies()
-                #     cookie_list_array = cookie_list_str.split(";")
-                #     for tmp_cookie in cookie_list_array:
-                #         cookie_dict = {
-                #             "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
-                #             'name': tmp_cookie.split("=")[0].strip(),
-                #             'value': tmp_cookie.split("=")[1].strip(),
-                #             "expires": "",
-                #             'path': '/',
-                #             'httpOnly': False,
-                #             'HostOnly': False,
-                #             'Secure': False}
-                #         driver.add_cookie(cookie_dict)
-                #     driver.refresh()
-                time.sleep(random.randint(2, 3))
+                if self.use_cookie == 'yes':
+                    if cookie_list_str != '':
+                        driver.delete_all_cookies()
+                        cookie_list_array = cookie_list_str.split(";")
+                        for tmp_cookie in cookie_list_array:
+                            cookie_dict = {
+                                "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
+                                'name': tmp_cookie.split("=")[0].strip(),
+                                'value': tmp_cookie.split("=")[1].strip(),
+                                "expires": "",
+                                'path': '/',
+                                'httpOnly': False,
+                                'HostOnly': False,
+                                'Secure': False}
+                            driver.add_cookie(cookie_dict)
+                        driver.refresh()
+                    time.sleep(random.randint(2, 3))
 
-                # 判断是否登录，右上角是否存在那个登录按钮
-                # usernames = driver.find_elements_by_class_name("user-name")
-                # if len(usernames) == 0:
-                #     delete_cookies.append(tmp_city_cookie)
+                    # 判断是否登录，右上角是否存在那个登录按钮
+                    usernames = driver.find_elements_by_class_name("user-name")
+                    if len(usernames) == 0:
+                        delete_cookies.append(tmp_city_cookie)
+                time.sleep(random.randint(1, 2))
                 driver.get(
                     "https://www.baidu.com/s?ie=UTF-8&wd=" + word["keyword"] + "&si=" + self.site + "&ct=2097152")
                 element = WebDriverWait(driver, 10).until(
@@ -188,6 +192,15 @@ class oneThread(threading.Thread):
                 )
 
                 time.sleep(random.randint(1, 3))
+                inputs = driver.find_element_by_id("kw")
+                ActionChains(driver).click(inputs).perform()
+                for i in range(10):
+                    inputs.send_keys(Keys.BACKSPACE)
+                    time.sleep(random.randint(1, 3) / 10)
+                for keyword in word["keyword"]:
+                    inputs.send_keys(keyword)
+                    random_count = random.randint(1, 10)
+                    time.sleep(random_count / 10)
                 su = driver.find_element_by_id("su")
                 ActionChains(driver).click(su).perform()
                 wait = WebDriverWait(driver, 3, 1)
@@ -699,6 +712,7 @@ if __name__ == '__main__':
         pool_num = prams[3]
         server_id = prams[4]
         ip_address = prams[5]
+        use_cookie = prams[6]
         sizelist = get_window_size.split(",")
         aclass = Aclass()
         engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@192.168.1.10:3306/youpudb')
@@ -853,7 +867,7 @@ if __name__ == '__main__':
                                                 ip["City"], ip["County"],
                                                 aclass.citycookies, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
-                                                int(open_chrome_sec) * int(num), int(ip_min), int(pool_num))
+                                                int(open_chrome_sec) * int(num), int(ip_min), int(pool_num), use_cookie)
                                 threads.append(one)
                         for thread in threads:
                             time.sleep(int(open_chrome_sec))
