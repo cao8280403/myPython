@@ -186,7 +186,7 @@ class oneThread(threading.Thread):
                         delete_cookies.append(tmp_city_cookie)
                 time.sleep(random.randint(1, 2))
                 driver.get(
-                    "https://www.baidu.com/s?ie=UTF-8&wd=" + word["keyword"] + "&si=" + self.site + "&ct=2097152")
+                    "https://www.baidu.com/s?ie=UTF-8&wd=" + str(word["keyword"])[-2:] + "&si=" + self.site + "&ct=2097152")
                 element = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
                 )
@@ -194,7 +194,7 @@ class oneThread(threading.Thread):
                 time.sleep(random.randint(1, 3))
                 inputs = driver.find_element_by_id("kw")
                 ActionChains(driver).click(inputs).perform()
-                for i in range(10):
+                for i in range(3):
                     inputs.send_keys(Keys.BACKSPACE)
                     time.sleep(random.randint(1, 3) / 10)
                 for keyword in word["keyword"]:
@@ -208,6 +208,23 @@ class oneThread(threading.Thread):
                 wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
 
                 time.sleep(random.randint(2, 3))
+                # 判断是否存在广告，先点广告
+                ads = driver.find_elements_by_xpath("//div[@data-ecimtimesign]")
+                if ads.__len__() > 0:
+                    random_index = random.randint(0,ads.__len__()-1)
+                    dest = ads[random_index]
+                    driver.execute_script("arguments[0].scrollIntoView();", dest)
+                    # 再向上移动200
+                    js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                    driver.execute_script(js)
+                    a = dest.find_element_by_xpath(".//a[1]")
+                    ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
+                    windows = driver.window_handles
+                    driver.switch_to.window(windows[-1])
+                    driver.close()
+                    driver.switch_to.window(windows[0])
+                    time.sleep(random.randint(1, 3))
 
                 try:
                     proxies = {'http': self.proxies}
@@ -558,11 +575,14 @@ class oneThread(threading.Thread):
             else:
                 time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
                                           60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
+            driver.close()
             windows = driver.window_handles
             driver.switch_to.window(windows[0])
             time.sleep(1)
-            su = driver.find_element_by_id("su")
-            ActionChains(driver).click(su).perform()
+            # su = driver.find_element_by_id("su")
+            # ActionChains(driver).click(su).perform()
+            js = "document.documentElement.scrollTop=document.documentElement.scrollTop+200"
+            driver.execute_script(js)
             time.sleep(2)
             driver.quit()
         except Exception as error:
@@ -870,8 +890,8 @@ if __name__ == '__main__':
                                                 int(open_chrome_sec) * int(num), int(ip_min), int(pool_num), use_cookie)
                                 threads.append(one)
                         for thread in threads:
-                            time.sleep(int(open_chrome_sec))
                             thread.start()
+                            time.sleep(int(open_chrome_sec))
                     loop_jiange_time = abs(round(time.time() - loop_now_time) - int(this_time))
                     loop_now_time = time.time()
                     print("threads")
