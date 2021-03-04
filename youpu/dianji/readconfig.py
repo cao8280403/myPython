@@ -26,6 +26,13 @@ class ReadConfig:
         value = self.cf.get("Url-Num", "url_num")
         return value
 
+    def get_dba(self):
+        ip = self.cf.get("Dba", "ip")
+        port = '3306'
+        user = 'youpudb'
+        password = 'Youpu123'
+        return [ip,port,user,password]
+
     def get_pram(self):
         ip_min = self.cf.get("Pram", "ip_min")
         show_window = self.cf.get("Pram", "show_window")
@@ -34,7 +41,9 @@ class ReadConfig:
         server_id = self.cf.get("Pram", "server_id")
         ip_address = self.cf.get("Pram", "ip_address")
         use_cookie = self.cf.get("Pram", "cookie")
-        return [ip_min,show_window,open_chrome_sec,pool_num,server_id,ip_address,use_cookie]
+        batch_count = self.cf.get("Pram", "batch_count")
+        commit_count = self.cf.get("Pram", "commit_count")
+        return [ip_min,show_window,open_chrome_sec,pool_num,server_id,ip_address,use_cookie,batch_count,commit_count]
 
 
 if __name__ == '__main__':
