@@ -19,7 +19,7 @@ from selenium.webdriver.support.wait import WebDriverWait  # 浏览器等待对�
 from selenium.webdriver.chrome.service import Service
 import time, pyautogui
 import json
-import os, re
+import os
 import random
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
@@ -51,7 +51,7 @@ end_word = ['推荐', '排名', '推荐', '排名', '价格', '价格', '价格'
 class oneThread(threading.Thread):
     # def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
     def __init__(self, word_one, site, arg1, ip, city, county, citycookies, show_window, proxies, n, arg_x, ip_min,
-                 total_loop_count, use_cookie, cities, first_word):
+                 total_loop_count, use_cookie, cities,first_word):
         threading.Thread.__init__(self)
         self.word_one = word_one
         # if word_two != "":
@@ -196,9 +196,81 @@ class oneThread(threading.Thread):
                     if len(usernames) == 0:
                         delete_cookies.append(tmp_city_cookie)
                 time.sleep(random.randint(1, 2))
-                # main step
+                # 去掉城市名
+                change_keyword = str(self.first_word)
+                for tmp_city in self.cities:
+                    if str(tmp_city[0]) in change_keyword:
+                        change_keyword = change_keyword.replace(tmp_city[0], "").replace("市", "")
+
+                # if change_keyword.__len__() > 3:
+                #     change_keyword = change_keyword[0:-2]
+                if random.randint(1, 100)>95:
+                    change_keyword = change_keyword + self.city
+                if random.randint(1, 100) > 95:
+                    change_keyword = change_keyword + end_word[random.randint(0, end_word.__len__()-1)]
+
+                uri = "https://www.baidu.com/s?ie=UTF-8&wd=" + change_keyword + "&f=8&si=" + self.site + "&ct=2097152"
+                driver.get(uri)
+
+                wait = WebDriverWait(driver, 8, 1)
+                # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+                wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+
+                time.sleep(random.randint(1, 3))
+                # 滚动下
+                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
+                driver.execute_script(js)
+
+                if random.randint(1,5)<=5:
+                    tops = driver.find_elements_by_xpath("//div[@class='cr-content  new-pmd']//tr[@class='toplist1-tr']")
+                    if tops.__len__()>0:
+                        top = tops[random.randint(0,9)]
+                        driver.execute_script("arguments[0].scrollIntoView();", top)
+                        # 再向上移动200
+                        js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        driver.execute_script(js)
+                        a = top.find_elements_by_xpath(".//a")[0]
+                        ActionChains(driver).click(a).perform()
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        now_height = random.randint(2, 6)
+                        js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
+                        driver.execute_script(js)
+                        time.sleep(random.randint(1, 3))
+                        # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
+                        for i in range(random.randint(1, 3)):
+                            if random.randint(1, 2) == 1:
+                                now_height = min(now_height + random.randint(1, 5), 10)
+                                if now_height == 0:
+                                    js = "document.documentElement.scrollTop=document.body.scrollTop"
+                                else:
+                                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(
+                                        now_height)
+                                driver.execute_script(js)
+                                time.sleep(random.randint(1, 3))
+                            else:
+                                tmp = random.randint(1, 5)
+                                now_height = now_height - tmp if now_height > tmp else 0
+                                if now_height == 0:
+                                    js = "document.documentElement.scrollTop=document.body.scrollTop"
+                                else:
+                                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(
+                                        now_height)
+                                driver.execute_script(js)
+                                time.sleep(random.randint(1, 3))
+                        driver.close()
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[0])
+
+
+
+
+                time.sleep(1)
                 inputs = driver.find_element_by_id("kw")
                 ActionChains(driver).click(inputs).perform()
+                for i in range(15):
+                    inputs.send_keys(Keys.BACKSPACE)
+                    time.sleep(random.randint(1, 2) / 10)
                 for keyword in word["keyword"]:
                     inputs.send_keys(keyword)
                     random_count = random.randint(1, 10)
@@ -208,14 +280,46 @@ class oneThread(threading.Thread):
                 wait = WebDriverWait(driver, 3, 1)
                 # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
                 wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                time.sleep(random.randint(3, 4))
+                time.sleep(random.randint(2, 3))
+
+                # 判断是否存在广告，先点广告
+                ads = driver.find_elements_by_xpath("//div[@data-ecimtimesign]")
+                if ads.__len__() > 0:
+                    random_index = random.randint(0, ads.__len__() - 1)
+                    dest = ads[random_index]
+                    driver.execute_script("arguments[0].scrollIntoView();", dest)
+                    # 再向上移动200
+                    js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                    driver.execute_script(js)
+                    a = dest.find_element_by_xpath(".//a[1]")
+                    ActionChains(driver).click(a).perform()
+                    time.sleep(random.randint(1, 3))
+                    windows = driver.window_handles
+                    driver.switch_to.window(windows[-1])
+                    driver.close()
+                    driver.switch_to.window(windows[0])
+                    time.sleep(random.randint(1, 3))
+                else:
+                    js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
+                    driver.execute_script(js)
+                    time.sleep(1)
+                    driver.quit()
+
+                try:
+                    proxies = {'http': self.proxies}
+                    # 恶意访问将ip拉入黑名单
+                    for t in range(7):
+                        time.sleep(0.1)
+                        r = requests.get("http://" + self.site + "/shell.php", proxies=proxies, timeout=3)
+                except Exception as error:
+                    print("error attack: " + str(error))
 
                 now_height = random.randint(2, 6)
                 js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
                 driver.execute_script(js)
                 time.sleep(random.randint(1, 3))
                 # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
-                for i in range(random.randint(1, 2)):
+                for i in range(random.randint(1, 3)):
                     if random.randint(1, 2) == 1:
                         now_height = min(now_height + random.randint(1, 5), 10)
                         if now_height == 0:
@@ -225,7 +329,7 @@ class oneThread(threading.Thread):
                         driver.execute_script(js)
                         time.sleep(random.randint(1, 3))
                     else:
-                        tmp = random.randint(1, 2)
+                        tmp = random.randint(1, 5)
                         now_height = now_height - tmp if now_height > tmp else 0
                         if now_height == 0:
                             js = "document.documentElement.scrollTop=document.body.scrollTop"
@@ -233,280 +337,263 @@ class oneThread(threading.Thread):
                             js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(now_height)
                         driver.execute_script(js)
                         time.sleep(random.randint(1, 3))
-                # 准备好构造地址
-                top1 = driver.find_element_by_xpath("//div[@class='cr-content  new-pmd']//tr[1]//a")
-                href = top1.get_property("href")
-                old = re.findall('wd=(.*?)&', href)
-                new = word["keyword"]
-                new = href.replace(old[0], new) + "&rn=1&si=" + self.site + "&ct=2097152"
-
-                divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                if divs.__len__() > 0:
-                    dest = divs[random.randint(0, divs.__len__() - 1)]
-                    driver.execute_script("arguments[0].scrollIntoView();", dest)
-                    # 再向上移动200
-                    js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                    driver.execute_script(js)
-                    a = dest.find_element_by_xpath(".//a[1]")
-                    ActionChains(driver).click(a).perform()
-                    windows = driver.window_handles
-                    driver.switch_to.window(windows[-1])
-                    time.sleep(random.randint(2, 8))
-                    driver.close()
-                    driver.switch_to.window(windows[0])
-                    time.sleep(random.randint(1, 3))
-                    # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
-                    for i in range(random.randint(2, 3)):
-                        if random.randint(1, 2) == 1:
-                            now_height = min(now_height + random.randint(1, 5), 10)
-                            if now_height == 0:
-                                js = "document.documentElement.scrollTop=document.body.scrollTop"
-                            else:
-                                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(
-                                    now_height)
-                            driver.execute_script(js)
-                            time.sleep(random.randint(1, 3))
-                        else:
-                            tmp = random.randint(1, 2)
-                            now_height = now_height - tmp if now_height > tmp else 0
-                            if now_height == 0:
-                                js = "document.documentElement.scrollTop=document.body.scrollTop"
-                            else:
-                                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(
-                                    now_height)
-                            driver.execute_script(js)
-                            time.sleep(random.randint(1, 3))
-
-                    driver.execute_script("window.open('" + new + "');")
-                    windows = driver.window_handles
-                    driver.switch_to.window(windows[-1])
-
-                    element = WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
-                    )
-                    #判断是否有广告，没有则点百度一下，还是没有就退出
-                    ads = driver.find_elements_by_xpath("//div[@data-ecimtimesign]")
-                    if ads.__len__() == 0:
-                        su = driver.find_element_by_id("su")
-                        ActionChains(driver).click(su).perform()
-                        wait = WebDriverWait(driver, 3, 1)
-                        # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
-                        wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                        time.sleep(random.randint(3, 4))
-                        ads = driver.find_elements_by_xpath("//div[@data-ecimtimesign]")
-                        if ads.__len__() == 0:
-                            driver.quit()
-
-                    try:
-                        proxies = {'http': self.proxies}
-                        # 恶意访问将ip拉入黑名单
-                        for t in range(7):
-                            time.sleep(0.1)
-                            r = requests.get("http://" + self.site + "/shell.php", proxies=proxies, timeout=3)
-                    except Exception as error:
-                        print("error attack: " + str(error))
-                    # 执行1-5次的滚动（50%上滚、50%下滚），幅度为随机20%~60%的高度，每次滚动后停留随机1~3秒
-                    for i in range(random.randint(2, 3)):
-                        if random.randint(1, 2) == 1:
-                            now_height = min(now_height + random.randint(1, 5), 10)
-                            if now_height == 0:
-                                js = "document.documentElement.scrollTop=document.body.scrollTop"
-                            else:
-                                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(
-                                    now_height)
-                            driver.execute_script(js)
-                            time.sleep(random.randint(1, 3))
-                        else:
-                            tmp = random.randint(1, 2)
-                            now_height = now_height - tmp if now_height > tmp else 0
-                            if now_height == 0:
-                                js = "document.documentElement.scrollTop=document.body.scrollTop"
-                            else:
-                                js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(
-                                    now_height)
-                            driver.execute_script(js)
-                            time.sleep(random.randint(1, 3))
-
-                    if not (word["short_title"]) is None and len(word["short_title"]) > 0:
-                        # 判断
-                        # 如果标题不包括带的标题
-                        # 获取所有标题
-                        divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                        tmp_index = 100
-                        for div in divs:
-                            tmp_title = div.find_element_by_xpath(".//a[1]").text
-                            if str(word["short_title"]) in tmp_title:
-                                tmp_index = divs.index(div)
-                                break
-                        if tmp_index < 100:
-                            dest = divs[tmp_index]
+                if not (word["short_title"]) is None and len(word["short_title"]) > 0:
+                    # 判断
+                    # 如果标题不包括带的标题
+                    # 获取所有标题
+                    divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                    tmp_index = 100
+                    for div in divs:
+                        tmp_title = div.find_element_by_xpath(".//a[1]").text
+                        if str(word["short_title"]) in tmp_title:
+                            tmp_index = divs.index(div)
+                            break
+                    if tmp_index < 100:
+                        dest = divs[tmp_index]
+                        driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        # 再向上移动200
+                        js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        driver.execute_script(js)
+                        time.sleep(random.randint(2, 3))
+                        a = dest.find_element_by_xpath(".//a[1]")
+                        ActionChains(driver).click(a).perform()
+                        windows = driver.window_handles
+                        driver.switch_to.window(windows[-1])
+                        self.last_step(word, driver)
+                    else:
+                        #判断是否有首页，有则点击
+                        dict35 = {}
+                        divs35 = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                        for div in divs35:
+                            divas = div.find_elements_by_xpath(".//div//a")
+                            for diva in divas:
+                                if diva.text == self.site + "/":
+                                    tmp = divs35.index(div)
+                                    dict35[tmp] = diva.text
+                        if dict35.__len__() > 0:
+                            index = sorted(dict35.items())[0][0]
+                            dest = divs35[index]
                             driver.execute_script("arguments[0].scrollIntoView();", dest)
                             # 再向上移动200
                             js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
                             driver.execute_script(js)
-                            time.sleep(random.randint(2, 3))
-                            a = dest.find_element_by_xpath(".//a[1]")
-                            ActionChains(driver).click(a).perform()
-                            windows = driver.window_handles
-                            driver.switch_to.window(windows[-1])
-                            self.last_step(word, driver)
-                        else:
-                            # 判断是否有首页，有则点击
-                            dict35 = {}
-                            divs35 = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                            for div in divs35:
-                                divas = div.find_elements_by_xpath(".//div//a")
-                                for diva in divas:
-                                    if diva.text == self.site + "/":
-                                        tmp = divs35.index(div)
-                                        dict35[tmp] = diva.text
-                            if dict35.__len__() > 0:
-                                index = sorted(dict35.items())[0][0]
-                                dest = divs35[index]
-                                driver.execute_script("arguments[0].scrollIntoView();", dest)
-                                # 再向上移动200
-                                js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                                driver.execute_script(js)
-                                time.sleep(random.randint(3, 5))
+                            time.sleep(random.randint(3, 5))
 
-                                miaoshu = dest.find_element_by_xpath(".//div[@class='c-abstract']")
-                                ActionChains(driver).click(miaoshu).perform()
-                                time.sleep(random.randint(3, 5))
+                            miaoshu = dest.find_element_by_xpath(".//div[@class='c-abstract']")
+                            ActionChains(driver).click(miaoshu).perform()
+                            time.sleep(random.randint(3, 5))
 
-                                random_num = random.randint(1, 100)
+                            random_num = random.randint(1, 100)
 
-                                if random.randint(1, 5) == 5:
-                                    # 标题
-                                    if random_num > 20:
-                                        index = sorted(dict35.items())[0][0]
-                                        dest = divs35[index]
-                                        a = dest.find_element_by_xpath(".//a[1]")
+                            if random.randint(1, 5) == 5:
+                                # 标题
+                                if random_num > 20:
+                                    index = sorted(dict35.items())[0][0]
+                                    dest = divs35[index]
+                                    a = dest.find_element_by_xpath(".//a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                                # 网址
+                                elif random_num < 6:
+                                    index = sorted(dict35.items())[0][0]
+                                    dest = divs35[index]
+                                    node_div = dest.find_elements_by_xpath("./div")
+                                    # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                    if node_div.__len__() == 1:
+                                        a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
                                         ActionChains(driver).click(a).perform()
                                         windows = driver.window_handles
                                         driver.switch_to.window(windows[-1])
                                         self.last_step(word, driver)
-                                    # 网址
-                                    elif random_num < 6:
-                                        index = sorted(dict35.items())[0][0]
-                                        dest = divs35[index]
-                                        node_div = dest.find_elements_by_xpath("./div")
-                                        # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                                        if node_div.__len__() == 1:
-                                            a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
-                                            ActionChains(driver).click(a).perform()
-                                            windows = driver.window_handles
-                                            driver.switch_to.window(windows[-1])
-                                            self.last_step(word, driver)
-                                        else:
-                                            a = dest.find_element_by_xpath("./div[2]/a[1]")
-                                            # ActionChains(driver).move_to_element(a).perform()
-                                            # time.sleep(300)
-                                            ActionChains(driver).click(a).perform()
-                                            windows = driver.window_handles
-                                            driver.switch_to.window(windows[-1])
-                                            self.last_step(word, driver)
-                                    # 图片
                                     else:
-                                        index = sorted(dict35.items())[0][0]
-                                        dest = divs35[index]
-                                        # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                                        node_div = dest.find_elements_by_xpath("./div")
-                                        # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                                        if node_div.__len__() == 1:
-                                            a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
-                                            ActionChains(driver).click(a).perform()
-                                            windows = driver.window_handles
-                                            driver.switch_to.window(windows[-1])
-                                            self.last_step(word, driver)
-                            else:
-                                driver.quit()
-                            # dest = divs[0]
-                            # driver.execute_script("arguments[0].scrollIntoView();", dest)
-                            # # 再向上移动200
-                            # js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                            # driver.execute_script(js)
-                            # time.sleep(random.randint(2, 3))
-                            # a = dest.find_element_by_xpath(".//a[1]")
-                            # ActionChains(driver).click(a).perform()
-                            # windows = driver.window_handles
-                            # driver.switch_to.window(windows[-1])
-                            # self.last_step(word, driver)
+                                        a = dest.find_element_by_xpath("./div[2]/a[1]")
+                                        # ActionChains(driver).move_to_element(a).perform()
+                                        # time.sleep(300)
+                                        ActionChains(driver).click(a).perform()
+                                        windows = driver.window_handles
+                                        driver.switch_to.window(windows[-1])
+                                        self.last_step(word, driver)
+                                # 图片
+                                else:
+                                    index = sorted(dict35.items())[0][0]
+                                    dest = divs35[index]
+                                    # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                    node_div = dest.find_elements_by_xpath("./div")
+                                    # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                    if node_div.__len__() == 1:
+                                        a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                                        ActionChains(driver).click(a).perform()
+                                        windows = driver.window_handles
+                                        driver.switch_to.window(windows[-1])
+                                        self.last_step(word, driver)
+                        else:
+                            driver.quit()
+                        # dest = divs[0]
+                        # driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        # # 再向上移动200
+                        # js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        # driver.execute_script(js)
+                        # time.sleep(random.randint(2, 3))
+                        # a = dest.find_element_by_xpath(".//a[1]")
+                        # ActionChains(driver).click(a).perform()
+                        # windows = driver.window_handles
+                        # driver.switch_to.window(windows[-1])
+                        # self.last_step(word, driver)
 
-                            # driver.get(
-                            #     "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
-                            #         "keyword"] + "&rn=2&si=" + self.site + "&ct=2097152")
-                            # # time.sleep(random.randint(2, 3))
-                            # # su = driver.find_element_by_id("su")
-                            # # ActionChains(driver).click(su).perform()
-                            # # wait = WebDriverWait(driver, 3, 1)
-                            # # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
-                            # # wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                            # time.sleep(random.randint(2, 3))
-                            # divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                            # tmp_index = 100
-                            # for div in divs:
-                            #     tmp_title = div.find_element_by_xpath(".//a[1]").text
-                            #     if str(word["short_title"]) in tmp_title:
-                            #         tmp_index = divs.index(div)
-                            #         break
-                            # if tmp_index < 100:
-                            #     su = driver.find_element_by_id("su")
-                            #     ActionChains(driver).click(su).perform()
-                            #     wait = WebDriverWait(driver, 3, 1)
-                            #     wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                            #     dest = divs[tmp_index]
-                            #     driver.execute_script("arguments[0].scrollIntoView();", dest)
-                            #     # 再向上移动200
-                            #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                            #     driver.execute_script(js)
-                            #     time.sleep(random.randint(2, 3))
-                            #     a = dest.find_element_by_xpath(".//a[1]")
-                            #     ActionChains(driver).click(a).perform()
-                            #     windows = driver.window_handles
-                            #     driver.switch_to.window(windows[-1])
-                            #     self.last_step(word, driver)
-                            # else:
-                            #     driver.get(
-                            #         "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
-                            #             "keyword"] + "&rn=3&si=" + self.site + "&ct=2097152")
-                            #     # time.sleep(random.randint(2, 3))
-                            #     # su = driver.find_element_by_id("su")
-                            #     # ActionChains(driver).click(su).perform()
-                            #     # wait = WebDriverWait(driver, 3, 1)
-                            #     # # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
-                            #     # wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                            #     time.sleep(random.randint(2, 3))
-                            #     divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                            #     tmp_index = 100
-                            #     for div in divs:
-                            #         tmp_title = div.find_element_by_xpath(".//a[1]").text
-                            #         if str(word["short_title"]) in tmp_title:
-                            #             tmp_index = divs.index(div)
-                            #             break
-                            #     if tmp_index < 100:
-                            #         su = driver.find_element_by_id("su")
-                            #         ActionChains(driver).click(su).perform()
-                            #         wait = WebDriverWait(driver, 3, 1)
-                            #         wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
-                            #         dest = divs[tmp_index]
-                            #         driver.execute_script("arguments[0].scrollIntoView();", dest)
-                            #         # 再向上移动200
-                            #         js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                            #         driver.execute_script(js)
-                            #         time.sleep(random.randint(2, 3))
-                            #         a = dest.find_element_by_xpath(".//a[1]")
-                            #         ActionChains(driver).click(a).perform()
-                            #         windows = driver.window_handles
-                            #         driver.switch_to.window(windows[-1])
-                            #         self.last_step(word, driver)
-                            #     else:
-                            #         driver.quit()
-                            #         # dest = divs[0]
-                            #         # a = dest.find_element_by_xpath(".//a[1]")
-                            #         # ActionChains(driver).click(a).perform()
-                            #         # windows = driver.window_handles
-                            #         # driver.switch_to.window(windows[-1])
-                            #         # self.last_step(word, driver)
+                        # driver.get(
+                        #     "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
+                        #         "keyword"] + "&rn=2&si=" + self.site + "&ct=2097152")
+                        # # time.sleep(random.randint(2, 3))
+                        # # su = driver.find_element_by_id("su")
+                        # # ActionChains(driver).click(su).perform()
+                        # # wait = WebDriverWait(driver, 3, 1)
+                        # # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+                        # # wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        # time.sleep(random.randint(2, 3))
+                        # divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                        # tmp_index = 100
+                        # for div in divs:
+                        #     tmp_title = div.find_element_by_xpath(".//a[1]").text
+                        #     if str(word["short_title"]) in tmp_title:
+                        #         tmp_index = divs.index(div)
+                        #         break
+                        # if tmp_index < 100:
+                        #     su = driver.find_element_by_id("su")
+                        #     ActionChains(driver).click(su).perform()
+                        #     wait = WebDriverWait(driver, 3, 1)
+                        #     wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        #     dest = divs[tmp_index]
+                        #     driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        #     # 再向上移动200
+                        #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        #     driver.execute_script(js)
+                        #     time.sleep(random.randint(2, 3))
+                        #     a = dest.find_element_by_xpath(".//a[1]")
+                        #     ActionChains(driver).click(a).perform()
+                        #     windows = driver.window_handles
+                        #     driver.switch_to.window(windows[-1])
+                        #     self.last_step(word, driver)
+                        # else:
+                        #     driver.get(
+                        #         "https://www.baidu.com/s?ie=UTF-8&wd=" + word[
+                        #             "keyword"] + "&rn=3&si=" + self.site + "&ct=2097152")
+                        #     # time.sleep(random.randint(2, 3))
+                        #     # su = driver.find_element_by_id("su")
+                        #     # ActionChains(driver).click(su).perform()
+                        #     # wait = WebDriverWait(driver, 3, 1)
+                        #     # # 每隔0.5秒检查一次，直到页面元素出现id为'content_left'的标签
+                        #     # wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        #     time.sleep(random.randint(2, 3))
+                        #     divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                        #     tmp_index = 100
+                        #     for div in divs:
+                        #         tmp_title = div.find_element_by_xpath(".//a[1]").text
+                        #         if str(word["short_title"]) in tmp_title:
+                        #             tmp_index = divs.index(div)
+                        #             break
+                        #     if tmp_index < 100:
+                        #         su = driver.find_element_by_id("su")
+                        #         ActionChains(driver).click(su).perform()
+                        #         wait = WebDriverWait(driver, 3, 1)
+                        #         wait.until(EC.presence_of_all_elements_located((By.ID, "content_left")))
+                        #         dest = divs[tmp_index]
+                        #         driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        #         # 再向上移动200
+                        #         js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        #         driver.execute_script(js)
+                        #         time.sleep(random.randint(2, 3))
+                        #         a = dest.find_element_by_xpath(".//a[1]")
+                        #         ActionChains(driver).click(a).perform()
+                        #         windows = driver.window_handles
+                        #         driver.switch_to.window(windows[-1])
+                        #         self.last_step(word, driver)
+                        #     else:
+                        #         driver.quit()
+                        #         # dest = divs[0]
+                        #         # a = dest.find_element_by_xpath(".//a[1]")
+                        #         # ActionChains(driver).click(a).perform()
+                        #         # windows = driver.window_handles
+                        #         # driver.switch_to.window(windows[-1])
+                        #         # self.last_step(word, driver)
+                else:
+                    # 判断目标网站的地址需要为正好www.kf400.cn / 斜杠后面没有后缀的，判断这是第几名，就滚到【第几名 / 总位数】的位置，停留随机1~3秒.如果都是带后缀的内页就点击第一个带www.kf400.cn的目标网站
+                    # 获取所有带目标网站的地址
+                    dict1 = {}
+                    dict2 = {}
+                    all_divs = driver.find_elements_by_xpath("//div/h3")
+                    ad_count = all_divs.__len__() - 10
+                    divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                    for div in divs:
+                        divas = div.find_elements_by_xpath(".//div//a")
+                        for diva in divas:
+                            if diva.text == self.site + "/":
+                                tmp = divs.index(div)
+                                dict1[tmp] = diva.text
+                            if self.site in diva.text:
+                                tmp = divs.index(div)
+                                dict2[tmp] = diva.text
+                    if dict1.__len__() > 0:
+                        index = sorted(dict1.items())[0][0]
+                        dest = divs[index]
+                        driver.execute_script("arguments[0].scrollIntoView();", dest)
+                        # 再向上移动200
+                        js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                        driver.execute_script(js)
+                        time.sleep(random.randint(3, 5))
+
+                        miaoshu = dest.find_element_by_xpath(".//div[@class='c-abstract']")
+                        ActionChains(driver).click(miaoshu).perform()
+                        time.sleep(random.randint(3, 5))
+
+                        random_num = random.randint(1, 100)
+
+                        if random.randint(1, 5) ==5:
+                            # 标题
+                            if random_num > 20:
+                                index = sorted(dict1.items())[0][0]
+                                dest = divs[index]
+                                a = dest.find_element_by_xpath(".//a[1]")
+                                ActionChains(driver).click(a).perform()
+                                windows = driver.window_handles
+                                driver.switch_to.window(windows[-1])
+                                self.last_step(word, driver)
+                            # 网址
+                            elif random_num < 6:
+                                index = sorted(dict1.items())[0][0]
+                                dest = divs[index]
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                                else:
+                                    a = dest.find_element_by_xpath("./div[2]/a[1]")
+                                    # ActionChains(driver).move_to_element(a).perform()
+                                    # time.sleep(300)
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                        # 图片
+                        else:
+
+                            if random.randint(1, 5) == 5:
+                                index = sorted(dict1.items())[0][0]
+                                dest = divs[index]
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
                     else:
                         divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
                         dest = divs[0]
@@ -519,176 +606,179 @@ class oneThread(threading.Thread):
                         driver.execute_script(js)
                         time.sleep(random.randint(2, 3))
                         random_num = random.randint(1, 100)
-                        # if random.randint(1, 5) ==5:
-                        # 标题
-                        if random_num > 20:
-                            a = dest.find_element_by_xpath(".//a[1]")
-                            ActionChains(driver).click(a).perform()
-                            windows = driver.window_handles
-                            driver.switch_to.window(windows[-1])
-                            self.last_step(word, driver)
-                        # 网址
-                        elif random_num < 6:
-                            node_div = dest.find_elements_by_xpath("./div")
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            if node_div.__len__() == 1:
-                                a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                        if random.randint(1, 5) ==5:
+                            # 标题
+                            if random_num > 20:
+                                a = dest.find_element_by_xpath(".//a[1]")
                                 ActionChains(driver).click(a).perform()
                                 windows = driver.window_handles
                                 driver.switch_to.window(windows[-1])
                                 self.last_step(word, driver)
+                            # 网址
+                            elif random_num < 6:
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                                else:
+                                    a = dest.find_element_by_xpath("./div[2]/a[1]")
+                                    # ActionChains(driver).move_to_element(a).perform()
+                                    # time.sleep(300)
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                            # 图片
                             else:
-                                a = dest.find_element_by_xpath("./div[2]/a[1]")
-                                # ActionChains(driver).move_to_element(a).perform()
-                                # time.sleep(300)
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
-                        # 图片
-                        else:
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            node_div = dest.find_elements_by_xpath("./div")
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            if node_div.__len__() == 1:
-                                a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
-                        # # 判断目标网站的地址需要为正好www.kf400.cn / 斜杠后面没有后缀的，判断这是第几名，就滚到【第几名 / 总位数】的位置，停留随机1~3秒.如果都是带后缀的内页就点击第一个带www.kf400.cn的目标网站
-                        # # 获取所有带目标网站的地址
-                        # dict1 = {}
-                        # dict2 = {}
-                        # all_divs = driver.find_elements_by_xpath("//div/h3")
-                        # ad_count = all_divs.__len__() - 10
-                        # divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                        # for div in divs:
-                        #     divas = div.find_elements_by_xpath(".//div//a")
-                        #     for diva in divas:
-                        #         if diva.text == self.site + "/":
-                        #             tmp = divs.index(div)
-                        #             dict1[tmp] = diva.text
-                        #         if self.site in diva.text:
-                        #             tmp = divs.index(div)
-                        #             dict2[tmp] = diva.text
-                        # if dict1.__len__() > 0:
-                        #     index = sorted(dict1.items())[0][0]
-                        #     dest = divs[index]
-                        #     driver.execute_script("arguments[0].scrollIntoView();", dest)
-                        #     # 再向上移动200
-                        #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                        #     driver.execute_script(js)
-                        #     time.sleep(random.randint(3, 5))
-                        #
-                        #     miaoshu = dest.find_element_by_xpath(".//div[@class='c-abstract']")
-                        #     ActionChains(driver).click(miaoshu).perform()
-                        #     time.sleep(random.randint(3, 5))
-                        #
-                        #     random_num = random.randint(1, 100)
-                        #
-                        #     # if random.randint(1, 5) == 5:
-                        #     # 标题
-                        #     if random_num > 20:
-                        #         index = sorted(dict1.items())[0][0]
-                        #         dest = divs[index]
-                        #         a = dest.find_element_by_xpath(".//a[1]")
-                        #         ActionChains(driver).click(a).perform()
-                        #         windows = driver.window_handles
-                        #         driver.switch_to.window(windows[-1])
-                        #         self.last_step(word, driver)
-                        #     # 网址
-                        #     elif random_num < 6:
-                        #         index = sorted(dict1.items())[0][0]
-                        #         dest = divs[index]
-                        #         node_div = dest.find_elements_by_xpath("./div")
-                        #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                        #         if node_div.__len__() == 1:
-                        #             a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
-                        #             ActionChains(driver).click(a).perform()
-                        #             windows = driver.window_handles
-                        #             driver.switch_to.window(windows[-1])
-                        #             self.last_step(word, driver)
-                        #         else:
-                        #             a = dest.find_element_by_xpath("./div[2]/a[1]")
-                        #             # ActionChains(driver).move_to_element(a).perform()
-                        #             # time.sleep(300)
-                        #             ActionChains(driver).click(a).perform()
-                        #             windows = driver.window_handles
-                        #             driver.switch_to.window(windows[-1])
-                        #             self.last_step(word, driver)
-                        #     # 图片
-                        #     else:
-                        #
-                        #         # if random.randint(1, 5) == 5:
-                        #         index = sorted(dict1.items())[0][0]
-                        #         dest = divs[index]
-                        #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                        #         node_div = dest.find_elements_by_xpath("./div")
-                        #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                        #         if node_div.__len__() == 1:
-                        #             a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
-                        #             ActionChains(driver).click(a).perform()
-                        #             windows = driver.window_handles
-                        #             driver.switch_to.window(windows[-1])
-                        #             self.last_step(word, driver)
-                        # else:
-                        #     divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
-                        #     dest = divs[0]
-                        #     # miaoshu = dest.find_element_by_xpath(".//div[@class='c-abstract']")
-                        #     # ActionChains(driver).click(miaoshu).perform()
-                        #     # time.sleep(random.randint(3, 5))
-                        #     driver.execute_script("arguments[0].scrollIntoView();", dest)
-                        #     # 再向上移动200
-                        #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
-                        #     driver.execute_script(js)
-                        #     time.sleep(random.randint(2, 3))
-                        #     random_num = random.randint(1, 100)
-                        #     # if random.randint(1, 5) ==5:
-                        #     # 标题
-                        #     if random_num > 20:
-                        #         a = dest.find_element_by_xpath(".//a[1]")
-                        #         ActionChains(driver).click(a).perform()
-                        #         windows = driver.window_handles
-                        #         driver.switch_to.window(windows[-1])
-                        #         self.last_step(word, driver)
-                        #     # 网址
-                        #     elif random_num < 6:
-                        #         node_div = dest.find_elements_by_xpath("./div")
-                        #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                        #         if node_div.__len__() == 1:
-                        #             a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
-                        #             ActionChains(driver).click(a).perform()
-                        #             windows = driver.window_handles
-                        #             driver.switch_to.window(windows[-1])
-                        #             self.last_step(word, driver)
-                        #         else:
-                        #             a = dest.find_element_by_xpath("./div[2]/a[1]")
-                        #             # ActionChains(driver).move_to_element(a).perform()
-                        #             # time.sleep(300)
-                        #             ActionChains(driver).click(a).perform()
-                        #             windows = driver.window_handles
-                        #             driver.switch_to.window(windows[-1])
-                        #             self.last_step(word, driver)
-                        #     # 图片
-                        #     else:
-                        #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                        #         node_div = dest.find_elements_by_xpath("./div")
-                        #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                        #         if node_div.__len__() == 1:
-                        #             a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
-                        #             ActionChains(driver).click(a).perform()
-                        #             windows = driver.window_handles
-                        #             driver.switch_to.window(windows[-1])
-                        #             self.last_step(word, driver)
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
 
+                # js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 5))
+                # driver.execute_script(js)
+                # time.sleep(random.randint(3, 5))
+                #
+                # # 判断目标网站的地址需要为正好www.kf400.cn / 斜杠后面没有后缀的，判断这是第几名，就滚到【第几名 / 总位数】的位置，停留随机1~3秒.如果都是带后缀的内页就点击第一个带www.kf400.cn的目标网站
+                # # 获取所有带目标网站的地址
+                # dict1 = {}
+                # dict2 = {}
+                # all_divs = driver.find_elements_by_xpath("//div/h3")
+                # ad_count = all_divs.__len__() - 10
+                # divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
+                # for div in divs:
+                #     divas = div.find_elements_by_xpath(".//div//a")
+                #     for diva in divas:
+                #         if diva.text == self.site + "/":
+                #             tmp = divs.index(div)
+                #             dict1[tmp] = diva.text
+                #         if self.site in diva.text:
+                #             tmp = divs.index(div)
+                #             dict2[tmp] = diva.text
+                # if dict1.__len__() > 0:
+                #     index = sorted(dict1.items())[0][0]
+                #     dest = divs[index]
+                #     driver.execute_script("arguments[0].scrollIntoView();", dest)
+                #     # 再向上移动200
+                #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                #     driver.execute_script(js)
+                #     time.sleep(random.randint(3, 5))
+                #
+                #     miaoshu = dest.find_element_by_xpath(".//div[@class='c-abstract']")
+                #     ActionChains(driver).click(miaoshu).perform()
+                #     time.sleep(random.randint(3, 5))
+                #
+                #     random_num = random.randint(1, 100)
+                #     # 标题
+                #     if random_num > 20:
+                #         index = sorted(dict1.items())[0][0]
+                #         dest = divs[index]
+                #         a = dest.find_element_by_xpath(".//a[1]")
+                #         ActionChains(driver).click(a).perform()
+                #         windows = driver.window_handles
+                #         driver.switch_to.window(windows[-1])
+                #         self.last_step(word, driver)
+                #     # 网址
+                #     elif random_num < 6:
+                #         index = sorted(dict1.items())[0][0]
+                #         dest = divs[index]
+                #         node_div = dest.find_elements_by_xpath("./div")
+                #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                #         if node_div.__len__() == 1:
+                #             a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                #             ActionChains(driver).click(a).perform()
+                #             windows = driver.window_handles
+                #             driver.switch_to.window(windows[-1])
+                #             self.last_step(word, driver)
+                #         else:
+                #             a = dest.find_element_by_xpath("./div[2]/a[1]")
+                #             # ActionChains(driver).move_to_element(a).perform()
+                #             # time.sleep(300)
+                #             ActionChains(driver).click(a).perform()
+                #             windows = driver.window_handles
+                #             driver.switch_to.window(windows[-1])
+                #             self.last_step(word, driver)
+                #     # 图片
+                #     else:
+                #         index = sorted(dict1.items())[0][0]
+                #         dest = divs[index]
+                #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                #         node_div = dest.find_elements_by_xpath("./div")
+                #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                #         if node_div.__len__() == 1:
+                #             a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                #             ActionChains(driver).click(a).perform()
+                #             windows = driver.window_handles
+                #             driver.switch_to.window(windows[-1])
+                #             self.last_step(word, driver)
+                # elif dict2.__len__() > 0:
+                #     index = sorted(dict2.items())[0][0]
+                #     dest = divs[index]
+                #     driver.execute_script("arguments[0].scrollIntoView();", dest)
+                #     # 再向上移动200
+                #     js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
+                #     driver.execute_script(js)
+                #
+                #     time.sleep(random.randint(3, 5))
+                #     miaoshu = dest.find_element_by_xpath(".//div[@class='c-abstract']")
+                #     ActionChains(driver).click(miaoshu).perform()
+                #     time.sleep(random.randint(3, 5))
+                #     random_num = random.randint(1, 100)
+                #     # 标题
+                #     if random_num > 20:
+                #         index = sorted(dict2.items())[0][0]
+                #         dest = divs[index]
+                #         a = dest.find_element_by_xpath(".//a[1]")
+                #         ActionChains(driver).click(a).perform()
+                #         windows = driver.window_handles
+                #         driver.switch_to.window(windows[-1])
+                #         self.last_step(word, driver)
+                #     # 网址
+                #     elif random_num < 6:
+                #         index = sorted(dict2.items())[0][0]
+                #         dest = divs[index]
+                #         node_div = dest.find_elements_by_xpath("./div")
+                #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                #         if node_div.__len__() == 1:
+                #             a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                #             ActionChains(driver).click(a).perform()
+                #             windows = driver.window_handles
+                #             driver.switch_to.window(windows[-1])
+                #             self.last_step(word, driver)
+                #         else:
+                #             a = dest.find_element_by_xpath("./div[2]/a[1]")
+                #             ActionChains(driver).click(a).perform()
+                #             windows = driver.window_handles
+                #             driver.switch_to.window(windows[-1])
+                #             self.last_step(word, driver)
+                #     # 图片
+                #     else:
+                #         index = sorted(dict2.items())[0][0]
+                #         dest = divs[index]
+                #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                #         node_div = dest.find_elements_by_xpath("./div")
+                #         # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                #         if node_div.__len__() == 1:
+                #             a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                #             ActionChains(driver).click(a).perform()
+                #             windows = driver.window_handles
+                #             driver.switch_to.window(windows[-1])
+                #             self.last_step(word, driver)
             except Exception as error:
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + " error main process: " + str(error))
                 if 'Connection aborted' in str(error):
                     delete_cookies.append(tmp_city_cookie)
                 driver.quit()
                 # print('traceback.print_exc():' + str(traceback.print_exc()))
-
         except Exception as error:
             print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 2: " + str(error))
             # print('traceback.print_exc():' + str(traceback.print_exc()))
@@ -710,18 +800,18 @@ class oneThread(threading.Thread):
                 time.sleep(30)
                 driver.quit()
                 return
-            # else:
-            #     time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
-            #                               60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
-            # driver.close()
-            # windows = driver.window_handles
-            # driver.switch_to.window(windows[0])
-            # time.sleep(1)
-            # # su = driver.find_element_by_id("su")
-            # # ActionChains(driver).click(su).perform()
-            # js = "document.documentElement.scrollTop=document.documentElement.scrollTop+200"
-            # driver.execute_script(js)
-            # time.sleep(2)
+            else:
+                time.sleep(random.randint(60 * (self.ip_min - 1) - 10,
+                                          60 * (self.ip_min - 1)) - self.sleep_time * self.arg_x)
+            driver.close()
+            windows = driver.window_handles
+            driver.switch_to.window(windows[0])
+            time.sleep(1)
+            # su = driver.find_element_by_id("su")
+            # ActionChains(driver).click(su).perform()
+            js = "document.documentElement.scrollTop=document.documentElement.scrollTop+200"
+            driver.execute_script(js)
+            time.sleep(2)
             driver.quit()
         except Exception as error:
             if 'HTTPConnectionPool' not in str(error):
@@ -1083,22 +1173,24 @@ if __name__ == '__main__':
                                 if fabaos_tmp == "":
                                     fabaos_tmp = aclass.fabaos.pop(0)
                                 site = fabaos_tmp["site"]
-                                # 找所有的此site的对象
+                                #找所有的此site的对象
                                 fabao_array = []
                                 for fabao in aclass.fabaos:
                                     if site == fabao["site"]:
                                         fabao_array.append(fabao)
-                                first_word = ''
-                                if len(fabao_array) > 0:
+                                first_word =''
+                                if len(fabao_array)>0:
                                     first_word = fabao_array[random.randint(0, len(fabao_array) - 1)]["keyword"]
 
+                                if first_word =='':
+                                    first_word = fabaos_tmp["keyword"]
                                 one = oneThread(fabaos_tmp, site,
                                                 "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
                                                 ip["City"], ip["County"],
                                                 aclass.citycookies, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
                                                 int(open_chrome_sec) * int(num), int(ip_min), int(pool_num), use_cookie,
-                                                aclass.cities, first_word)
+                                                aclass.cities,first_word)
                                 threads.append(one)
                         for thread in threads:
                             thread.start()
