@@ -5,7 +5,7 @@ from fetchip import Fetchip
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list, Mipcms_fabao_server_record, \
-    Mipcms_fabao_server_switch, Mipcms_ip
+    Mipcms_fabao_server_switch, Mipcms_ip,Cookie_list,Cookie_list
 import os
 import platform
 import ctypes
@@ -50,8 +50,8 @@ end_word = ['推荐', '排名', '推荐', '排名', '价格', '价格', '价格'
 
 class oneThread(threading.Thread):
     # def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
-    def __init__(self, word_one, site, arg1, ip, city, county, citycookies, show_window, proxies, n, arg_x, ip_min,
-                 total_loop_count, use_cookie, cities,first_word):
+    def __init__(self, word_one, site, arg1, ip, city, county, cookie, show_window, proxies, n, arg_x, ip_min,
+                 total_loop_count, use_cookie, cities,first_word,ua):
         threading.Thread.__init__(self)
         self.word_one = word_one
         # if word_two != "":
@@ -63,7 +63,7 @@ class oneThread(threading.Thread):
         self.ip = ip
         self.city = city
         self.county = county
-        self.citycookies = citycookies
+        self.cookie = cookie
         self.show_window = show_window
         self.proxies = proxies
         self.sleep_time = n
@@ -73,6 +73,7 @@ class oneThread(threading.Thread):
         self.use_cookie = use_cookie
         self.cities = cities
         self.first_word = first_word
+        self.ua = ua
 
     def run(self):
         global delete_cookies
@@ -111,58 +112,14 @@ class oneThread(threading.Thread):
             # aliip = Aliip()
             # ali_result = aliip.requesturl(self.ip)
             # json_result = json.loads(ali_result)
-            # # 如果地域不全，就随机拿个ua，否则根据城市和地区选一个随机的cookie
             cookie_list_str = ''
             tmp_city_cookie = ''
-            # ua = ""
-            # cookie_flag = True
-            tmp_cookies = []
-            if use_cookie == "yes":
-                for tmp in self.citycookies:
-                    if tmp.city == self.city and tmp.zone == self.county:
-                        tmp_cookies.append(tmp)
-                if tmp_cookies.__len__() == 1:
-                    city_cookie = tmp_cookies[0]
-                    ua = city_cookie.ua
-                    tmp_city_cookie = city_cookie
-                    cookie_list_str = city_cookie.cookie
-                elif tmp_cookies.__len__() == 0:
-                    return
-                    # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
-                    # cookie_flag = False
-                    # not_exist_zone.append(json_result["City"] + "--" + json_result["County"])
-                else:
-                    city_cookie = tmp_cookies[random.randint(0, tmp_cookies.__len__() - 1)]
-                    ua = city_cookie.ua
-                    tmp_city_cookie = city_cookie
-                    cookie_list_str = city_cookie.cookie
+            ua = ""
+            if not use_cookie == "yes":
+                ua = self.ua
             else:
-                ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
-            # if json_result["City"] != '' and json_result["County"] != '':
-            #     tmp_cookies = []
-            #     for tmp in self.citycookies:
-            #         if tmp.city == json_result["City"] and tmp.zone == json_result["County"]:
-            #             tmp_cookies.append(tmp)
-            #     if tmp_cookies.__len__() == 1:
-            #         city_cookie = tmp_cookies[0]
-            #         ua = city_cookie.ua
-            #         tmp_city_cookie = city_cookie
-            #         cookie_list_str = city_cookie.cookie
-            #     elif tmp_cookies.__len__() == 0:
-            #         return
-            #         # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
-            #         # cookie_flag = False
-            #         # not_exist_zone.append(json_result["City"] + "--" + json_result["County"])
-            #     else:
-            #         city_cookie = tmp_cookies[random.randint(0, tmp_cookies.__len__() - 1)]
-            #         ua = city_cookie.ua
-            #         tmp_city_cookie = city_cookie
-            #         cookie_list_str = city_cookie.cookie
-            # else:
-            #     return
-            #     # cookie_flag = False
-            #     # ua = self.citycookies[random.randint(0, len(self.citycookies) - 1)].ua
-            # 'user-agent="' + ua[random.randint(0, ua.__len__() - 1)][0] + '"',
+                ua = self.cookie[0]["ua"]
+
             options.add_argument('user-agent="' + ua + '"')
             options.add_argument('Connection="close"')
             driver = webdriver.Chrome(options=options)
@@ -385,49 +342,50 @@ class oneThread(threading.Thread):
                             time.sleep(random.randint(3, 5))
 
                             random_num = random.randint(1, 100)
-                            # 标题
-                            if random_num > 20:
-                                index = sorted(dict35.items())[0][0]
-                                dest = divs35[index]
-                                a = dest.find_element_by_xpath(".//a[1]")
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
-                            # 网址
-                            elif random_num < 6:
-                                index = sorted(dict35.items())[0][0]
-                                dest = divs35[index]
-                                node_div = dest.find_elements_by_xpath("./div")
-                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                                if node_div.__len__() == 1:
-                                    a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
-                                    ActionChains(driver).click(a).perform()
-                                    windows = driver.window_handles
-                                    driver.switch_to.window(windows[-1])
-                                    self.last_step(word, driver)
-                                else:
-                                    a = dest.find_element_by_xpath("./div[2]/a[1]")
-                                    # ActionChains(driver).move_to_element(a).perform()
-                                    # time.sleep(300)
-                                    ActionChains(driver).click(a).perform()
-                                    windows = driver.window_handles
-                                    driver.switch_to.window(windows[-1])
-                                    self.last_step(word, driver)
-                            # 图片
-                            else:
-                                index = sorted(dict35.items())[0][0]
-                                dest = divs35[index]
-                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                                node_div = dest.find_elements_by_xpath("./div")
-                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                                if node_div.__len__() == 1:
-                                    a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
-                                    ActionChains(driver).click(a).perform()
-                                    windows = driver.window_handles
-                                    driver.switch_to.window(windows[-1])
-                                    self.last_step(word, driver)
 
+                            if random.randint(1, 5) == 5:
+                                # 标题
+                                if random_num > 20:
+                                    index = sorted(dict35.items())[0][0]
+                                    dest = divs35[index]
+                                    a = dest.find_element_by_xpath(".//a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                                # 网址
+                                elif random_num < 6:
+                                    index = sorted(dict35.items())[0][0]
+                                    dest = divs35[index]
+                                    node_div = dest.find_elements_by_xpath("./div")
+                                    # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                    if node_div.__len__() == 1:
+                                        a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                                        ActionChains(driver).click(a).perform()
+                                        windows = driver.window_handles
+                                        driver.switch_to.window(windows[-1])
+                                        self.last_step(word, driver)
+                                    else:
+                                        a = dest.find_element_by_xpath("./div[2]/a[1]")
+                                        # ActionChains(driver).move_to_element(a).perform()
+                                        # time.sleep(300)
+                                        ActionChains(driver).click(a).perform()
+                                        windows = driver.window_handles
+                                        driver.switch_to.window(windows[-1])
+                                        self.last_step(word, driver)
+                                # 图片
+                                else:
+                                    index = sorted(dict35.items())[0][0]
+                                    dest = divs35[index]
+                                    # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                    node_div = dest.find_elements_by_xpath("./div")
+                                    # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                    if node_div.__len__() == 1:
+                                        a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                                        ActionChains(driver).click(a).perform()
+                                        windows = driver.window_handles
+                                        driver.switch_to.window(windows[-1])
+                                        self.last_step(word, driver)
                         else:
                             # driver.quit()
                             dest = divs[0]
@@ -548,50 +506,52 @@ class oneThread(threading.Thread):
                         time.sleep(random.randint(3, 5))
 
                         random_num = random.randint(1, 100)
-                        # 标题
-                        if random_num > 20:
-                            index = sorted(dict1.items())[0][0]
-                            dest = divs[index]
-                            a = dest.find_element_by_xpath(".//a[1]")
-                            ActionChains(driver).click(a).perform()
-                            windows = driver.window_handles
-                            driver.switch_to.window(windows[-1])
-                            self.last_step(word, driver)
-                        # 网址
-                        elif random_num < 6:
-                            index = sorted(dict1.items())[0][0]
-                            dest = divs[index]
-                            node_div = dest.find_elements_by_xpath("./div")
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            if node_div.__len__() == 1:
-                                a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
-                            else:
-                                a = dest.find_element_by_xpath("./div[2]/a[1]")
-                                # ActionChains(driver).move_to_element(a).perform()
-                                # time.sleep(300)
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
 
+                        if random.randint(1, 5) ==5:
+                            # 标题
+                            if random_num > 20:
+                                index = sorted(dict1.items())[0][0]
+                                dest = divs[index]
+                                a = dest.find_element_by_xpath(".//a[1]")
+                                ActionChains(driver).click(a).perform()
+                                windows = driver.window_handles
+                                driver.switch_to.window(windows[-1])
+                                self.last_step(word, driver)
+                            # 网址
+                            elif random_num < 6:
+                                index = sorted(dict1.items())[0][0]
+                                dest = divs[index]
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                                else:
+                                    a = dest.find_element_by_xpath("./div[2]/a[1]")
+                                    # ActionChains(driver).move_to_element(a).perform()
+                                    # time.sleep(300)
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
                         # 图片
                         else:
-                            index = sorted(dict1.items())[0][0]
-                            dest = divs[index]
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            node_div = dest.find_elements_by_xpath("./div")
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            if node_div.__len__() == 1:
-                                a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
 
+                            if random.randint(1, 5) == 5:
+                                index = sorted(dict1.items())[0][0]
+                                dest = divs[index]
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
                     else:
                         divs = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
                         dest = divs[0]
@@ -604,43 +564,43 @@ class oneThread(threading.Thread):
                         driver.execute_script(js)
                         time.sleep(random.randint(2, 3))
                         random_num = random.randint(1, 100)
-                        # 标题
-                        if random_num > 20:
-                            a = dest.find_element_by_xpath(".//a[1]")
-                            ActionChains(driver).click(a).perform()
-                            windows = driver.window_handles
-                            driver.switch_to.window(windows[-1])
-                            self.last_step(word, driver)
-                        # 网址
-                        elif random_num < 6:
-                            node_div = dest.find_elements_by_xpath("./div")
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            if node_div.__len__() == 1:
-                                a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                        if random.randint(1, 5) ==5:
+                            # 标题
+                            if random_num > 20:
+                                a = dest.find_element_by_xpath(".//a[1]")
                                 ActionChains(driver).click(a).perform()
                                 windows = driver.window_handles
                                 driver.switch_to.window(windows[-1])
                                 self.last_step(word, driver)
+                            # 网址
+                            elif random_num < 6:
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[2]/div[2]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                                else:
+                                    a = dest.find_element_by_xpath("./div[2]/a[1]")
+                                    # ActionChains(driver).move_to_element(a).perform()
+                                    # time.sleep(300)
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
+                            # 图片
                             else:
-                                a = dest.find_element_by_xpath("./div[2]/a[1]")
-                                # ActionChains(driver).move_to_element(a).perform()
-                                # time.sleep(300)
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
-                        # 图片
-                        else:
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            node_div = dest.find_elements_by_xpath("./div")
-                            # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
-                            if node_div.__len__() == 1:
-                                a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
-                                ActionChains(driver).click(a).perform()
-                                windows = driver.window_handles
-                                driver.switch_to.window(windows[-1])
-                                self.last_step(word, driver)
-
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                node_div = dest.find_elements_by_xpath("./div")
+                                # 判断子节点div的个数，个数为1就是有图片，个数为2就是没有图片
+                                if node_div.__len__() == 1:
+                                    a = dest.find_element_by_xpath("./div[1]/div[1]/a[1]")
+                                    ActionChains(driver).click(a).perform()
+                                    windows = driver.window_handles
+                                    driver.switch_to.window(windows[-1])
+                                    self.last_step(word, driver)
 
                 # js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 5))
                 # driver.execute_script(js)
@@ -822,6 +782,7 @@ class Aclass(object):
         self.fabaos = []
         self.citycookies = []
         self.cities = []
+        self.ourcookies = {}
 
     def fetch_fabao(self, dba, batch_count):
         dba_ip = dba[0]
@@ -883,8 +844,39 @@ class Aclass(object):
         else:
             x = 0
         citycookies = session.query(City_cookies).limit(50000).offset(x).all()
-        print(len(citycookies))
+        print("citycookies count :" + str(len(citycookies)))
         self.citycookies = citycookies
+
+    def fetch_our_cookies(self, dba):
+        dba_ip = dba[0]
+        dba_port = dba[1]
+        dba_user = dba[2]
+        dba_pwd = dba[3]
+        engine = create_engine(
+            'mysql+mysqlconnector://' + dba_user + ':' + dba_pwd + '@' + dba_ip + ':' + dba_port + '/youpudb')
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()  # 创建session
+        sql = "select a.id,a.ua,a.city,a.zone,b.id as bid,b.domain,b.expiry,b.httpOnly,b.name,b.path,b.secure,b.value from (select * from cookie_list ORDER BY RAND() limit 100) a left join cookie_detail b on a.id = b.cookie_id"
+        cursor = session.execute(sql)
+        result = cursor.fetchall()
+        print("our_cookies count :" + str(len(result)))
+        dict = {}
+        #先提取出id列表
+        ids = []
+        for i in result:
+            if not i["id"] in ids:
+                ids.append(i["id"])
+        #找出id的对应字典
+        for i in ids:
+            list = []
+            for j in result:
+                if j["id"]==i:
+                    list.append(j)
+            dict[i]=list
+        for ourcookie in dict:
+            m = dict.get(ourcookie)
+        self.ourcookies = dict
+        ua = self.ourcookies[random.randint(0, aclass.ourcookies.__len__() - 1)].ua
 
     def fetch_mipcms_fabao_server_switch(self, dba):
         dba_ip = dba[0]
@@ -1010,6 +1002,7 @@ if __name__ == '__main__':
         cursor = session.execute("update mipcms_fabao_server_switch set flag = 0")
         session.commit()
         try:
+            aclass.fetch_our_cookies(dba)
             aclass.fetch_cookies(dba)
             aclass.fetch_cities(dba)
         except Exception as err:
@@ -1017,7 +1010,7 @@ if __name__ == '__main__':
             time.sleep(60)
         loop_count = 0
         while True:
-            close_chrome()
+            # close_chrome()
             try:
                 flag = aclass.fetch_mipcms_fabao_server_switch(dba)
                 if flag == 1:
@@ -1182,13 +1175,27 @@ if __name__ == '__main__':
 
                                 if first_word =='':
                                     first_word = fabaos_tmp["keyword"]
+                                #找出我们的cookie里是否有合适的，没有就不带cookie，有就80%概率用此城市的cookie，20%不带cookie
+                                have_city = False
+                                tmp_cookie = []
+                                for ourcookie in aclass.ourcookies:
+                                    if aclass.ourcookies.get(ourcookie)[0]["city"] == ip["City"] and aclass.ourcookies.get(ourcookie)[0]["zone"] == ip["County"]:
+                                        tmp_cookie = aclass.ourcookies.pop(ourcookie)
+                                        have_city = True
+
+                                ua = ""
+                                if have_city or random.randint(1,10)>2:
+                                    use_cookie = "no"
+                                    #找一个随机的ua
+                                    ua = aclass.ourcookies[random.sample(aclass.ourcookies.keys(), 1)[0]][0]["ua"]
+
                                 one = oneThread(fabaos_tmp, site,
                                                 "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
                                                 ip["City"], ip["County"],
-                                                aclass.citycookies, show_window,
+                                                tmp_cookie, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
                                                 int(open_chrome_sec) * int(num), int(ip_min), int(pool_num), use_cookie,
-                                                aclass.cities,first_word)
+                                                aclass.cities,first_word,ua)
                                 threads.append(one)
                         for thread in threads:
                             thread.start()
@@ -1213,7 +1220,7 @@ if __name__ == '__main__':
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                # time.sleep(120)
+                time.sleep(120)
             else:
                 print("fetchdb")
                 try:
@@ -1225,7 +1232,7 @@ if __name__ == '__main__':
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                     time.sleep(60)
                 tmp = sizelist[random.randint(0, sizelist.__len__() - 1)]
-                change_fbl(tmp.split("*")[0], tmp.split("*")[1])
+                # change_fbl(tmp.split("*")[0], tmp.split("*")[1])
             # memCpu = getMemCpu()
             this_time = min(abs(loop_jiange_time - int(num) * int(open_chrome_sec) * int(pool_num)), 10)
             time.sleep(abs(int(this_time) - 2))

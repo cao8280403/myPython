@@ -74,6 +74,24 @@ class Mipcms_fabao_server_switch(Base):
     flag = Column(String(255))
 
 
+class Cookie_list(Base):
+    __tablename__ = 'cookie_list'
+    id = Column(Integer, primary_key=True,autoincrement=True)
+    ua = Column(String(255))
+    city = Column(String(255))
+    zone = Column(String(255))
+
+class Cookie_detail(Base):
+    __tablename__ = 'cookie_detail'
+    id = Column(Integer, primary_key=True,autoincrement=True)
+    cookie_id = Column(Integer)
+    domain = Column(String(19))
+    expiry = Column(String(255))
+    httpOnly = Column(String(255))
+    name = Column(String(255))
+    path = Column(String(255))
+    secure = Column(String(255))
+    value = Column(String(255))
 #
 # class Updatedb():
 #     def updatedb(self, total_ids):

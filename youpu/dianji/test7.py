@@ -41,7 +41,8 @@ try:
     aa = browser.find_element_by_xpath("//div[@class='cr-content  new-pmd']//tr[1]//a")
     href = aa.get_property("href")
     re.findall('(.*)wd=(.*)&(.*)', href)
-    browser.execute_script("window.open('www.baidu.com');")
+    # browser.execute_script("window.open('www.baidu.com');")
+    cookies =  browser.get_cookies()
     # python中正则匹配，如果不加（）,默认是一个分组，group（）中的参数，如果是0，默认是所有组，即返回整个字符串
     # 如果是要访问自定义的组的元素，则需要从1开始
     #
