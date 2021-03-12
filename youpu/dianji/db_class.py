@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, create_engine, ForeignKey, Integer
+from sqlalchemy import Column, String, create_engine, ForeignKey, Integer, Text
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 import time
@@ -74,24 +74,18 @@ class Mipcms_fabao_server_switch(Base):
     flag = Column(String(255))
 
 
-class Cookie_list(Base):
-    __tablename__ = 'cookie_list'
+class Cookie_catch_list(Base):
+    __tablename__ = 'cookie_catch_list'
     id = Column(Integer, primary_key=True,autoincrement=True)
-    ua = Column(String(255))
+    cookie = Column(Text())
+    ua = Column(Text())
     city = Column(String(255))
     zone = Column(String(255))
 
-class Cookie_detail(Base):
-    __tablename__ = 'cookie_detail'
+class Cookie_ua(Base):
+    __tablename__ = 'cookie_ua'
     id = Column(Integer, primary_key=True,autoincrement=True)
-    cookie_id = Column(Integer)
-    domain = Column(String(19))
-    expiry = Column(String(255))
-    httpOnly = Column(String(255))
-    name = Column(String(255))
-    path = Column(String(255))
-    secure = Column(String(255))
-    value = Column(String(255))
+    ua = Column(Text())
 #
 # class Updatedb():
 #     def updatedb(self, total_ids):

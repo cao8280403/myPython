@@ -5,7 +5,7 @@ from fetchip import Fetchip
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from db_class import Mipcms_fabao_history, Mipcms_fabao, City_cookies, Mipcms_fabao_list, Mipcms_fabao_server_record, \
-    Mipcms_fabao_server_switch, Mipcms_ip,Cookie_list,Cookie_list
+    Mipcms_fabao_server_switch, Mipcms_ip, Cookie_catch_list,Cookie_ua
 import os
 import platform
 import ctypes
@@ -40,6 +40,8 @@ submit_time = time.time() - 1
 loop_jiange_time = 38
 submit_jiange_time = 0
 all_ips = []
+save_catch_cookies = []
+update_catch_cookies = []
 memCpu = ''
 end_word = ['推荐', '排名', '推荐', '排名', '价格', '价格', '价格', '价格', '价格', '价格', '价格', '厂家', '厂家', '厂家', '厂家', '厂家', '厂家', '厂家',
             '公司', '公司', '公司', '公司', '公司', '公司', '公司', '公司', '公司', '电话', '服务', '方案', '服务', '方案', '服务', '方案', '电话', '教程',
@@ -51,7 +53,7 @@ end_word = ['推荐', '排名', '推荐', '排名', '价格', '价格', '价格'
 class oneThread(threading.Thread):
     # def __init__(self, word_one, word_two, site, arg1, ip, citycookies, show_window, proxies, n, arg_x, ip_min):
     def __init__(self, word_one, site, arg1, ip, city, county, cookie, show_window, proxies, n, arg_x, ip_min,
-                 total_loop_count, use_cookie, cities,first_word,ua):
+                 total_loop_count, use_cookie, cities, first_word, ua):
         threading.Thread.__init__(self)
         self.word_one = word_one
         # if word_two != "":
@@ -82,6 +84,8 @@ class oneThread(threading.Thread):
         global not_exist_zone
         global memCpu
         global end_word
+        global save_catch_cookies
+        global update_catch_cookies
         word = self.word_one
         if self.sleep_time == self.total_loop_count - 1:
             memCpu = getMemCpu()
@@ -112,15 +116,7 @@ class oneThread(threading.Thread):
             # aliip = Aliip()
             # ali_result = aliip.requesturl(self.ip)
             # json_result = json.loads(ali_result)
-            cookie_list_str = ''
-            tmp_city_cookie = ''
-            ua = ""
-            if not use_cookie == "yes":
-                ua = self.ua
-            else:
-                ua = self.cookie[0]["ua"]
-
-            options.add_argument('user-agent="' + ua + '"')
+            options.add_argument('user-agent="' + self.ua + '"')
             options.add_argument('Connection="close"')
             driver = webdriver.Chrome(options=options)
             try:
@@ -131,28 +127,35 @@ class oneThread(threading.Thread):
                     EC.presence_of_element_located((By.XPATH, '//*[@id="su"]'))
                 )
                 if self.use_cookie == 'yes':
-                    if cookie_list_str != '':
-                        driver.delete_all_cookies()
-                        cookie_list_array = cookie_list_str.split(";")
-                        for tmp_cookie in cookie_list_array:
-                            cookie_dict = {
-                                "domain": ".baidu.com",  # 火狐浏览器不用填写，谷歌要需要
-                                'name': tmp_cookie.split("=")[0].strip(),
-                                'value': tmp_cookie.split("=")[1].strip(),
-                                "expires": "",
-                                'path': '/',
-                                'httpOnly': False,
-                                'HostOnly': False,
-                                'Secure': False}
-                            driver.add_cookie(cookie_dict)
-                        driver.refresh()
+                    driver.delete_all_cookies()
+                    this_cookie = self.cookie
+                    cookie_str = this_cookie.cookie
+                    # print(cookie_str)
+                    cookie_list = eval(cookie_str)
+                    for cookie_dict in cookie_list:
+                        driver.add_cookie(cookie_dict)
+                    driver.refresh()
+                    cookies = driver.get_cookies()
+                    this_cookie.cookie = str(cookies)
+                    update_catch_cookies.append(this_cookie)
+                    # print(str(cookies))
                     time.sleep(random.randint(2, 3))
 
                     # 判断是否登录，右上角是否存在那个登录按钮
-                    usernames = driver.find_elements_by_class_name("user-name")
-                    if len(usernames) == 0:
-                        delete_cookies.append(tmp_city_cookie)
+                    # usernames = driver.find_elements_by_class_name("user-name")
+                    # if len(usernames) == 0:
+                    #     delete_cookies.append(self.cookie)
+                else:
+                    cookies = driver.get_cookies()
+                    save_cookie = {}
+                    save_cookie["cookie"] = str(cookies)
+                    save_cookie["ua"] = str(self.ua)
+                    save_cookie["city"] = str(self.city)
+                    save_cookie["zone"] = str(self.county)
+                    save_catch_cookies.append(save_cookie)
                 time.sleep(random.randint(1, 2))
+                # driver.quit()
+                # return
                 # 去掉城市名
                 change_keyword = str(self.first_word)
                 for tmp_city in self.cities:
@@ -161,10 +164,10 @@ class oneThread(threading.Thread):
 
                 # if change_keyword.__len__() > 3:
                 #     change_keyword = change_keyword[0:-2]
-                if random.randint(1, 100)>95:
+                if random.randint(1, 100) > 95:
                     change_keyword = change_keyword + self.city
                 if random.randint(1, 100) > 95:
-                    change_keyword = change_keyword + end_word[random.randint(0, end_word.__len__()-1)]
+                    change_keyword = change_keyword + end_word[random.randint(0, end_word.__len__() - 1)]
 
                 uri = "https://www.baidu.com/s?ie=UTF-8&wd=" + change_keyword + "&f=8&si=" + self.site + "&ct=2097152"
                 driver.get(uri)
@@ -178,10 +181,11 @@ class oneThread(threading.Thread):
                 js = "document.documentElement.scrollTop=document.body.scrollHeight/10*" + str(random.randint(2, 6))
                 driver.execute_script(js)
 
-                if random.randint(1,5)==5:
-                    tops = driver.find_elements_by_xpath("//div[@class='cr-content  new-pmd']//tr[@class='toplist1-tr']")
-                    if tops.__len__()>0:
-                        top = tops[random.randint(0,9)]
+                if random.randint(1, 5) == 5:
+                    tops = driver.find_elements_by_xpath(
+                        "//div[@class='cr-content  new-pmd']//tr[@class='toplist1-tr']")
+                    if tops.__len__() > 0:
+                        top = tops[random.randint(0, 9)]
                         driver.execute_script("arguments[0].scrollIntoView();", top)
                         # 再向上移动200
                         js = "document.documentElement.scrollTop=document.documentElement.scrollTop<=200?document.body.scrollTop:document.documentElement.scrollTop-200"
@@ -218,9 +222,6 @@ class oneThread(threading.Thread):
                         driver.close()
                         windows = driver.window_handles
                         driver.switch_to.window(windows[0])
-
-
-
 
                 time.sleep(1)
                 inputs = driver.find_element_by_id("kw")
@@ -319,7 +320,7 @@ class oneThread(threading.Thread):
                         driver.switch_to.window(windows[-1])
                         self.last_step(word, driver)
                     else:
-                        #判断是否有首页，有则点击
+                        # 判断是否有首页，有则点击
                         dict35 = {}
                         divs35 = driver.find_elements_by_xpath("//div[@class='result c-container new-pmd']")
                         for div in divs35:
@@ -507,7 +508,7 @@ class oneThread(threading.Thread):
 
                         random_num = random.randint(1, 100)
 
-                        if random.randint(1, 5) ==5:
+                        if random.randint(1, 5) == 5:
                             # 标题
                             if random_num > 20:
                                 index = sorted(dict1.items())[0][0]
@@ -564,7 +565,7 @@ class oneThread(threading.Thread):
                         driver.execute_script(js)
                         time.sleep(random.randint(2, 3))
                         random_num = random.randint(1, 100)
-                        if random.randint(1, 5) ==5:
+                        if random.randint(1, 5) == 5:
                             # 标题
                             if random_num > 20:
                                 a = dest.find_element_by_xpath(".//a[1]")
@@ -734,7 +735,7 @@ class oneThread(threading.Thread):
             except Exception as error:
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + " error main process: " + str(error))
                 if 'Connection aborted' in str(error):
-                    delete_cookies.append(tmp_city_cookie)
+                    delete_cookies.append(self.cookie)
                 driver.quit()
                 # print('traceback.print_exc():' + str(traceback.print_exc()))
         except Exception as error:
@@ -782,7 +783,8 @@ class Aclass(object):
         self.fabaos = []
         self.citycookies = []
         self.cities = []
-        self.ourcookies = {}
+        self.cookie_uas = []
+        self.ourcookies = []
 
     def fetch_fabao(self, dba, batch_count):
         dba_ip = dba[0]
@@ -856,27 +858,39 @@ class Aclass(object):
             'mysql+mysqlconnector://' + dba_user + ':' + dba_pwd + '@' + dba_ip + ':' + dba_port + '/youpudb')
         DBSession = sessionmaker(bind=engine)
         session = DBSession()  # 创建session
-        sql = "select a.id,a.ua,a.city,a.zone,b.id as bid,b.domain,b.expiry,b.httpOnly,b.name,b.path,b.secure,b.value from (select * from cookie_list ORDER BY RAND() limit 100) a left join cookie_detail b on a.id = b.cookie_id"
-        cursor = session.execute(sql)
-        result = cursor.fetchall()
-        print("our_cookies count :" + str(len(result)))
-        dict = {}
-        #先提取出id列表
-        ids = []
-        for i in result:
-            if not i["id"] in ids:
-                ids.append(i["id"])
-        #找出id的对应字典
-        for i in ids:
-            list = []
-            for j in result:
-                if j["id"]==i:
-                    list.append(j)
-            dict[i]=list
-        for ourcookie in dict:
-            m = dict.get(ourcookie)
-        self.ourcookies = dict
-        ua = self.ourcookies[random.randint(0, aclass.ourcookies.__len__() - 1)].ua
+        all_count = session.query(func.count(Cookie_catch_list.id)).scalar()
+        if all_count > 50000:
+            x = random.randint(0, all_count - 50000)
+        else:
+            x = 0
+        cookie_catch_list = session.query(Cookie_catch_list).limit(50000).offset(x).all()
+        print("Cookie_catch_list count :" + str(len(cookie_catch_list)))
+        self.ourcookies = cookie_catch_list
+        # cookie_str = cookie_catch_list[0]
+        # cookie_dict = eval(cookie_str.cookie)
+        # for i in cookie_dict:
+        #     one = i
+        #     for m in one:
+        #         print(one[m])
+        # d=1
+
+    def fetch_uas(self, dba):
+        dba_ip = dba[0]
+        dba_port = dba[1]
+        dba_user = dba[2]
+        dba_pwd = dba[3]
+        engine = create_engine(
+            'mysql+mysqlconnector://' + dba_user + ':' + dba_pwd + '@' + dba_ip + ':' + dba_port + '/youpudb')
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()  # 创建session
+        all_count = session.query(func.count(Cookie_ua.id)).scalar()
+        if all_count > 50000:
+            x = random.randint(0, all_count - 50000)
+        else:
+            x = 0
+        list = session.query(Cookie_ua).limit(50000).offset(x).all()
+        print("Cookie_ua count :" + str(len(list)))
+        self.cookie_uas = list
 
     def fetch_mipcms_fabao_server_switch(self, dba):
         dba_ip = dba[0]
@@ -1004,6 +1018,7 @@ if __name__ == '__main__':
         try:
             aclass.fetch_our_cookies(dba)
             aclass.fetch_cookies(dba)
+            aclass.fetch_uas(dba)
             aclass.fetch_cities(dba)
         except Exception as err:
             print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
@@ -1019,12 +1034,40 @@ if __name__ == '__main__':
             except Exception as err:
                 print(time.strftime("%Y-%m-%d %H:%M:%S") + " " + str(err))
                 time.sleep(60)
+
+            # 保存获取的临时cookie
+            if len(save_catch_cookies) > 0:
+                objects = []
+                for item in save_catch_cookies:
+                    objects.append(
+                        Cookie_catch_list(ua=item['ua'], city=item['city'], zone=item['zone'], cookie=item['cookie']))
+                session.bulk_save_objects(objects)
+                session.commit()
             if len(not_exist_zone) > 0:
                 filename = 'not_exist_zone.txt'
                 with open(filename, 'a', encoding='utf8') as file_object:
                     for x in not_exist_zone:
                         file_object.write(x + "\n")
                     file_object.close()
+            #满500提交一次更新
+            if len(update_catch_cookies) >= 500:
+                bbb = update_catch_cookies
+                try:
+                    engine = create_engine(
+                        'mysql+mysqlconnector://' + dba_user + ':' + dba_pwd + '@' + dba_ip + ':' + dba_port + '/youpudb')
+                    # engine = create_engine('mysql+mysqlconnector://youpudb:Youpu123@wtc.cn:3306/youpudb')
+                    DBSession = sessionmaker(bind=engine)
+                    session = DBSession()  # 创建session
+                    save_objs = [{'id': obj.id, 'cookie': obj.cookie, 'ua': obj.ua, 'city': obj.city,
+                                  'zone': obj.zone} for
+                                 obj in bbb]
+                    session.bulk_update_mappings(Cookie_catch_list, save_objs)
+                    session.commit()
+                    update_catch_cookies = []
+                except Exception as err:
+                    time.sleep(60 * 10)
+                    print(time.strftime("%Y-%m-%d %H:%M:%S") + " update Cookie_catch_list error " + str(err))
+
             if len(gids) >= int(commit_count):
                 aaa = gids
                 try:
@@ -1113,21 +1156,21 @@ if __name__ == '__main__':
                     loop_count = loop_count + 1
                     tmp_ips = []
                     for ip in ips:
-                        if use_cookie == 'yes':
-                            # 根据ip获取阿里ip的地域
-                            ali_result = aliip.requesturl(ip["origin_ip"])
-                            json_result = json.loads(ali_result)
-                            ip["City"] = json_result["City"]
-                            ip["County"] = json_result["County"]
-                            all_ips.append(ip)
+                        # if use_cookie == 'yes':
+                        # 根据ip获取阿里ip的地域
+                        ali_result = aliip.requesturl(ip["origin_ip"])
+                        json_result = json.loads(ali_result)
+                        ip["City"] = json_result["City"]
+                        ip["County"] = json_result["County"]
+                        all_ips.append(ip)
 
-                            if json_result["City"] != '' and json_result["County"] != '':
-                                tmp_ips.append(ip)
-                        else:
-                            ip["City"] = ip["city"]
-                            ip["County"] = ''
-                            all_ips.append(ip)
+                        if json_result["City"] != '' and json_result["County"] != '':
                             tmp_ips.append(ip)
+                    # else:
+                    #     ip["City"] = ip["city"]
+                    #     ip["County"] = ''
+                    #     all_ips.append(ip)
+                    #     tmp_ips.append(ip)
                     # 这批ip使用10次
                     for n in range(int(pool_num)):
                         # for n in range(1):
@@ -1164,38 +1207,42 @@ if __name__ == '__main__':
                                 if fabaos_tmp == "":
                                     fabaos_tmp = aclass.fabaos.pop(0)
                                 site = fabaos_tmp["site"]
-                                #找所有的此site的对象
+                                # 找所有的此site的对象
                                 fabao_array = []
                                 for fabao in aclass.fabaos:
                                     if site == fabao["site"]:
                                         fabao_array.append(fabao)
-                                first_word =''
-                                if len(fabao_array)>0:
+                                first_word = ''
+                                if len(fabao_array) > 0:
                                     first_word = fabao_array[random.randint(0, len(fabao_array) - 1)]["keyword"]
 
-                                if first_word =='':
+                                if first_word == '':
                                     first_word = fabaos_tmp["keyword"]
-                                #找出我们的cookie里是否有合适的，没有就不带cookie，有就80%概率用此城市的cookie，20%不带cookie
+                                # 找出我们的cookie里是否有合适的，没有就不带cookie，有就80%概率用此城市的cookie，20%不带cookie
                                 have_city = False
                                 tmp_cookie = []
                                 for ourcookie in aclass.ourcookies:
-                                    if aclass.ourcookies.get(ourcookie)[0]["city"] == ip["City"] and aclass.ourcookies.get(ourcookie)[0]["zone"] == ip["County"]:
-                                        tmp_cookie = aclass.ourcookies.pop(ourcookie)
+                                    if ourcookie.city == ip["City"] and ourcookie.zone == ip["County"]:
+                                        tmp_cookie = aclass.ourcookies.pop(aclass.ourcookies.index(ourcookie))
                                         have_city = True
 
                                 ua = ""
-                                if have_city or random.randint(1,10)>2:
-                                    use_cookie = "no"
-                                    #找一个随机的ua
-                                    ua = aclass.ourcookies[random.sample(aclass.ourcookies.keys(), 1)[0]][0]["ua"]
-
+                                tmp_use_cookie = use_cookie
+                                if have_city and random.randint(1, 10) >2:
+                                    ua = tmp_cookie.ua
+                                else:
+                                    tmp_use_cookie = "no"
+                                    # 找一个随机的ua
+                                    # ua = aclass.ourcookies[random.sample(aclass.ourcookies.keys(), 1)[0]][0]["ua"]
+                                    ua = aclass.cookie_uas[random.randint(0, aclass.cookie_uas.__len__() - 1)].ua
+                                print(have_city)
                                 one = oneThread(fabaos_tmp, site,
                                                 "--proxy-server=http://" + ip["ip"] + ":" + ip["port"], ip["origin_ip"],
                                                 ip["City"], ip["County"],
                                                 tmp_cookie, show_window,
                                                 "http://" + ip["ip"] + ":" + ip["port"], n,
-                                                int(open_chrome_sec) * int(num), int(ip_min), int(pool_num), use_cookie,
-                                                aclass.cities,first_word,ua)
+                                                int(open_chrome_sec) * int(num), int(ip_min), int(pool_num), tmp_use_cookie,
+                                                aclass.cities, first_word, ua)
                                 threads.append(one)
                         for thread in threads:
                             thread.start()
@@ -1220,7 +1267,7 @@ if __name__ == '__main__':
                 except Exception as err:
                     print(time.strftime("%Y-%m-%d %H:%M:%S") + " error 8: " + str(err))
                     # print('traceback.print_exc():' + str(traceback.print_exc()))
-                time.sleep(120)
+                # time.sleep(120)
             else:
                 print("fetchdb")
                 try:
